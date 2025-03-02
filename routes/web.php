@@ -30,8 +30,8 @@ Route::prefix('checkout')->group(function () {
 	Route::get('/setPaymentMethod', [CheckoutController::class, 'setPaymentMethod'])->name('checkout.payment');
 });
 
-Route::prefix('shoppingCart')->group(function () {
-	Route::get('/cart', [ShoppingCartController::class, 'showCart'])->name('cart.index');
+Route::prefix('cart')->group(function () {
+	Route::get('/', [ShoppingCartController::class, 'showCart'])->name('cart.index');
 	Route::post('/addItem', [ShoppingCartController::class, 'addItem'])->name('shoppingCart.addItem');
 	Route::post('/updateCartItem', [ShoppingCartController::class, 'updateCartItem'])->name('shoppingCart.updateCartItem');
 	Route::get('/removeItem', [ShoppingCartController::class, 'removeItem'])->name('shoppingCart.removeItem');

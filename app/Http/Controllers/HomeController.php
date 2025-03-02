@@ -49,8 +49,10 @@ class HomeController extends Controller
 
 	public function login(): View
 	{
+		// TODO
+
 		// Passing data to the view
-		return view('myAccount', ['classActiveLogin' => true]);
+		// return view('profile', ['classActiveLogin' => true]);
 	}
 
 	public function about(): View
