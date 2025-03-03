@@ -24,23 +24,14 @@
 ----------------------------------------------------------
 -- Create the users table
 DROP TABLE IF EXISTS users;
--- CREATE TABLE users (
--- 	id BIGSERIAL PRIMARY KEY,
--- 	email VARCHAR(50) UNIQUE NOT NULL,
--- 	password_hash TEXT NOT NULL,
--- 	first_name VARCHAR(50),
--- 	last_name VARCHAR(50),
--- 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
--- 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
--- );
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
-	first_name VARCHAR(255) NULL,
-	last_name VARCHAR(255) NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    email_verified_at TIMESTAMP NULL,
+	first_name VARCHAR(255),
+	last_name VARCHAR(255),
+    email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    remember_token VARCHAR(100) NULL,
+    email_verified_at TIMESTAMP,
+    remember_token VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -79,8 +70,7 @@ CREATE TABLE book_categories (
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
 	id BIGSERIAL PRIMARY KEY,
-	-- completed, pending, cancelled
-	order_status VARCHAR(20) DEFAULT 'pending',
+	order_status VARCHAR(20) DEFAULT 'pending' NOT NULL, -- completed, pending, cancelled
 	order_total DECIMAL(19, 2) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -91,8 +81,7 @@ CREATE TABLE orders (
 DROP TABLE IF EXISTS order_books;
 CREATE TABLE order_books (
 	quantity SMALLINT NOT NULL,
-	-- price of the book at the time of purchase, which might differ from the current price
-	price DECIMAL(19, 2) NOT NULL,
+	price DECIMAL(19, 2) NOT NULL, -- price of the book at the time of purchase, which might differ from the current price
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	order_id BIGINT,
@@ -104,25 +93,21 @@ DROP TABLE IF EXISTS reviews;
 CREATE TABLE reviews (
 	id SERIAL PRIMARY KEY,
 	-- 1 to 5 stars
-	rating SMALLINT CHECK (
-		rating >= 1
-		AND rating <= 5
-	),
+	rating SMALLINT CHECK (rating >= 1 AND rating <= 5) NOT NULL,
 	review_comment TEXT,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	book_id BIGINT,
-	user_id BIGINT
+	book_id BIGINT NOT NULL,
+	user_id BIGINT NOT NULL,
 );
 -- Create the payments table
 -- Order can have multiple payments (for example, couple of failed payment attempts before successful payment)
 DROP TABLE IF EXISTS payments;
 CREATE TABLE payments (
 	id BIGSERIAL PRIMARY KEY,
-	amount DECIMAL(19, 2),
-	transaction_id TEXT,
-	-- success, pending, failed
-	payment_status VARCHAR(20),
+	amount DECIMAL(19, 2) NOT NULL,
+	transaction_id VARCHAR(255) NOT NULL,
+	payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL, -- success, pending, failed
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	order_id BIGINT
@@ -131,12 +116,14 @@ CREATE TABLE payments (
 -- Foreign Key Constraints
 ----------------------------------------------------------
 ALTER TABLE reviews
-ADD CONSTRAINT FK_reviews_books FOREIGN KEY (book_id) REFERENCES books(id) ON UPDATE CASCADE ON DELETE
-SET NULL;
+	ADD CONSTRAINT FK_reviews_books FOREIGN KEY (book_id) REFERENCES books(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 --
 ALTER TABLE reviews
-ADD CONSTRAINT FK_reviews_users FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE
-SET NULL;
+ADD CONSTRAINT FK_reviews_users FOREIGN KEY (user_id) REFERENCES users(id)
+	ON UPDATE CASCADE
+	ON DELETE CASCADE;
 --
 ALTER TABLE orders
 ADD CONSTRAINT FK_orders_users FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE
