@@ -8,7 +8,7 @@ use App\Models\ShoppingCart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class ShoppingCartController extends Controller
+class CartController extends Controller
 {
 	/**
 	 * Display the shopping cart.

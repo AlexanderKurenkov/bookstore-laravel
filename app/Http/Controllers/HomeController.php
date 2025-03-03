@@ -34,7 +34,8 @@ class HomeController extends Controller
 		// UserShippingService $userShippingService,
 		// OrderService $orderService,
 		// CartItemService $cartItemService
-	) {
+	)
+	{
 		// $this->userService = $userService;
 		// $this->userPaymentService = $userPaymentService;
 		// $this->userShippingService = $userShippingService;
@@ -49,10 +50,7 @@ class HomeController extends Controller
 
 	public function login(): View
 	{
-		// TODO
-
-		// Passing data to the view
-		// return view('profile', ['classActiveLogin' => true]);
+		return view('auth.login');
 	}
 
 	public function about(): View
@@ -70,7 +68,7 @@ class HomeController extends Controller
 		$user = Auth::user(); // Get the currently authenticated user
 		$bookList = Book::all(); // Fetch all books
 
-		return view('catalog', [
+		return view('catalog.index', [
 			'user' => $user,               // Pass the user data to the view
 			'bookList' => $bookList,       // Pass the list of books to the view
 			'activeAll' => true            // Add additional data for the view
@@ -84,12 +82,11 @@ class HomeController extends Controller
 
 		$qtyList = range(1, 10); // Generate a list of quantities
 
-		return view('book', [
+		return view('catalog.book', [
 			'user' => $user,         // Pass the user data to the view
 			'book' => $book,         // Pass the book details to the view
 			'qtyList' => $qtyList,   // Pass the quantity list to the view
 			'qty' => 1               // Default quantity
 		]);
 	}
-
 }
