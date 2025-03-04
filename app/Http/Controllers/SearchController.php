@@ -3,18 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class SearchController extends Controller
 {
+	// Shows advanced search form.
+	public function index(): View
+    {
+        return view('search.index'); // View for the advanced search form
+    }
+
 	/**
-	 * Search books by category.
+	 * Search books by title or description.
 	 */
-	public function searchByCategory(Request $request): \Illuminate\View\View
+	public function results(Request $request): View
 	{
-		$category = $request->query('category');
+		$query = $request->input('query'); // Get search term
 		$user = Auth::user();
 
 		$viewData = [];
@@ -23,46 +29,18 @@ class SearchController extends Controller
 			$viewData['user'] = $user;
 		}
 
-		$classActiveCategory = 'active' . preg_replace('/[&\s]+/', '', $category);
-		$viewData[$classActiveCategory] = true;
-
-		$bookList = Book::where('category', $category)->get();
-
-		if ($bookList->isEmpty()) {
-			$viewData['emptyList'] = true;
-			return view('catalog', $viewData);
-		}
-
-		$viewData['bookList'] = $bookList;
-
-		return view('catalog', $viewData);
-	}
-
-	/**
-	 * Search books by keyword.
-	 */
-	public function searchByTitle(Request $request): \Illuminate\View\View
-	{
-		$keyword = $request->input('keyword');
-		$user = Auth::user();
-
-		$viewData = [];
-
-		if ($user) {
-			$viewData['user'] = $user;
-		}
-
-		$bookList = Book::where('title', 'LIKE', "%$keyword%")
-			->orWhere('description', 'LIKE', "%$keyword%")
+		$bookList = Book::where('title', 'ILIKE', "%$query%")
+			->orWhere('description', 'ILIKE', "%$query%")
 			->get();
 
+
 		if ($bookList->isEmpty()) {
 			$viewData['emptyList'] = true;
-			return view('catalog', $viewData);
+			return view('catalog.index', $viewData);
 		}
 
 		$viewData['bookList'] = $bookList;
 
-		return view('catalog', $viewData);
+		return view('catalog.index', $viewData);
 	}
 }

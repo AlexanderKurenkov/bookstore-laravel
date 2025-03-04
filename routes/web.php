@@ -33,15 +33,17 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
 });
 
 Route::prefix('cart')->name('cart.')->group(function () {
-    Route::get('/', [CartController::class, 'show'])->name('index');
-    Route::post('/items', [CartController::class, 'storeItem'])->name('items.store');
-    Route::patch('/items/{id}', [CartController::class, 'updateItem'])->name('items.update');
-    Route::delete('/items/{id}', [CartController::class, 'destroyItem'])->name('items.destroy');
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('/item', [CartController::class, 'storeItem'])->name('item.store');
+    Route::patch('/item/{id}', [CartController::class, 'updateItem'])->name('item.update');
+    Route::delete('/item/{id}', [CartController::class, 'destroyItem'])->name('item.destroy');
 });
 
 Route::prefix('search')->name('search.')->group(function () {
-    Route::get('/category', [SearchController::class, 'byCategory'])->name('category');
-    Route::post('/books', [SearchController::class, 'byBook'])->name('books');
+    // Shows advanced search form.
+    Route::get('/', [SearchController::class, 'index'])->name('index');
+    // GET method for search allows users to bookmark search results.
+    Route::get('/results', [SearchController::class, 'results'])->name('results');
 });
 
 // Route::get('/dashboard', function () {
