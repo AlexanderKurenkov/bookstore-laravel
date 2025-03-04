@@ -9,16 +9,16 @@
 -- 3) cd into a folder with a schema.sql file
 -- 4) execute schema.sql
 -- 	$ psql -U <user> -d bookstore -f schema.sql
--- 	$ psql -U postgres -d bookstore -f schema.sql
+-- 		$ psql -U postgres -d bookstore -f schema.sql
 ----------------------------------------------------------
 -- Tables
 ----------------------------------------------------------
 -- users
 -- books
 -- categories
--- book_categories -- join table
+-- books_categories -- join table
 -- orders
--- order_books -- join table
+-- orders_books -- join table
 -- reviews
 -- payments
 ----------------------------------------------------------
@@ -60,10 +60,10 @@ CREATE TABLE categories (
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 -- modeling a many-to-many relationship between books and categories
-DROP TABLE IF EXISTS book_categories;
-CREATE TABLE book_categories (
-	book_id BIGINT,
-	category_id BIGINT,
+DROP TABLE IF EXISTS books_categories;
+CREATE TABLE books_categories (
+	book_id BIGINT NOT NULL,
+	category_id BIGINT NOT NULL,
 	PRIMARY KEY (book_id, category_id)
 );
 -- Create the orders table
@@ -74,21 +74,21 @@ CREATE TABLE orders (
 	order_total DECIMAL(19, 2) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	user_id BIGINT
+	user_id BIGINT NOT NULL
 );
--- Create the cart_item table
+-- Create the orders_books table
 -- modeling a many-to-many relationship between orders and books
-DROP TABLE IF EXISTS order_books;
-CREATE TABLE order_books (
+DROP TABLE IF EXISTS orders_books;
+CREATE TABLE orders_books (
 	quantity SMALLINT NOT NULL,
 	price DECIMAL(19, 2) NOT NULL, -- price of the book at the time of purchase, which might differ from the current price
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	order_id BIGINT,
-	book_id BIGINT,
+	order_id BIGINT NOT NULL,
+	book_id BIGINT NOT NULL,
 	PRIMARY KEY (order_id, book_id)
 );
--- Reviews Table
+-- Reviews table
 DROP TABLE IF EXISTS reviews;
 CREATE TABLE reviews (
 	id SERIAL PRIMARY KEY,
@@ -98,7 +98,7 @@ CREATE TABLE reviews (
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	book_id BIGINT NOT NULL,
-	user_id BIGINT NOT NULL,
+	user_id BIGINT NOT NULL
 );
 -- Create the payments table
 -- Order can have multiple payments (for example, couple of failed payment attempts before successful payment)
@@ -110,7 +110,7 @@ CREATE TABLE payments (
 	payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL, -- success, pending, failed
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	order_id BIGINT
+	order_id BIGINT NOT NULL
 );
 ----------------------------------------------------------
 -- Foreign Key Constraints
@@ -121,33 +121,43 @@ ALTER TABLE reviews
 		ON DELETE CASCADE;
 --
 ALTER TABLE reviews
-ADD CONSTRAINT FK_reviews_users FOREIGN KEY (user_id) REFERENCES users(id)
-	ON UPDATE CASCADE
-	ON DELETE CASCADE;
+	ADD CONSTRAINT FK_reviews_users FOREIGN KEY (user_id) REFERENCES users(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
+--
+-- prevent users from reviewing the same book multiple times
+ALTER TABLE reviews
+	ADD CONSTRAINT UNIQUE_user_book_review UNIQUE (user_id, book_id);
 --
 ALTER TABLE orders
-ADD CONSTRAINT FK_orders_users FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE
-SET NULL;
+	ADD CONSTRAINT FK_orders_users FOREIGN KEY (user_id) REFERENCES users(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 --
 ALTER TABLE payments
-ADD CONSTRAINT FK_payments_orders FOREIGN KEY (order_id) REFERENCES orders(id) ON UPDATE CASCADE ON DELETE
-SET NULL;
+	ADD CONSTRAINT FK_payments_orders FOREIGN KEY (order_id) REFERENCES orders(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 --
-ALTER TABLE book_categories
-ADD CONSTRAINT FK_book_categories_books FOREIGN KEY (book_id) REFERENCES books(id) ON UPDATE CASCADE ON DELETE
-SET NULL;
+ALTER TABLE books_categories
+	ADD CONSTRAINT FK_books_categories_books FOREIGN KEY (book_id) REFERENCES books(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 --
-ALTER TABLE book_categories
-ADD CONSTRAINT FK_book_categories_categories FOREIGN KEY (category_id) REFERENCES categories(id) ON UPDATE CASCADE ON DELETE
-SET NULL;
+ALTER TABLE books_categories
+	ADD CONSTRAINT FK_books_categories_categories FOREIGN KEY (category_id) REFERENCES categories(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 --
-ALTER TABLE order_books
-ADD CONSTRAINT FK_order_books_books FOREIGN KEY (book_id) REFERENCES books(id) ON UPDATE CASCADE ON DELETE
-SET NULL;
+ALTER TABLE orders_books
+	ADD CONSTRAINT FK_orders_books_books FOREIGN KEY (book_id) REFERENCES books(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 --
-ALTER TABLE order_books
-ADD CONSTRAINT FK_order_books_orders FOREIGN KEY (order_id) REFERENCES orders(id) ON UPDATE CASCADE ON DELETE
-SET NULL;
+ALTER TABLE orders_books
+	ADD CONSTRAINT FK_orders_books_orders FOREIGN KEY (order_id) REFERENCES orders(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 ----------------------------------------------------------
 -- Triggers
 ----------------------------------------------------------
@@ -159,25 +169,25 @@ END;
 $$ LANGUAGE plpgsql;
 -- Add the trigger to the `users` table
 CREATE TRIGGER update_timestamp_in_users BEFORE
-UPDATE ON users FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+	UPDATE ON users FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 -- Add the trigger to the `books` table
 CREATE TRIGGER update_timestamp_in_books BEFORE
-UPDATE ON books FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+	UPDATE ON books FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 -- Add the trigger to the `categories` table
 CREATE TRIGGER update_timestamp_in_categories BEFORE
-UPDATE ON categories FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+	UPDATE ON categories FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 -- Add the trigger to the `reviews` table
 CREATE TRIGGER update_timestamp_in_reviews BEFORE
-UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+	UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 -- Add the trigger to the `orders` table
 CREATE TRIGGER update_timestamp_in_orders BEFORE
-UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `order_books` table
-CREATE TRIGGER update_timestamp_in_order_books BEFORE
-UPDATE ON order_books FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+	UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+-- Add the trigger to the `orders_books` table
+CREATE TRIGGER update_timestamp_in_orders_books BEFORE
+	UPDATE ON orders_books FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 -- Add the trigger to the `payments` table
 CREATE TRIGGER update_timestamp_in_payments BEFORE
-UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+	UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 ----------------------------------------------------------
 -- Indices
 ----------------------------------------------------------
@@ -188,9 +198,9 @@ CREATE INDEX idx_reviews_user_id ON reviews(user_id);
 CREATE INDEX idx_orders_user_id ON orders(user_id);
 -- `payments`
 CREATE INDEX idx_payments_order_id ON payments(order_id);
--- `book_categories` (composite key)
-CREATE INDEX idx_book_categories_book_id ON book_categories(book_id);
-CREATE INDEX idx_book_categories_category_id ON book_categories(category_id);
--- `order_books` (composite key)
-CREATE INDEX idx_order_books_order_id ON order_books(order_id);
-CREATE INDEX idx_order_books_book_id ON order_books(book_id);
+-- `books_categories` (composite key)
+CREATE INDEX idx_books_categories_book_id ON books_categories(book_id);
+CREATE INDEX idx_books_categories_category_id ON books_categories(category_id);
+-- `orders_books` (composite key)
+CREATE INDEX idx_orders_books_order_id ON orders_books(order_id);
+CREATE INDEX idx_orders_books_book_id ON orders_books(book_id);

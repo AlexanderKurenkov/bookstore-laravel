@@ -63,7 +63,7 @@ INSERT INTO categories (name, description) VALUES
 	('Классика', 'Произведения, проверенные временем'),
 	('Поэзия', 'Сборники стихотворений и поэм');
 
-INSERT INTO book_categories (book_id, category_id) VALUES
+INSERT INTO books_categories (book_id, category_id) VALUES
     (1, 9),  -- "Преступление и наказание" -> Классика
     (2, 9),  -- "Война и мир" -> Классика
     (2, 4),  -- "Война и мир" -> История
@@ -91,7 +91,7 @@ VALUES
     ('cancelled', 899.00, 4),
     ('completed', 2799.00, 3);
 
-INSERT INTO order_books (quantity, price, order_id, book_id)
+INSERT INTO orders_books (quantity, price, order_id, book_id)
 VALUES
     (2, 799.99, 1, 1),  -- 2 copies of book with ID 1 for order with ID 1
     (1, 1499.50, 2, 2), -- 1 copy of book with ID 2 for order with ID 2
