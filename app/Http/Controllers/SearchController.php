@@ -41,7 +41,7 @@ class SearchController extends Controller
 	/**
 	 * Search books by keyword.
 	 */
-	public function searchBook(Request $request): \Illuminate\View\View
+	public function searchByTitle(Request $request): \Illuminate\View\View
 	{
 		$keyword = $request->input('keyword');
 		$user = Auth::user();
