@@ -3,64 +3,115 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Order;
+use App\Services\CartService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class CartController extends Controller
 {
+	protected CartService $cartService;
+
+	public function __construct(CartService $cartService)
+	{
+		$this->cartService = $cartService;
+	}
+
 	/**
-	 * Display the shopping cart.
+	 * Display all itmes in the shopping cart.
 	 */
 	public function index(): View
 	{
+		// Get the authenticated user
 		$user = Auth::user();
-		// TODO
-		// $shoppingCart = $user->shoppingCart;
-		// $cartItemList = $shoppingCart->cartItems;
 
-		// Ensure the shopping cart is updated (assume a service or model method exists for this logic)
-		$shoppingCart->updateCart();
+		// Fetch the user's open order (cart)
+		$order = $user->orders->where('order_status', 'pending')->first();
 
-		return view('cart.index', [
-			'cartItemList' => $cartItemList,
-			'shoppingCart' => $shoppingCart,
+		if (!$order) {
+			// If no pending order, create one (i.e., empty cart)
+			$order = Order::create([
+				'user_id' => $user->id,
+				'order_status' => 'pending',
+				'order_total' => 0.0,
+			]);
+		}
+
+		$orderItems = $order->books; // Get the books in the order
+
+		return view('cart', [
+			'order' => $order,
+			'orderItems' => $orderItems
 		]);
+
+		// return view('cart', [
+		// 	'cartItemList' => $this->cartService->getAllItems(),
+		// ]);
 	}
 
 	/**
 	 * Add an item to the shopping cart.
 	 */
-	public function storeItem(Request $request): \Illuminate\Http\RedirectResponse
+	public function storeItem(Request $request): RedirectResponse
 	{
 		$user = Auth::user();
 		$book = Book::findOrFail($request->input('book_id'));
-		$qty = (int)$request->input('qty');
+		$quantity = (int) $request->input('qty');
 
-		if ($qty > $book->in_stock_number) {
-			return redirect()->route('book', ['id' => $book->id])
-				->with('notEnoughStock', true);
+		// Fetch the user's open order (cart)
+		$order = $user->orders()->where('order_status', 'pending')->first();
+
+		if (!$order) {
+			// If no pending order exists, create one
+			$order = Order::create([
+				'user_id' => $user->id,
+				'order_status' => 'pending',
+				'order_total' => 0.0,
+			]);
 		}
 
-		// TODO
-		// Assume addBookToCartItem is a method implemented in the ShoppingCart or CartItem model/service
-		// Book::addBookToCartItem($book, $user, $qty);
+		// Check if the book is already in the order
+		$existingItem = $order->books()->where('book_id', $book->id)->first();
 
-		return redirect()->route('catalog', ['id' => $book->id])
+		if ($existingItem) {
+			// If the book is already in the order, update the quantity
+			$existingItem->pivot->quantity += $quantity;
+			$existingItem->pivot->save();
+		} else {
+			// Add new book to the order
+			$order->books()->attach($book->id, [
+				'quantity' => $quantity,
+				'price' => $book->price // Assuming a `price` attribute exists on the Book model
+			]);
+		}
+
+		// Update the order total (recalculate if needed)
+		$this->updateOrderTotal($order);
+
+		return redirect()->route('cart.index')
 			->with('addBookSuccess', true);
+
+		// $success = $this->cartService->addBookToCart(
+		// 	$request->input('book_id'),
+		// 	(int) $request->input('quantity')
+		// );
+
+		// return redirect()->route('cart.index')
+		// 	->with($success ? 'addBookSuccess' : 'notEnoughStock', true);
 	}
 
 	/**
 	 * Update an item in the shopping cart.
 	 */
-	public function updateItem(Request $request): \Illuminate\Http\RedirectResponse
+	public function updateItem(Request $request): RedirectResponse
 	{
 		$cartItemId = $request->input('id');
 		$qty = (int)$request->input('qty');
 
-		$cartItem = Book::findOrFail($cartItemId);
-		$cartItem->qty = $qty;
-		$cartItem->save();
+		// Call the CartService to update the cart item
+		$this->cartService->updateCartItem($cartItemId, $qty);
 
 		return redirect()->route('cart.index');
 	}
@@ -68,13 +119,68 @@ class CartController extends Controller
 	/**
 	 * Remove an item from the shopping cart.
 	 */
-	public function destroyItem(Request $request): \Illuminate\Http\RedirectResponse
+	public function destroyItem(Request $request): RedirectResponse
 	{
-		$cartItemId = $request->query('id');
+		$bookId = $request->query('book_id');
+        $user = Auth::user();
 
-		$cartItem = Book::findOrFail($cartItemId);
-		$cartItem->delete();
+        // Fetch the user's open order (cart)
+        $order = $user->orders->where('order_status', 'pending')->first();
 
-		return redirect()->route('cart.index');
+        if (!$order) {
+            return redirect()->route('cart.index')->with('error', 'No active order found.');
+        }
+
+        // Remove the book from the order
+        $order->books()->detach($bookId);
+
+        // Update the order total
+        $this->updateOrderTotal($order);
+
+        return redirect()->route('cart.index')
+            ->with('removeBookSuccess', true);
+
+		// $this->cartService->removeCartItem($request->query('id'));
+		// return redirect()->route('cart.index');
 	}
+
+	/**
+     * Remove all items from the user's order (cart).
+     */
+    public function clear(): RedirectResponse
+    {
+        $user = Auth::user();
+
+        // Fetch the user's open order (cart)
+        $order = $user->orders->where('order_status', 'pending')->first();
+
+        if (!$order) {
+            return redirect()->route('cart.index')->with('error', 'No active order found.');
+        }
+
+        // Detach all books from the order (empty the cart)
+        $order->books()->detach();
+
+        // Update the order total
+        $this->updateOrderTotal($order);
+
+        return redirect()->route('cart.index')->with('clearCartSuccess', true);
+    }
+
+	/**
+     * Update the order's total price.
+     */
+    private function updateOrderTotal(Order $order)
+    {
+        $total = 0;
+
+        // Calculate the total price of the books in the order
+        foreach ($order->books as $book) {
+            $total += $book->pivot->quantity * $book->pivot->price;
+        }
+
+        // Update the order's total price
+        $order->order_total = $total;
+        $order->save();
+    }
 }

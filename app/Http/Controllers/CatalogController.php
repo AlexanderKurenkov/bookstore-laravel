@@ -3,15 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Services\CatalogService;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
 
 class CatalogController extends Controller
 {
+	protected CatalogService $catalogService;
+
+    public function __construct(CatalogService $catalogService)
+    {
+        $this->catalogService = $catalogService;
+    }
+
 	public function index(): View
 	{
 		$user = Auth::user(); // Get the currently authenticated user
-		$bookList = Book::all(); // Fetch all books
+		$bookList = $this->catalogService->getAllBooks(); // Fetch all books
 
 		return view('catalog.index', [
 			'user' => $user,               // Pass the user data to the view
@@ -23,8 +31,7 @@ class CatalogController extends Controller
 	public function show($id): View
 	{
 		$user = Auth::user(); // Get the currently authenticated user
-		$book = Book::findOrFail($id); // Find the book by ID or fail with 404
-
+		$book = $this->catalogService->getBookById($id); // Find the book by ID or fail with 404
 		$qtyList = range(1, 10); // Generate a list of quantities
 
 		return view('catalog.book', [

@@ -7,25 +7,27 @@ use Illuminate\Http\Request;
 use App\Models\BillingAddress;
 use App\Models\ShippingAddress;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class CheckoutController extends Controller
 {
-	public function checkout(Request $request, $cartId)
+	public function show(Request $request, $cartId)
 	{
 		$user = Auth::user();
 
-		if ($cartId != $user->shoppingCart->id) {
-			return redirect()->route('errors.500');
-		}
+		// ? redundant
+		// if ($cartId != $user->shoppingCart->id) {
+		// 	abort(500);
+		// }
 
 		$cartItemList = $this->cartItemService->findByShoppingCart($user->shoppingCart);
 		if ($cartItemList->isEmpty()) {
-			return redirect()->route('shoppingCart.cart')->with('emptyCart', true);
+			return redirect()->route('cart.index')->with('emptyCart', true);
 		}
 
 		foreach ($cartItemList as $cartItem) {
 			if ($cartItem->book->in_stock_number < $cartItem->qty) {
-				return redirect()->route('shoppingCart.cart')->with('notEnoughStock', true);
+				return redirect()->route('cart.index')->with('notEnoughStock', true);
 			}
 		}
 
@@ -61,7 +63,7 @@ class CheckoutController extends Controller
 		));
 	}
 
-	public function checkoutPost(Request $request)
+	public function process(Request $request): View
 	{
 		$user = Auth::user();
 		$shoppingCart = $user->shoppingCart;
