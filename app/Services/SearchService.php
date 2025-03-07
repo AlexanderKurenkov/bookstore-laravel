@@ -13,7 +13,7 @@ class SearchService
             ->get();
     }
 
-    public function prepareViewData($user, $bookList)
+    public function prepareViewData(User $user, $bookList)
     {
         $viewData = [];
 

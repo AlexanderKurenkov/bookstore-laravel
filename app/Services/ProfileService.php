@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class ProfileService
 {
-    public function updateProfile($user, $validatedData)
+    public function updateProfile(User $user, mixed $validatedData)
     {
         $user->fill($validatedData);
 
@@ -19,7 +19,7 @@ class ProfileService
         $user->save();
     }
 
-    public function deleteUser($user)
+    public function deleteUser(User $user)
     {
         Auth::logout();  // Log out the user
         $user->delete(); // Delete the user

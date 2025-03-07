@@ -15,9 +15,4 @@ class CatalogService
     {
         return Book::findOrFail($id);
     }
-
-    public function getQtyList()
-    {
-        return range(1, 10);
-    }
 }

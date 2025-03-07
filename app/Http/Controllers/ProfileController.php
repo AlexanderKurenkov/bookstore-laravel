@@ -65,14 +65,14 @@ class ProfileController extends Controller
         return redirect()->to('/');
     }
 
-    private function validateDeletionRequest(Request $request)
+    private function validateDeletionRequest(Request $request) : void
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
     }
 
-    private function invalidateSession(Request $request)
+    private function invalidateSession(Request $request) : void
     {
         $request->session()->invalidate();    // Invalidate session
         $request->session()->regenerateToken(); // Regenerate CSRF token

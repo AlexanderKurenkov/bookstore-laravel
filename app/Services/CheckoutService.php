@@ -6,7 +6,7 @@ use App\Models\Order;
 
 class CheckoutService
 {
-    public function prepareCheckoutData($user)
+    public function prepareCheckoutData(User $user)
     {
         $cartItems = $user->orders()->where('order_status', 'pending')->first()?->books ?? collect();
 
@@ -23,7 +23,7 @@ class CheckoutService
         return compact('cartItems', 'user');
     }
 
-    public function processOrder($user)
+    public function processOrder(User $user)
     {
         $order = Order::create([
             'user_id' => $user->id,
@@ -37,7 +37,7 @@ class CheckoutService
         return ['estimatedDeliveryDate' => now()->addDays(3)];
     }
 
-    private function calculateTotal($user)
+    private function calculateTotal(User $user)
     {
         $order = $user->orders()->where('order_status', 'pending')->first();
         return $order?->books->sum(fn($book) => $book->pivot->quantity * $book->pivot->price) ?? 0;

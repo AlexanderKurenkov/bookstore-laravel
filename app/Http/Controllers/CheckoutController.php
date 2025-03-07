@@ -2,100 +2,43 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Payment;
+use App\Services\CheckoutService;
 use Illuminate\Http\Request;
-use App\Models\BillingAddress;
-use App\Models\ShippingAddress;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class CheckoutController extends Controller
 {
-	public function show(Request $request, $cartId)
-	{
-		$user = Auth::user();
+    protected CheckoutService $checkoutService;
 
-		// ? redundant
-		// if ($cartId != $user->shoppingCart->id) {
-		// 	abort(500);
-		// }
+    public function __construct(CheckoutService $checkoutService)
+    {
+        $this->checkoutService = $checkoutService;
+    }
 
-		$cartItemList = $this->cartItemService->findByShoppingCart($user->shoppingCart);
-		if ($cartItemList->isEmpty()) {
-			return redirect()->route('cart.index')->with('emptyCart', true);
-		}
+    public function show(): View|RedirectResponse
+    {
+        $user = Auth::user();
+        $result = $this->checkoutService->prepareCheckoutData($user);
 
-		foreach ($cartItemList as $cartItem) {
-			if ($cartItem->book->in_stock_number < $cartItem->qty) {
-				return redirect()->route('cart.index')->with('notEnoughStock', true);
-			}
-		}
+        if (isset($result['redirect'])) {
+            return redirect()->route('cart.index')->with($result['redirect']);
+        }
 
-		$userShippingList = $user->userShipping;
-		$userPaymentList = $user->userPayment;
+        return view('checkout', $result);
+    }
 
-		$shippingAddress = new ShippingAddress();
-		$billingAddress = new BillingAddress();
-		$payment = new Payment();
+    public function process(Request $request): View|RedirectResponse
+    {
+        $user = Auth::user();
+        $result = $this->checkoutService->processOrder($user, $request);
 
-		foreach ($userShippingList as $userShipping) {
-			if ($userShipping->is_default) {
-				$this->shippingAddressService->setByUserShipping($userShipping, $shippingAddress);
-			}
-		}
+        if (isset($result['redirect'])) {
+            return redirect()->route('checkout.show')->with($result['redirect']);
+        }
 
-		foreach ($userPaymentList as $userPayment) {
-			if ($userPayment->is_default) {
-				$this->paymentService->setByUserPayment($userPayment, $payment);
-				$this->billingAddressService->setByUserBilling($userPayment->userBilling, $billingAddress);
-			}
-		}
-
-		return view('checkout', compact(
-			'shippingAddress',
-			'payment',
-			'billingAddress',
-			'cartItemList',
-			'userShippingList',
-			'userPaymentList',
-			'user',
-			'cartId'
-		));
-	}
-
-	public function process(Request $request): View
-	{
-		$user = Auth::user();
-		$shoppingCart = $user->shoppingCart;
-
-		$cartItemList = $this->cartItemService->findByShoppingCart($shoppingCart);
-
-		if ($request->billing_same_as_shipping == 'true') {
-			$billingAddress = new BillingAddress($request->shippingAddress->toArray());
-		}
-
-		if ($this->validateRequiredFields($request, $billingAddress)) {
-			return redirect()->route('checkout', ['id' => $shoppingCart->id])->with('missingRequiredField', true);
-		}
-
-		$order = $this->orderService->createOrder($shoppingCart, $request->shippingAddress, $billingAddress, $request->payment, $request->shippingMethod, $user);
-
-		// Optionally send confirmation email
-		// Mail::to($user->email)->send(new OrderConfirmationMail($user, $order));
-
-		$this->shoppingCartService->clearShoppingCart($shoppingCart);
-
-		$estimatedDeliveryDate = now()->addDays($request->shippingMethod == 'groundShipping' ? 5 : 3);
-
-		return view('orderSubmittedPage', compact('estimatedDeliveryDate'));
-	}
-
-	private function validateRequiredFields(Request $request, $billingAddress)
-	{
-		return empty($request->shippingAddress->street1) || empty($request->shippingAddress->city) ||
-			empty($request->shippingAddress->state) || empty($request->shippingAddress->zipcode) ||
-			empty($request->payment->card_number) || empty($request->payment->cvc) ||
-			empty($billingAddress->street1) || empty($billingAddress->city) ||
-			empty($billingAddress->state) || empty($billingAddress->zipcode);
-	}
+		// ? cart view or something different (maybe new view like 'cart.submitted')
+        return view('cart', $result);
+    }
 }
