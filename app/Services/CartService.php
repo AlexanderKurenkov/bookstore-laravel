@@ -11,7 +11,7 @@ class CartService
 	public function getAllItems(User $user) : \Illuminate\Support\Collection | \Illuminate\Database\Eloquent\Collection
 	{
 		$order = $this->getActiveOrder($user);
-		return $order ? $order->books : collect();
+		return $order ? $order->books() : collect();
 	}
 
 	public function addCartItem(User $user, int $bookId, int $qty): bool
@@ -92,7 +92,7 @@ class CartService
 
 	private function updateOrderTotal(Order $order): void
 	{
-		$total = $order->books->sum(fn($book) => $book->pivot->quantity * $book->pivot->price);
+		$total = $order->books()->sum(fn($book) => $book->pivot->quantity * $book->pivot->price);
 		$order->order_total = $total;
 		$order->save();
 	}

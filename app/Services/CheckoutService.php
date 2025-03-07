@@ -7,9 +7,9 @@ use App\Models\User;
 
 class CheckoutService
 {
-    public function prepareCheckoutData(User $user)
+    public function prepareCheckoutData(User $user) : array
     {
-        $cartItems = $user->orders()->where('order_status', 'pending')->first()?->books ?? collect();
+        $cartItems = $user->orders()->where('order_status', 'pending')->first()?->books() ?? collect();
 
         if ($cartItems->isEmpty()) {
             return ['redirect' => ['emptyCart' => true]];
@@ -24,7 +24,7 @@ class CheckoutService
         return compact('cartItems', 'user');
     }
 
-    public function processOrder(User $user)
+    public function processOrder(User $user) : array
     {
         $order = Order::create([
             'user_id' => $user->id,
@@ -38,9 +38,9 @@ class CheckoutService
         return ['estimatedDeliveryDate' => now()->addDays(3)];
     }
 
-    private function calculateTotal(User $user)
+    private function calculateTotal(User $user) : mixed
     {
         $order = $user->orders()->where('order_status', 'pending')->first();
-        return $order?->books->sum(fn($book) => $book->pivot->quantity * $book->pivot->price) ?? 0;
+        return $order?->books()->sum(fn($book) => $book->pivot->quantity * $book->pivot->price) ?? 0;
     }
 }

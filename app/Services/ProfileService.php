@@ -2,13 +2,12 @@
 
 namespace App\Services;
 
-use Illuminate\Http\RedirectResponse;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 
 class ProfileService
 {
-    public function updateProfile(User $user, mixed $validatedData)
+    public function updateProfile(User $user, mixed $validatedData) : bool
     {
         $user->fill($validatedData);
 
@@ -16,12 +15,13 @@ class ProfileService
             $user->email_verified_at = null;
         }
 
-        $user->save();
+        return $user->save();
     }
 
-    public function deleteUser(User $user)
+    public function deleteUser(User $user) : bool
     {
         Auth::logout();  // Log out the user
-        $user->delete(); // Delete the user
+        // Using type casting because Model::delete() returns bool|null.
+        return (bool)$user->delete(); // Delete the user
     }
 }

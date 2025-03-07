@@ -3,17 +3,18 @@
 namespace App\Services;
 
 use App\Models\Book;
+use App\Models\User;
 
 class SearchService
 {
-    public function searchBooks($query)
+    public function searchBooks($query) : mixed
     {
         return Book::where('title', 'ILIKE', "%$query%")
             ->orWhere('description', 'ILIKE', "%$query%")
             ->get();
     }
 
-    public function prepareViewData(User $user, $bookList)
+    public function prepareViewData(User $user, $bookList) : array
     {
         $viewData = [];
 
