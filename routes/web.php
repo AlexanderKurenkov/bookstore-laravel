@@ -5,6 +5,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,8 +14,8 @@ Route::get('/about', [HomeController::class, 'about'])->name('home.about');
 Route::get('/faq', [HomeController::class, 'faq'])->name('home.faq');
 
 Route::prefix('catalog')->name('catalog.')->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('index');
-    Route::get('/book/{id}', [HomeController::class, 'show'])->name('show');
+    Route::get('/', [CatalogController::class, 'index'])->name('index');
+    Route::get('/book/{id}', [CatalogController::class, 'show'])->name('show');
 });
 
 Route::prefix('search')->name('search.')->group(function () {
