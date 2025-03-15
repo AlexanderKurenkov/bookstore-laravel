@@ -21,5 +21,8 @@
     "An unexpected error has occurred": "Возникла непредвиденная ошибка",
     "Server error": "Ошибка сервера",
     "Page not found": "Запрашиваемая страница не найдена",
-    "To the main page": "На главную"
+    "To the main page": "На главную",
+    "Book catalog": "Каталог",
+    "Add to cart": "В корзину",
+    "Checkout" : "Оформить"
 }

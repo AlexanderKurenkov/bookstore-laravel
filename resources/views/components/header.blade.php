@@ -5,7 +5,7 @@
 
     <!-- Bootstrap core CSS -->
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
 
     <!-- Custom styles -->
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
