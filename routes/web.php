@@ -18,6 +18,13 @@ Route::prefix('catalog')->name('catalog.')->group(function () {
     Route::get('/book/{id}', [CatalogController::class, 'show'])->name('show');
 });
 
+Route::prefix('reviews')->name('reviews.')->group(function () {
+    Route::get('/', [ReviewController::class, 'index'])->name('index');
+    Route::post('/', [ReviewController::class, 'store'])->name('store');
+    Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
+    Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
+});
+
 Route::prefix('search')->name('search.')->group(function () {
     // Shows advanced search form.
     Route::get('/', [SearchController::class, 'index'])->name('index');
@@ -26,7 +33,7 @@ Route::prefix('search')->name('search.')->group(function () {
 });
 
 // Protected routes.
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // No need to include {id} in the URL path for the profile routes because
     // profile belongs to the authenticated user.
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -49,13 +56,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/{cartId}', [CheckoutController::class, 'process'])->name('process');
         // Route::patch('/shipping', [CheckoutController::class, 'updateShipping'])->name('shipping');
         // Route::patch('/payment', [CheckoutController::class, 'updatePayment'])->name('payment');
-    });
-
-    Route::prefix('reviews')->name('reviews.')->group(function () {
-        Route::get('/', [ReviewController::class, 'index'])->name('index');
-        Route::post('/', [ReviewController::class, 'store'])->name('store');
-        Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
-        Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
     });
 });
 

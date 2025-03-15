@@ -11,10 +11,12 @@
     <main class="d-flex align-items-center justify-content-center flex-grow-1">
         <div class="row" style="margin-top:10px">
             <div class="text-center">
-				<h2>500<br>Ошибка сервера</h2>
+				<h2>500<br>{{__('Server error')}}</h2>
                 <br>
                 <h4>
-                    <a href="{{ route('index') }}" class="text-decoration-none">На главную</a>
+                    <a href="{{ route('index') }}" class="text-decoration-none">
+                        {{ __('To the main page')}}
+                    </a>
                 </h4>
             </div>
         </div>

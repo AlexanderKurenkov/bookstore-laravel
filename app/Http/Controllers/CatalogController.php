@@ -20,14 +20,9 @@ class CatalogController extends Controller
 		// TODO not only authenticated user can view the catalog - maybe no need to pass user to the view at all?
 		// ?
 		// $user = Auth::user(); // Get the currently authenticated user
-		$bookList = $this->catalogService->getAllBooks(); // Fetch all books
+		$books = $this->catalogService->getAllBooks()->paginate(8); // Fetch all books & paginate
 
-		return view('catalog.index', [
-			// ?
-			// 'user' => $user,               // Pass the user data to the view
-			'bookList' => $bookList,       // Pass the list of books to the view
-			'activeAll' => true            // Add additional data for the view
-		]);
+		return view('catalog.index', compact('books'));
 	}
 
 	public function show($id): View

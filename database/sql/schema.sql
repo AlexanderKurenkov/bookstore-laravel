@@ -43,6 +43,7 @@ CREATE TABLE books (
 	title VARCHAR(255) NOT NULL,
 	author VARCHAR(255) NOT NULL,
 	publisher VARCHAR(255) NOT NULL,
+	image_path VARCHAR(255),
 	publication_year SMALLINT NOT NULL,
 	price DECIMAL(19, 2) NOT NULL,
 	quantity_in_stock SMALLINT NOT NULL,

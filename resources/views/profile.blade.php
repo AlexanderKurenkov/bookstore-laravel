@@ -1,8 +1,7 @@
-<x-header />
+<x-layout>
 
-<x-navbar />
+    <div class="mt-4">
+        <h1>Profile</h1>
+    </div>
 
-<div class="container mt-4">
-</div>
-
-<x-footer />
+</x-layout>

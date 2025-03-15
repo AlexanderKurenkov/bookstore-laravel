@@ -13,5 +13,13 @@
     "Confirm": "Подтвердить",
     "Confirm password": "Подтвердить пароль",
     "Reset password": "Сбросить пароль",
-    "This is a secure area of the application. Please confirm your password before continuing.": "Данный раздел требует авторизации. Пожалуйста, подтвердите свой пароль, прежде чем продолжить."
+    "This is a secure area of the application. Please confirm your password before continuing": "Данный раздел требует авторизации. Пожалуйста, подтвердите свой пароль, прежде чем продолжить.",
+    "Verify E-mail address": "Подтвердите адрес электронной почты",
+    "Verification link has been sent to the e-mail": "Ссылка для подтверждения была отправлена на ваш электронный адрес.",
+    "Verify your e-mail address": "Подтвердите свой адрес электронной почты",
+    "Resend": "Отправить повторно",
+    "An unexpected error has occurred": "Возникла непредвиденная ошибка",
+    "Server error": "Ошибка сервера",
+    "Page not found": "Запрашиваемая страница не найдена",
+    "To the main page": "На главную"
 }
