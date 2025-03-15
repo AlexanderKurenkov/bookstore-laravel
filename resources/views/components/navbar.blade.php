@@ -1,20 +1,20 @@
 <!-- resources/views/components/navbar.blade.php -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('home.index') }}">Книгочей</a>
+        <a class="navbar-brand" href="{{ route('index') }}">Книгочей</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('home.index') ? 'active' : '' }}" href="{{ route('home.index') }}">Главная</a>
+                    <a class="nav-link {{ request()->routeIs('index') ? 'active' : '' }}" href="{{ route('index') }}">Главная</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('catalog.index') ? 'active' : '' }}" href="{{ route('catalog.index') }}">Каталог</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('home.faq') ? 'active' : '' }}" href="{{ route('home.faq') }}">Вопрос-ответ</a>
+                    <a class="nav-link {{ request()->routeIs('faq') ? 'active' : '' }}" href="{{ route('faq') }}">Вопрос-ответ</a>
                 </li>
             </ul>
 

@@ -1,4 +1,3 @@
-<!-- resources/views/components/footer.blade.php -->
 <footer class="bg-dark text-white text-sm pt-2 pb-0 mb-0" style="font-size: 0.75rem;">
     <div class="container">
         <div class="row">

@@ -1,11 +1,8 @@
-@extends('layouts.guest')
-
-@section('content')
-<div class="container">
-    <div class="row justify-content-center">
+<x-layout>
+    <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Verify Your Email Address') }}</div>
+                <div class="card-header">{{ __('Verify E-mail address') }}</div>
 
                 <div class="card-body">
                     @if (session('status') == 'verification-link-sent')
@@ -15,7 +12,7 @@
                     @endif
 
                     <div class="mb-3">
-                        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}                        
+                        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
                     </div>
 
                     <form class="d-inline" method="POST" action="{{ route('verification.send') }}">
@@ -28,5 +25,4 @@
             </div>
         </div>
     </div>
-</div>
-@endsection
+</x-layout>

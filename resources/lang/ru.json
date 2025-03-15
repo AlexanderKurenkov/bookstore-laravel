@@ -1,0 +1,17 @@
+{
+    "Profile": "Профиль",
+    "Login": "Вход",
+    "E-mail": "E-mail",
+    "Password": "Пароль",
+    "Remember me": "Запомнить меня",
+    "Forgot your password?": "Забыли пароль?",
+    "Log in": "Войти",
+    "Registration": "Регистрация",
+    "Register": "Зарегистрироваться",
+    "Already registered?": "Уже зарегистрированы?",
+    "Name": "Имя",
+    "Confirm": "Подтвердить",
+    "Confirm password": "Подтвердить пароль",
+    "Reset password": "Сбросить пароль",
+    "This is a secure area of the application. Please confirm your password before continuing.": "Данный раздел требует авторизации. Пожалуйста, подтвердите свой пароль, прежде чем продолжить."
+}
