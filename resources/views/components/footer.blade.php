@@ -1,15 +1,15 @@
 <!-- resources/views/components/footer.blade.php -->
-<footer class="bg-dark text-white pt-4 pb-0 mb-0">
+<footer class="bg-dark text-white text-sm pt-2 pb-0 mb-0" style="font-size: 0.75rem;">
     <div class="container">
         <div class="row">
             <!-- About Section -->
             <div class="col-md-4">
-                <h5>О магазине</h5>
+                <h6>О магазине</h6>
                 <p>Книги на любой вкус. Мы стремимся предоставить лучший сервис и качественную продукцию.</p>
             </div>
             <!-- Contact Section -->
             <div class="col-md-4">
-                <h5>Контакты</h5>
+                <h6>Контакты</h6>
                 <ul class="list-unstyled">
                     <li><i class="bi bi-geo-alt"></i> Адрес: ул. Книжная, д. 77, г. Москва</li>
                     <li><i class="bi bi-telephone"></i> Телефон: 8-800-123-45-67</li>
@@ -18,7 +18,7 @@
             </div>
             <!-- Social Media Section -->
             <div class="col-md-4">
-                <h5>Мы в соцсетях</h5>
+                <h6>Мы в соцсетях</h6>
                 <ul class="list-unstyled">
                     <li class="text-white">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-telegram" viewBox="0 0 16 16">
@@ -29,8 +29,8 @@
                 </ul>
             </div>
         </div>
-        <hr class="bg-light">
-        <div class="text-center">
+        <hr class="bg-light mt-0 mb-0">
+        <div class="text-center mt-0 pt-0 mb-0">
             <p class="mb-0">&copy; 2025 Интернет-магазин Книгочей. Все права защищены.</p>
         </div>
     </div>

@@ -1,21 +1,21 @@
-<!-- resources/views/layout.blade.php -->
+<!-- resources/views/components/layout.blade.php -->
 <!DOCTYPE html>
 <html lang="en">
 <x-header />
 
-<body>
+<body class="d-flex flex-column min-vh-100"> <!-- <body> is a flex container -->
+
     <x-navbar />
 
-    <div class="container">
+    <main class="container flex-grow-1"> <!-- content takes available space -->
         {{ $slot }}
-    </div>
+    </main>
 
     <x-footer />
 
-    <div>
-        <script src="{{ asset('js/jquery.min.js') }}"></script>
-        <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-        <script src="{{ asset('js/script.js') }}"></script>
-    </div>
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/script.js') }}"></script>
+
 </body>
 </html>

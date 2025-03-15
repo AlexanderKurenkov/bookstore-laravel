@@ -1,9 +1,3 @@
-<x-header />
-
-<x-navbar />
-
-<div class="container mt-4">
+<x-layout>
 Home
-</div>
-
-<x-footer />
+</x-layout>
