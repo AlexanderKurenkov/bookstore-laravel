@@ -32,6 +32,14 @@ Route::prefix('search')->name('search.')->group(function () {
     Route::get('/results', [SearchController::class, 'results'])->name('results');
 });
 
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::get('/', [CartController::class, 'index'])->name('index');
+    Route::post('/item', [CartController::class, 'storeItem'])->name('item.store');
+    Route::patch('/item/{id}', [CartController::class, 'updateItem'])->name('item.update');
+    Route::delete('/item/{id}', [CartController::class, 'destroyItem'])->name('item.destroy');
+    Route::delete('/', [CartController::class, 'clear'])->name('clear');
+});
+
 // Protected routes.
 Route::middleware(['auth', 'verified'])->group(function () {
     // No need to include {id} in the URL path for the profile routes because
@@ -41,14 +49,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
-    });
-
-    Route::prefix('cart')->name('cart.')->group(function () {
-        Route::get('/', [CartController::class, 'index'])->name('index');
-        Route::post('/item', [CartController::class, 'storeItem'])->name('item.store');
-        Route::patch('/item/{id}', [CartController::class, 'updateItem'])->name('item.update');
-        Route::delete('/item/{id}', [CartController::class, 'destroyItem'])->name('item.destroy');
-        Route::delete('/', [CartController::class, 'clear'])->name('clear');
     });
 
     Route::prefix('checkout')->name('checkout.')->group(function () {
