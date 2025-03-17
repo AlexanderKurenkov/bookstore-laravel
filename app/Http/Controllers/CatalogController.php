@@ -30,15 +30,9 @@ class CatalogController extends Controller
 	{
 		// TODO not only authenticated user can view the catalog - maybe no need to pass user to the view at all?
 		// ?
-		// $user = Auth::user(); // Get the currently authenticated user
 		$book = $this->catalogService->getBookById($id); // Find the book by ID or fail with 404
-		$qtyList = range(1, 10); // Generate a list of quantities
+		// $qtyList = range(1, 10); // Generate a list of quantities
 
-		return view('catalog.book', [
-			// 'user' => $user,         // Pass the user data to the view
-			'book' => $book,         // Pass the book details to the view
-			'qtyList' => $qtyList,   // Pass the quantity list to the view
-			'qty' => 1               // Default quantity
-		]);
+		return view('catalog.book', compact('book'));
 	}
 }

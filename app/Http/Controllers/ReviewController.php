@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use Illuminate\Http\Request;
 use App\Services\ReviewService;
 use Illuminate\Http\RedirectResponse;
@@ -16,10 +17,14 @@ class ReviewController extends Controller
 		$this->reviewService = $reviewService;
 	}
 
-	public function index(): View
+	public function show($id) //: View
 	{
-		$reviews = $this->reviewService->getAllReviews();
-		return view('reviews.index', compact('reviews'));
+		// $reviews = $this->reviewService->getAllReviews($id);
+		// return view('reviews.index', compact('reviews'));
+
+		// $reviews = Book::findOrFail($id)->reviews()->paginate(10);
+		// return response()->json($reviews);
+		return $reviews;
 	}
 
 	public function store(Request $request): RedirectResponse

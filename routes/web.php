@@ -18,12 +18,12 @@ Route::prefix('catalog')->name('catalog.')->group(function () {
     Route::get('/book/{id}', [CatalogController::class, 'show'])->name('show');
 });
 
-Route::prefix('reviews')->name('reviews.')->group(function () {
-    Route::get('/', [ReviewController::class, 'index'])->name('index');
-    Route::post('/', [ReviewController::class, 'store'])->name('store');
-    Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
-    Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
-});
+// Route::prefix('reviews')->name('reviews.')->group(function () {
+//     Route::get('/', [ReviewController::class, 'index'])->name('index');
+//     Route::post('/', [ReviewController::class, 'store'])->name('store');
+//     Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
+//     Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
+// });
 
 Route::prefix('search')->name('search.')->group(function () {
     // Shows advanced search form.
