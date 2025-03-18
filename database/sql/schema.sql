@@ -44,13 +44,31 @@ CREATE TABLE books (
 	author VARCHAR(255) NOT NULL,
 	publisher VARCHAR(255) NOT NULL,
 	image_path VARCHAR(255),
+    sample_page_images TEXT[],     			-- массив URL-адресов изображений c примерами страниц
 	publication_year SMALLINT NOT NULL,
 	price DECIMAL(19, 2) NOT NULL,
-	quantity_in_stock SMALLINT NOT NULL,
+	quantity_in_stock SMALLINT,				-- NULL для цифровых и аудиокниг
 	description TEXT,
+	binding_type VARCHAR(50),       		-- тип переплета: твердый переплет, мягкая обложка (hardcover, paperback); NULL для цифровых и аудиокниг
+    publication_type VARCHAR(50) NOT NULL,	-- тип издания: печатное, цифровое, аудиокнига (physical, ebook, audiobook)
+    isbn VARCHAR(20) NOT NULL,				-- International Standard Book Number
+    edition VARCHAR(50),            		-- издание (например, "2-е издание")
+    language VARCHAR(50) NOT NULL,			-- язык (например, русский, английский)
+    pages SMALLINT,                 		-- общее число страниц
+	weight DECIMAL(10, 2),					-- вес книги
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create the user_favorites table to track favorite books for each user
+DROP TABLE IF EXISTS user_favorites;
+CREATE TABLE user_favorites (
+    user_id BIGINT NOT NULL,
+    book_id BIGINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, book_id) -- NOTE: also prevents user from 'liking' the same book multiple times
+);
+
 -- Categories Table
 DROP TABLE IF EXISTS categories;
 CREATE TABLE categories (
@@ -67,15 +85,17 @@ CREATE TABLE books_categories (
 	category_id BIGINT NOT NULL,
 	PRIMARY KEY (book_id, category_id)
 );
+
 -- Create the orders table
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
 	id BIGSERIAL PRIMARY KEY,
-	order_status VARCHAR(20) DEFAULT 'pending' NOT NULL, -- completed, pending, cancelled
+	order_status VARCHAR(20) DEFAULT 'pending' NOT NULL,
 	order_total DECIMAL(19, 2) NOT NULL,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	user_id BIGINT NOT NULL
+	user_id BIGINT NOT NULL,
+	delivery_detail_id BIGINT NOT NULL;
 );
 -- Create the orders_books table
 -- modeling a many-to-many relationship between orders and books
@@ -108,10 +128,76 @@ CREATE TABLE payments (
 	id BIGSERIAL PRIMARY KEY,
 	amount DECIMAL(19, 2) NOT NULL,
 	transaction_id VARCHAR(255) NOT NULL,
-	payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL, -- success, pending, failed
+	payment_method VARCHAR(20) DEFAULT 'card' NOT NULL; 	-- card, cash
+	payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL, 	-- success, pending, failed
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	order_id BIGINT NOT NULL
+);
+
+DROP TABLE IF EXISTS card_payments;
+CREATE TABLE card_payments (
+    id BIGSERIAL PRIMARY KEY,
+    payment_id BIGINT NOT NULL,
+    card_type VARCHAR(50) NOT NULL,      	-- e.g., Visa, MasterCard
+    card_last_four CHAR(4) NOT NULL,       -- Last four digits of the card number
+    card_expiry_month SMALLINT,            -- Expiration month (1-12)
+    card_expiry_year SMALLINT,             -- Expiration year (YYYY)
+    cardholder_name VARCHAR(255),          -- Optional: Name as printed on the card
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS delivery_details;
+CREATE TABLE delivery_details (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    address_line1 VARCHAR(255) NOT NULL,
+    address_line2 VARCHAR(255),
+    city VARCHAR(100) NOT NULL,
+    state VARCHAR(100) NOT NULL,
+    postal_code VARCHAR(20) NOT NULL,
+    country VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS deliveries;
+CREATE TABLE deliveries (
+    id BIGSERIAL PRIMARY KEY,
+    order_id BIGINT NOT NULL,
+    courier VARCHAR(255),              -- Name of the courier (e.g., UPS, FedEx)
+    tracking_number VARCHAR(255),      -- Tracking number provided by the courier
+    delivery_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- e.g., pending, shipped, in_transit, delivered, returned
+    shipped_at TIMESTAMP,              -- When the order was shipped
+    expected_delivery TIMESTAMP,       -- Estimated delivery date/time
+    delivered_at TIMESTAMP,            -- Actual delivery date/time
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS order_cancellations;
+CREATE TABLE order_cancellations (
+    id BIGSERIAL PRIMARY KEY,
+    order_id BIGINT NOT NULL,
+    cancellation_reason TEXT,
+    cancelled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    refunded_amount DECIMAL(19, 2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+DROP TABLE IF EXISTS order_returns;
+CREATE TABLE order_returns (
+    id BIGSERIAL PRIMARY KEY,
+    order_id BIGINT NOT NULL,
+    book_id BIGINT NOT NULL,
+    return_quantity SMALLINT NOT NULL,
+    return_reason TEXT,
+    return_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- e.g., pending, approved, rejected, processed
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ----------------------------------------------------------
 -- Foreign Key Constraints
@@ -125,7 +211,6 @@ ALTER TABLE reviews
 	ADD CONSTRAINT FK_reviews_users FOREIGN KEY (user_id) REFERENCES users(id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE;
---
 -- prevent users from reviewing the same book multiple times
 ALTER TABLE reviews
 	ADD CONSTRAINT UNIQUE_user_book_review UNIQUE (user_id, book_id);
@@ -135,8 +220,18 @@ ALTER TABLE orders
 		ON UPDATE CASCADE
 		ON DELETE CASCADE;
 --
+ALTER TABLE orders
+    ADD CONSTRAINT FK_orders_delivery_addresses FOREIGN KEY (delivery_address_id) REFERENCES delivery_addresses(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+--
 ALTER TABLE payments
 	ADD CONSTRAINT FK_payments_orders FOREIGN KEY (order_id) REFERENCES orders(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
+--
+ALTER TABLE card_payments
+    ADD CONSTRAINT FK_card_payments_payments FOREIGN KEY (payment_id) REFERENCES payments(id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE;
 --
@@ -150,6 +245,17 @@ ALTER TABLE books_categories
 		ON UPDATE CASCADE
 		ON DELETE CASCADE;
 --
+-- Foreign key constraint linking to the users table
+ALTER TABLE user_favorites
+    ADD CONSTRAINT FK_user_favorites_users FOREIGN KEY (user_id) REFERENCES users(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+-- Foreign key constraint linking to the books table
+ALTER TABLE user_favorites
+    ADD CONSTRAINT FK_user_favorites_books FOREIGN KEY (book_id) REFERENCES books(id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE;
+--
 ALTER TABLE orders_books
 	ADD CONSTRAINT FK_orders_books_books FOREIGN KEY (book_id) REFERENCES books(id)
 		ON UPDATE CASCADE
@@ -157,6 +263,31 @@ ALTER TABLE orders_books
 --
 ALTER TABLE orders_books
 	ADD CONSTRAINT FK_orders_books_orders FOREIGN KEY (order_id) REFERENCES orders(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
+
+ALTER TABLE delivery_details
+    ADD CONSTRAINT FK_delivery_details_users FOREIGN KEY (user_id) REFERENCES users(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
+
+LTER TABLE orders
+    ADD CONSTRAINT FK_orders_delivery_details FOREIGN KEY (delivery_detail_id) REFERENCES delivery_details(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
+
+ALTER TABLE order_cancellations
+    ADD CONSTRAINT FK_order_cancellations_orders FOREIGN KEY (order_id) REFERENCES orders(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
+
+ALTER TABLE order_returns
+    ADD CONSTRAINT FK_order_returns_orders FOREIGN KEY (order_id) REFERENCES orders(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
+
+ALTER TABLE order_returns
+    ADD CONSTRAINT FK_order_returns_books FOREIGN KEY (book_id) REFERENCES books(id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE;
 ----------------------------------------------------------
@@ -189,19 +320,55 @@ CREATE TRIGGER update_timestamp_in_orders_books BEFORE
 -- Add the trigger to the `payments` table
 CREATE TRIGGER update_timestamp_in_payments BEFORE
 	UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+-- Add the trigger to the `card_payments` table
+CREATE TRIGGER update_timestamp_in_card_payments BEFORE
+	UPDATE ON card_payments FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+-- Add the trigger to the `delivery_details` table
+CREATE TRIGGER update_timestamp_in_delivery_details BEFORE
+	UPDATE ON delivery_details FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+-- Add the trigger to the `deliveries` table
+CREATE TRIGGER update_timestamp_in_deliveries BEFORE
+	UPDATE ON deliveries FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+-- Add the trigger to the `order_cancellations` table
+CREATE TRIGGER update_timestamp_in_order_cancellations BEFORE
+	UPDATE ON order_cancellations FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+-- Add the trigger to the `order_returns` table
+CREATE TRIGGER update_timestamp_in_order_returns BEFORE
+	UPDATE ON order_returns FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
 ----------------------------------------------------------
--- Indices
+-- Indices on foreign keys
 ----------------------------------------------------------
 -- `reviews`
 CREATE INDEX idx_reviews_book_id ON reviews(book_id);
 CREATE INDEX idx_reviews_user_id ON reviews(user_id);
+
 -- `orders`
 CREATE INDEX idx_orders_user_id ON orders(user_id);
+
 -- `payments`
 CREATE INDEX idx_payments_order_id ON payments(order_id);
+
 -- `books_categories` (composite key)
 CREATE INDEX idx_books_categories_book_id ON books_categories(book_id);
 CREATE INDEX idx_books_categories_category_id ON books_categories(category_id);
+
 -- `orders_books` (composite key)
 CREATE INDEX idx_orders_books_order_id ON orders_books(order_id);
 CREATE INDEX idx_orders_books_book_id ON orders_books(book_id);
+
+-- card_payments (payment_id)
+CREATE INDEX idx_card_payments_payment_id ON card_payments(payment_id);
+
+-- delivery_details (user_id)
+CREATE INDEX idx_delivery_details_user_id ON delivery_details(user_id);
+
+-- deliveries (order_id)
+CREATE INDEX idx_deliveries_order_id ON deliveries(order_id);
+
+-- order_cancellations (order_id)
+CREATE INDEX idx_order_cancellations_order_id ON order_cancellations(order_id);
+
+-- order_returns (order_id, book_id)
+CREATE INDEX idx_order_returns_order_id ON order_returns(order_id);
+CREATE INDEX idx_order_returns_book_id ON order_returns(book_id);

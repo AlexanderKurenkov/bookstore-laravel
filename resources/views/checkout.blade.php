@@ -367,4 +367,114 @@
             </div>
         </div>
     </form>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle payment method selection
+            const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+            const cardDetails = document.getElementById('card-details');
+
+            paymentMethods.forEach(method => {
+                method.addEventListener('change', function () {
+                    if (this.value === 'card') {
+                        cardDetails.style.display = 'block';
+                    } else {
+                        cardDetails.style.display = 'none';
+                    }
+                });
+            });
+
+            // Handle delivery method selection and update shipping cost
+            const deliveryMethods = document.querySelectorAll('input[name="delivery_method"]');
+            const shippingCostElement = document.getElementById('shipping-cost');
+            const totalAmountElement = document.getElementById('total-amount');
+
+            deliveryMethods.forEach(method => {
+                method.addEventListener('change', function () {
+                    let shippingCost = 0;
+                    let shippingText = 'Бесплатно';
+
+                    if (this.value === 'standard') {
+                        // @php
+                        //     $cartTotal = session('cart_total') ?? 0;
+                        //     $standardShipping = $cartTotal >= 2000 ? 0 : 300;
+                        // @endphp
+                        shippingCost = 300;
+                        shippingText = shippingCost > 0 ? shippingCost.toFixed(2) + ' ₽' : 'Бесплатно';
+                    } else if (this.value === 'express') {
+                        shippingCost = 500;
+                        shippingText = '500.00 ₽';
+                    } else if (this.value === 'pickup') {
+                        shippingCost = 0;
+                        shippingText = 'Бесплатно';
+                    }
+
+                    shippingCostElement.textContent = shippingText;
+
+                    // Update total
+                    // @php
+                    //     $cartTotal = session('cart_total') ?? 0;
+                    //     $discount = session('promo_discount') ? $cartTotal * (session('promo_discount') / 100) : 0;
+                    //     $subtotal = $cartTotal - $discount;
+                    // @endphp
+                    //TODO retrieve $cartTotal via fetch call
+                    const cartTotal = 1000;
+                    const total = cartTotal + shippingCost;
+                    totalAmountElement.textContent = total.toFixed(2) + ' ₽';
+                });
+            });
+
+            // Form validation
+            const form = document.getElementById('checkout-form');
+
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            });
+
+            // Input formatting
+            const phoneInput = document.getElementById('phone');
+            phoneInput.addEventListener('input', function (e) {
+                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,1})(\d{0,3})(\d{0,3})(\d{0,2})(\d{0,2})/);
+                e.target.value = !x[2] ? x[1] : '+' + x[1] + ' (' + x[2] + ') ' + (x[3] ? x[3] + '-' + x[4] : (x[3] ? x[3] : '')) + (x[5] ? '-' + x[5] : '');
+            });
+
+            const cardNumberInput = document.getElementById('card_number');
+            cardNumberInput.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 16) value = value.slice(0, 16);
+                let formattedValue = '';
+                for (let i = 0; i < value.length; i++) {
+                    if (i > 0 && i % 4 === 0) formattedValue += ' ';
+                    formattedValue += value[i];
+                }
+                e.target.value = formattedValue;
+            });
+
+            const cardExpiryInput = document.getElementById('card_expiry');
+            cardExpiryInput.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 4) value = value.slice(0, 4);
+                if (value.length > 2) {
+                    e.target.value = value.slice(0, 2) + '/' + value.slice(2);
+                } else {
+                    e.target.value = value;
+                }
+            });
+
+            const cardCvvInput = document.getElementById('card_cvv');
+            cardCvvInput.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 3) value = value.slice(0, 3);
+                e.target.value = value;
+            });
+        });
+
+    </script>
+    @endpush
 </x-layout>

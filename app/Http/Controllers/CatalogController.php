@@ -46,5 +46,14 @@ class CatalogController extends Controller
 		// $qtyList = range(1, 10); // Generate a list of quantities
 
 		return view('catalog.book', compact('book'));
+		// return view('catalog.book', [
+		// 	'id' => $book->id,
+		// 	'title' => $book->title,
+		// 	'author' => $book->author,
+		// 	'price' => $book->price,
+		// 	'publisher' => $book->publisher,
+		// 	'publication_year' => $book->publication_year,
+		// 	'imagePath' => $book->image_path, // Assuming image_path is the attribute
+		// ]);
 	}
 }

@@ -14,4 +14,7 @@
     <link rel="icon" href="{{ asset('image/apple-touch-icon.png') }}">
 
     <title>{{ $title ?? 'Книгочей' }}</title>
+
+    <!-- Allow additional tags to be added here -->
+    @stack('head')
 </head>

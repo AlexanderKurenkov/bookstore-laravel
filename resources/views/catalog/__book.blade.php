@@ -6,38 +6,44 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100">
                 <div id="bookImageCarousel" class="carousel slide" data-bs-ride="false">
-                    <!-- Carousel Images -->
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#bookImageCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Cover"></button>
+                        @if($book->sample_page_images)
+                            @foreach($book->sample_page_images as $index => $image)
+                                <button type="button" data-bs-target="#bookImageCarousel" data-bs-slide-to="{{ $index + 1 }}" aria-label="Page {{ $index + 1 }}"></button>
+                            @endforeach
+                        @endif
+                    </div>
                     <div class="carousel-inner">
                         <div class="carousel-item active">
                             <img src="{{ $book->image_path ?? asset('images/placeholder-book.jpg') }}"
-                                class="d-block w-100 img-fluid"
-                                alt="{{ $book->title ?? 'Book Cover' }}">
+                                 class="d-block w-100 img-fluid"
+                                 alt="{{ $book->title ?? 'Book Cover' }}">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h5 class="bg-dark bg-opacity-50 p-1 rounded">Обложка</h5>
+                            </div>
                         </div>
                         @if($book->sample_page_images)
-                            <!-- Navigation arrows -->
-                            <button class="carousel-control-prev" type="button" data-bs-target="#bookImageCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon bg-secondary rounded-circle" aria-hidden="true"></span>
-                                <span class="visually-hidden">Предыдущая</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#bookImageCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon bg-secondary rounded-circle" aria-hidden="true"></span>
-                                <span class="visually-hidden">Следующая</span>
-                            </button>
-
                             @foreach($book->sample_page_images as $index => $image)
                                 <div class="carousel-item">
                                     <img src="{{ $image }}"
-                                        class="d-block w-100 img-fluid"
-                                        alt="Страница {{ $index + 1 }}">
+                                         class="d-block w-100 img-fluid"
+                                         alt="Страница {{ $index + 1 }}">
+                                    <div class="carousel-caption d-none d-md-block">
+                                        <h5 class="bg-dark bg-opacity-50 p-1 rounded">Страница {{ $index + 1 }}</h5>
+                                    </div>
                                 </div>
                             @endforeach
                         @endif
                     </div>
-
-                    <!-- Caption below image -->
-                    <div class="carousel-caption position-static d-block bg-light text-dark p-2 mb-2">
-                        <p class="mb-0" id="carousel-caption-text">Обложка</p>
-                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#bookImageCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Предыдущая</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#bookImageCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Следующая</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -182,7 +188,7 @@
                             @endif
                         @endif
 
-                        <form action="" method="POST" class="d-inline">
+                        <form action="toggleFavoriteForm" method="POST" class="d-inline">
                         {{-- <form action="{{ route('favorites.toggle', $book->id) }}" method="POST" class="d-inline"> --}}
                             @csrf
                             <button type="submit" class="btn btn-outline-secondary">
@@ -196,7 +202,7 @@
                     </div>
 
                     <div class="row mb-2">
-                        <div class="col-12 fw-bold fs-5 mb-2">Описание:</div>
+                        <div class="col-12 fw-bold fs-5 mb-2">Краткое описание:</div>
                         <div class="col-12">
                             <p>{{ $book->description }}</p>
                         </div>
@@ -376,186 +382,148 @@
         </div>
     </div>
 </div>
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Carousel caption update
-    const carousel = document.getElementById('bookImageCarousel');
-    const captionText = document.getElementById('carousel-caption-text');
 
-    if (carousel && captionText) {
-        carousel.addEventListener('slide.bs.carousel', function (event) {
-            const slideIndex = event.to;
-            if (slideIndex === 0) {
-                captionText.textContent = 'Обложка';
-            } else {
-                captionText.textContent = 'Страница ' + slideIndex;
-            }
-        });
-    }
-
-    // Review form toggle
-    const writeReviewBtn = document.getElementById('writeReviewBtn');
-    const reviewFormContainer = document.getElementById('reviewFormContainer');
-    const cancelReviewBtn = document.getElementById('cancelReviewBtn');
-    const ratingStars = document.querySelectorAll('.star-label');
-    const ratingValue = document.getElementById('ratingValue');
-
-    if (writeReviewBtn && reviewFormContainer && cancelReviewBtn) {
-        writeReviewBtn.addEventListener('click', function() {
-            reviewFormContainer.style.display = 'block';
-            writeReviewBtn.style.display = 'none';
-
-            // Initialize stars
-            updateStars(5);
-        });
-
-        cancelReviewBtn.addEventListener('click', function() {
-            reviewFormContainer.style.display = 'none';
-            writeReviewBtn.style.display = 'inline-block';
-        });
-    }
-
-    // Star rating functionality
-    if (ratingStars.length > 0 && ratingValue) {
-        ratingStars.forEach(star => {
-            // When a star is clicked
-            star.addEventListener('click', function() {
-                const starValue = this.getAttribute('for').replace('star', '');
-                document.getElementById('star' + starValue).checked = true;
-                ratingValue.textContent = starValue;
-                updateStars(starValue);
-            });
-
-            // Hover effect
-            star.addEventListener('mouseover', function() {
-                const starValue = this.getAttribute('for').replace('star', '');
-                highlightStars(starValue);
-            });
-        });
-
-        // Reset stars when mouse leaves the rating area
-        document.querySelector('.rating-stars').addEventListener('mouseleave', function() {
-            const checkedStar = document.querySelector('input[name="rating"]:checked');
-            if (checkedStar) {
-                const value = checkedStar.value;
-                highlightStars(value);
-            }
-        });
-    }
-
-    // Helper function to update stars based on selection
-    function updateStars(value) {
-        ratingStars.forEach(star => {
-            const starNum = parseInt(star.getAttribute('for').replace('star', ''));
-            const icon = star.querySelector('i');
-
-            if (starNum <= value) {
-                icon.classList.remove('bi-star');
-                icon.classList.add('bi-star-fill');
-            } else {
-                icon.classList.remove('bi-star-fill');
-                icon.classList.add('bi-star');
-            }
-        });
-
-        if (ratingValue) {
-            ratingValue.textContent = value;
-        }
-    }
-
-    // Helper function to highlight stars on hover
-    function highlightStars(value) {
-        ratingStars.forEach(star => {
-            const starNum = parseInt(star.getAttribute('for').replace('star', ''));
-            const icon = star.querySelector('i');
-
-            if (starNum <= value) {
-                icon.classList.remove('bi-star');
-                icon.classList.add('bi-star-fill');
-            } else {
-                icon.classList.remove('bi-star-fill');
-                icon.classList.add('bi-star');
-            }
-        });
-    }
-});
-</script>
-@endpush
 @push('head')
-<style>
-/* Carousel styling */
-.carousel-item img {
-    height: 400px;
-    object-fit: contain;
-    background-color: #f8f9fa;
-}
+    <style>
+        /* Carousel styling */
+        .carousel-item img {
+            height: 500px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+        }
 
-.carousel-caption {
-    position: static !important;
-    padding: 10px !important;
-    margin-bottom: 0 !important;
-    border-radius: 0 0 4px 4px;
-}
+        .carousel-caption {
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
 
-.carousel-indicators {
-    position: static !important;
-    margin: 10px 0 !important;
-    justify-content: center;
-}
+        /* Rating stars styling */
+        .rating-stars {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+        }
 
-.carousel-indicators [data-bs-target] {
-    width: 12px !important;
-    height: 12px !important;
-    border-radius: 50% !important;
-    margin: 0 5px !important;
-    border: none !important;
-    opacity: 0.5;
-}
+        .star-label {
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #ffc107;
+            margin-right: 5px;
+        }
 
-.carousel-indicators .active {
-    opacity: 1;
-}
+        .star-label:hover ~ .star-label i,
+        .star-label:hover i {
+            color: #ffc107;
+        }
 
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    padding: 15px;
-}
+        .selected-rating {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
 
-/* Rating stars styling */
-.rating-stars {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-start;
-}
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+    </style>
+@endpush
 
-.star-label {
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #ffc107;
-    margin-right: 5px;
-}
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Review form toggle
+            const writeReviewBtn = document.getElementById('writeReviewBtn');
+            const reviewFormContainer = document.getElementById('reviewFormContainer');
+            const cancelReviewBtn = document.getElementById('cancelReviewBtn');
+            const ratingStars = document.querySelectorAll('.star-label');
+            const ratingValue = document.getElementById('ratingValue');
 
-.star-label:hover ~ .star-label i,
-.star-label:hover i {
-    color: #ffc107;
-}
+            if (writeReviewBtn && reviewFormContainer && cancelReviewBtn) {
+                writeReviewBtn.addEventListener('click', function() {
+                    reviewFormContainer.style.display = 'block';
+                    writeReviewBtn.style.display = 'none';
 
-.selected-rating {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
+                    // Initialize stars
+                    updateStars(5);
+                });
 
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-}
-</style>
+                cancelReviewBtn.addEventListener('click', function() {
+                    reviewFormContainer.style.display = 'none';
+                    writeReviewBtn.style.display = 'inline-block';
+                });
+            }
+
+            // Star rating functionality
+            if (ratingStars.length > 0 && ratingValue) {
+                ratingStars.forEach(star => {
+                    // When a star is clicked
+                    star.addEventListener('click', function() {
+                        const starValue = this.getAttribute('for').replace('star', '');
+                        document.getElementById('star' + starValue).checked = true;
+                        ratingValue.textContent = starValue;
+                        updateStars(starValue);
+                    });
+
+                    // Hover effect
+                    star.addEventListener('mouseover', function() {
+                        const starValue = this.getAttribute('for').replace('star', '');
+                        highlightStars(starValue);
+                    });
+                });
+
+                // Reset stars when mouse leaves the rating area
+                document.querySelector('.rating-stars').addEventListener('mouseleave', function() {
+                    const checkedStar = document.querySelector('input[name="rating"]:checked');
+                    if (checkedStar) {
+                        const value = checkedStar.value;
+                        highlightStars(value);
+                    }
+                });
+            }
+
+            // Helper function to update stars based on selection
+            function updateStars(value) {
+                ratingStars.forEach(star => {
+                    const starNum = parseInt(star.getAttribute('for').replace('star', ''));
+                    const icon = star.querySelector('i');
+
+                    if (starNum <= value) {
+                        icon.classList.remove('bi-star');
+                        icon.classList.add('bi-star-fill');
+                    } else {
+                        icon.classList.remove('bi-star-fill');
+                        icon.classList.add('bi-star');
+                    }
+                });
+
+                if (ratingValue) {
+                    ratingValue.textContent = value;
+                }
+            }
+
+            // Helper function to highlight stars on hover
+            function highlightStars(value) {
+                ratingStars.forEach(star => {
+                    const starNum = parseInt(star.getAttribute('for').replace('star', ''));
+                    const icon = star.querySelector('i');
+
+                    if (starNum <= value) {
+                        icon.classList.remove('bi-star');
+                        icon.classList.add('bi-star-fill');
+                    } else {
+                        icon.classList.remove('bi-star-fill');
+                        icon.classList.add('bi-star');
+                    }
+                });
+            }
+        });
+    </script>
 @endpush
 </x-layout>

@@ -114,7 +114,7 @@
                     </a>
                 </div>
                 <div class="col">
-                    <a href="{{ route('catalog.categories') }}" class="text-decoration-none">
+                    <a href="{{ route('catalog.index') }}" class="text-decoration-none">
                         <div class="card h-100 text-center hover-shadow">
                             <div class="card-body">
                                 <i class="bi bi-grid fs-1 text-secondary mb-3"></i>
@@ -131,7 +131,9 @@
     <div class="row mb-5">
         <div class="col-12 d-flex justify-content-between align-items-center mb-4">
             <h2>Новинки</h2>
-            <a href="{{ route('catalog.new') }}" class="btn btn-outline-primary">Смотреть все</a>
+            {{-- TODO --}}
+            <a href="{{ route('index') }}" class="btn btn-outline-primary">Смотреть все</a>
+            {{-- <a href="{{ route('catalog.new') }}" class="btn btn-outline-primary">Смотреть все</a> --}}
         </div>
 
         <div class="col-12">
@@ -205,7 +207,9 @@
     <div class="row mb-5">
         <div class="col-12 d-flex justify-content-between align-items-center mb-4">
             <h2>Бестселлеры</h2>
-            <a href="{{ route('catalog.bestsellers') }}" class="btn btn-outline-primary">Смотреть все</a>
+            {{-- TODO --}}
+            <a href="{{ route('index') }}" class="btn btn-outline-primary">Смотреть все</a>
+            {{-- <a href="{{ route('catalog.bestsellers') }}" class="btn btn-outline-primary">Смотреть все</a> --}}
         </div>
 
         <div class="col-12">

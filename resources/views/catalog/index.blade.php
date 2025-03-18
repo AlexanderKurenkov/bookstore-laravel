@@ -10,6 +10,8 @@
                     :author="$book->author"
                     :price="$book->price"
                     :imagePath="$book->image_path"
+                    :publisher="$book->publisher"
+                    :publication_year="$book->publication_year"
                 />
             @endforeach
         </div>
@@ -18,4 +20,23 @@
             {{ $books->links('pagination::bootstrap-5') }} {{-- Laravel pagination --}}
         </div>
     </div>
+
+    @push('head')
+        <style>
+            .hover-shadow:hover {
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+                transform: translateY(-3px);
+                transition: all 0.3s ease;
+            }
+
+            .book-card {
+                transition: all 0.3s ease;
+            }
+
+            .book-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            }
+        </style>
+    @endpush
 </x-layout>
