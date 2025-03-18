@@ -159,6 +159,7 @@ CREATE TABLE delivery_details (
     postal_code VARCHAR(20) NOT NULL,
     country VARCHAR(100) NOT NULL,
     phone VARCHAR(20),
+	user_comment VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

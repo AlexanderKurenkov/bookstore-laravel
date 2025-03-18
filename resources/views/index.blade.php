@@ -3,10 +3,10 @@
     <div class="row mb-5">
         <div class="col-12">
             <div class="card bg-dark text-white rounded-3 overflow-hidden">
-                <img src="{{ asset('images/banner.jpg') ?? '/placeholder.svg?height=400&width=1200' }}" class="card-img opacity-50" alt="Книжный магазин" style="height: 400px; object-fit: cover;">
+                <img src="{{ asset('images/banner.jpg') }}" class="card-img opacity-50" alt="Книжный магазин" style="height: 400px; object-fit: cover;">
                 <div class="card-img-overlay d-flex flex-column justify-content-center">
                     <div class="container">
-                        <h1 class="card-title display-4 fw-bold">Добро пожаловать в наш книжный магазин</h1>
+                        <h1 class="card-title display-4 fw-bold">Добро пожаловать в наш магазин</h1>
                         <p class="card-text fs-5 mb-4">Откройте для себя новые миры с нашей коллекцией книг</p>
                         <div class="d-flex">
                             {{-- <a href="{{ route('books.new') }}" class="btn btn-primary btn-lg me-3">Новинки</a> --}}
@@ -18,48 +18,10 @@
         </div>
     </div>
 
-    <!-- Search and Filter -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <form action="{{ route('search.results') }}" method="GET" class="row g-3">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Поиск книг..." name="query">
-                                <button class="btn btn-primary" type="submit">
-                                    <i class="bi bi-search"></i> Найти
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" name="category">
-                                <option value="">Все категории</option>
-                                <option value="fiction">Художественная литература</option>
-                                <option value="non-fiction">Нон-фикшн</option>
-                                <option value="science">Наука</option>
-                                <option value="children">Детские книги</option>
-                                <option value="business">Бизнес</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" name="sort">
-                                <option value="popularity">По популярности</option>
-                                <option value="price_asc">Цена: по возрастанию</option>
-                                <option value="price_desc">Цена: по убыванию</option>
-                                <option value="newest">Сначала новые</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Categories -->
     <div class="row mb-5">
         <div class="col-12">
-            <h2 class="mb-4">Категории книг</h2>
+            <h2 class="mb-4">Популярные категории</h2>
         </div>
         <div class="col-12">
             <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">

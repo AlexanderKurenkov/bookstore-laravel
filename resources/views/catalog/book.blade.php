@@ -184,6 +184,8 @@
 
                         <form action="" method="POST" class="d-inline">
                         {{-- <form action="{{ route('favorites.toggle', $book->id) }}" method="POST" class="d-inline"> --}}
+                            <a class="nav-link position-relative" href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
+                            {{-- <i class="bi bi-heart fs-5"></i> --}}
                             @csrf
                             <button type="submit" class="btn btn-outline-secondary">
                                 @if(auth()->check() && auth()->user()->favorites->contains($book->id))
@@ -192,6 +194,7 @@
                                     <i class="bi bi-heart"></i> В избранное
                                 @endif
                             </button>
+                            </a>
                         </form>
                     </div>
 

@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
     <div class="container">
-        <!-- Logo/Brand (Left) -->
+        <!-- Logo/Brand -->
         <a class="navbar-brand d-flex align-items-center" href="{{ route('index') }}">
             <i class="bi bi-book fs-3 text-primary me-2"></i>
             <span class="fw-bold">{{__('Bookstore')}}</span>
@@ -14,12 +14,17 @@
 
         <!-- Navbar Content -->
         <div class="collapse navbar-collapse" id="navbarContent">
-            <!-- Search Form (Middle) -->
-            <form action="{{ route('search.results') }}" method="GET" class="w-50 mx-auto">
-                <div class="input-group">
-                    <input type="text" class="form-control flex-grow-1" placeholder="Поиск книг..." name="query">
-
-                    <select class="form-select flex-shrink-1" name="category" style="max-width: 250px;">
+            <form action="{{ route('search.results') }}" method="GET" class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Поиск книг..." name="query">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi bi-search"></i> Найти
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" name="category">
                         <option value="">Все категории</option>
                         <option value="fiction">Художественная литература</option>
                         <option value="non-fiction">Нон-фикшн</option>
@@ -27,17 +32,13 @@
                         <option value="children">Детские книги</option>
                         <option value="business">Бизнес</option>
                     </select>
-
-                    <button class="btn btn-light" type="submit">
-                        <i class="bi bi-search"></i>
-                    </button>
                 </div>
             </form>
 
-            <!-- User Actions (Right) -->
-            <ul class="navbar-nav ms-auto">
-                <!-- Favorites Button -->
-                <li class="nav-item me-2">
+            <!-- User Actions -->
+            <ul class="navbar-nav ms-lg-3">
+                  <!-- Favorites Button -->
+                  <li class="nav-item me-2">
                     <a class="nav-link position-relative" href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
                         <i class="bi bi-heart fs-5"></i>
                         {{-- TODO use session instead --}}
@@ -49,7 +50,6 @@
                         @endif --}}
                     </a>
                 </li>
-
                 <!-- Cart Dropdown -->
                 <li class="nav-item dropdown me-2">
                     <a class="nav-link position-relative" href="#" id="cartDropdown" role="button"
@@ -174,82 +174,6 @@
                         <a class="nav-link text-dark" href="{{ route('catalog.category', 'education') }}">Учебная</a>
                     </li>
                 </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Favorites Modal -->
-<div class="modal fade" id="favoritesModal" tabindex="-1" aria-labelledby="favoritesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="favoritesModalLabel">
-                    <i class="bi bi-heart-fill text-danger me-2"></i>Избранное
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                @auth
-                    @if(auth()->user()->favorites->count() > 0)
-                        <div class="favorites-list" style="max-height: 400px; overflow-y: auto;">
-                            @foreach(auth()->user()->favorites as $favorite)
-                                <div class="card mb-3">
-                                    <div class="row g-0">
-                                        <div class="col-md-2">
-                                            <img src="{{ $favorite->image_path ?? '/placeholder.svg?height=120&width=80' }}"
-                                                 class="img-fluid rounded-start" alt="{{ $favorite->title }}"
-                                                 style="height: 120px; width: 80px; object-fit: cover;">
-                                        </div>
-                                        <div class="col-md-8">
-                                            <div class="card-body py-2">
-                                                <h5 class="card-title">{{ $favorite->title }}</h5>
-                                                <p class="card-text text-muted mb-1">{{ $favorite->author }}</p>
-                                                <p class="card-text"><strong class="text-primary">{{ number_format($favorite->price, 2) }} ₽</strong></p>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                            <div class="btn-group-vertical">
-                                                <a href="{{ route('books.show', $favorite->id) }}" class="btn btn-sm btn-outline-primary mb-2">
-                                                    <i class="bi bi-eye"></i> Просмотр
-                                                </a>
-                                                <form action="{{ route('favorites.toggle', $favorite->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                        <i class="bi bi-trash"></i> Удалить
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="text-center py-5">
-                            <i class="bi bi-heart fs-1 text-muted"></i>
-                            <p class="mt-3">У вас пока нет избранных книг</p>
-                            <p class="text-muted">Добавляйте понравившиеся книги в избранное, чтобы вернуться к ним позже</p>
-                        </div>
-                    @endif
-                @else
-                    <div class="text-center py-5">
-                        <i class="bi bi-person-lock fs-1 text-muted"></i>
-                        <p class="mt-3">Войдите в аккаунт, чтобы добавлять книги в избранное</p>
-                        <div class="mt-3">
-                            <a href="{{ route('login') }}" class="btn btn-primary me-2">Войти</a>
-                            <a href="{{ route('register') }}" class="btn btn-outline-primary">Регистрация</a>
-                        </div>
-                    </div>
-                @endauth
-            </div>
-            <div class="modal-footer">
-                @auth
-                    @if(auth()->user()->favorites->count() > 0)
-                        <a href="{{ route('favorites.index') }}" class="btn btn-primary">Перейти в избранное</a>
-                    @endif
-                @endauth
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
         </div>
     </div>

@@ -62,9 +62,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // profile belongs to the authenticated user.
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
+
+        // TODO
+        Route::get('/orders', [ProfileController::class, 'orders'])->name('orders');
+        Route::get('/wishlist', [ProfileController::class, 'wishlist'])->name('wishlist');
+
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+
     });
 
 });
