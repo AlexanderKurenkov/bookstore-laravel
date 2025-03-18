@@ -20,10 +20,11 @@ class CartController extends Controller
 
 	public function index(): View
 	{
-		$user = Auth::user();
-		$orderItems = $this->cartService->getAllItems($user);
+		// $user = Auth::user();
+		// $orderItems = $this->cartService->getAllItems();
+		// return view('cart', ['orderItems' => $orderItems]);
 
-		return view('cart', ['orderItems' => $orderItems]);
+		return view('cart');
 	}
 
 	public function storeItem(Request $request)//: JsonResponse

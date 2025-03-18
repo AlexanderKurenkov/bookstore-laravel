@@ -1,4 +1,5 @@
 {
+    "Bookstore": "Книгочей",
     "Profile": "Профиль",
     "Login": "Вход",
     "E-mail": "E-mail",
@@ -24,5 +25,5 @@
     "To the main page": "На главную",
     "Book catalog": "Каталог",
     "Add to cart": "В корзину",
-    "Checkout" : "Оформить"
+    "Checkout": "Оформить"
 }

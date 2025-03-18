@@ -1,6 +1,7 @@
+@props(['categoryName' => __('Book catalog')])
 <x-layout>
     <div class="container my-4">
-        <h1 class="mb-4">{{__('Book catalog')}}</h1>
+        <h1 class="mb-4">{{ $categoryName }}</h1>
         <div class="row">
             @foreach($books as $book)
                 <x-book-card

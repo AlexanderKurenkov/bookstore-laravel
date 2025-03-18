@@ -11,10 +11,10 @@ class CatalogController extends Controller
 {
 	protected CatalogService $catalogService;
 
-    public function __construct(CatalogService $catalogService)
-    {
-        $this->catalogService = $catalogService;
-    }
+	public function __construct(CatalogService $catalogService)
+	{
+		$this->catalogService = $catalogService;
+	}
 
 	public function index(): View
 	{
@@ -26,7 +26,19 @@ class CatalogController extends Controller
 		return view('catalog.index', compact('books'));
 	}
 
-	public function show($id): View
+	public function showCategory(string $name): View
+	{
+		$books = Book::whereHas('categories', function ($query) use ($name) {
+			$query->where('name', $name);
+		})->paginate(10);
+
+		return view('catalog.index', [
+			'books' => $books,
+			'categoryName' => ucfirst($name), // Format name if needed
+		]);
+	}
+
+	public function showBook(int $id): View
 	{
 		// TODO not only authenticated user can view the catalog - maybe no need to pass user to the view at all?
 		// ?

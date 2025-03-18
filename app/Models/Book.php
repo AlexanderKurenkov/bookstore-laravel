@@ -55,7 +55,7 @@ class Book extends Model
 
 	public function categories(): BelongsToMany
 	{
-		return $this->belongsToMany(Category::class, 'book_categories');
+		return $this->belongsToMany(Category::class, 'books_categories');
 	}
 
 	public function orders(): BelongsToMany

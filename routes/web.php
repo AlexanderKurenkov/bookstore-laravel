@@ -14,16 +14,17 @@ Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 
 Route::prefix('catalog')->name('catalog.')->group(function () {
-    Route::get('/', [CatalogController::class, 'index'])->name('index');
-    Route::get('/book/{id}', [CatalogController::class, 'show'])->name('show');
+    Route::get('/', [CatalogController::class, 'index'])->name('index'); // displays all books
+    Route::get('/category/{name}', [CatalogController::class, 'showCategory'])->name('category');
+    Route::get('/book/{id}', [CatalogController::class, 'showBook'])->name('book');
 });
 
-// Route::prefix('reviews')->name('reviews.')->group(function () {
-//     Route::get('/', [ReviewController::class, 'index'])->name('index');
-//     Route::post('/', [ReviewController::class, 'store'])->name('store');
-//     Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
-//     Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
-// });
+Route::prefix('reviews')->name('reviews.')->group(function () {
+    Route::get('/', [ReviewController::class, 'index'])->name('index');
+    Route::post('/', [ReviewController::class, 'store'])->name('store');
+    Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
+    Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
+});
 
 Route::prefix('search')->name('search.')->group(function () {
     // Shows advanced search form.
@@ -40,6 +41,21 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
 });
 
+//TODO make '/checkout' protected
+Route::prefix('checkout')->name('checkout.')->group(function () {
+    //TODO
+    Route::get('/', [CheckoutController::class, 'index'])->name('index');
+    Route::get('/invoice', [CheckoutController::class, 'invoice'])->name('invoice');
+
+    Route::get('/{cartId}', [CheckoutController::class, 'show'])->name('show');
+    Route::post('/{cartId}', [CheckoutController::class, 'process'])->name('process');
+
+    Route::post('/{cartId}', [CheckoutController::class, 'destroy'])->name('destroy');
+
+    // Route::patch('/shipping', [CheckoutController::class, 'updateShipping'])->name('shipping');
+    // Route::patch('/payment', [CheckoutController::class, 'updatePayment'])->name('payment');
+});
+
 // Protected routes.
 Route::middleware(['auth', 'verified'])->group(function () {
     // No need to include {id} in the URL path for the profile routes because
@@ -51,12 +67,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
     });
 
-    Route::prefix('checkout')->name('checkout.')->group(function () {
-        Route::get('/{cartId}', [CheckoutController::class, 'show'])->name('show');
-        Route::post('/{cartId}', [CheckoutController::class, 'process'])->name('process');
-        // Route::patch('/shipping', [CheckoutController::class, 'updateShipping'])->name('shipping');
-        // Route::patch('/payment', [CheckoutController::class, 'updatePayment'])->name('payment');
-    });
 });
 
 // Route::get('/dashboard', function () {

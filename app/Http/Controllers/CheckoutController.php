@@ -17,6 +17,16 @@ class CheckoutController extends Controller
         $this->checkoutService = $checkoutService;
     }
 
+    public function index()
+    {
+        return view('checkout');
+    }
+
+    public function invoice()
+    {
+        return view('invoice');
+    }
+
     public function show(): View|RedirectResponse
     {
         $user = Auth::user();
@@ -38,7 +48,7 @@ class CheckoutController extends Controller
             return redirect()->route('checkout.show')->with($result['redirect']);
         }
 
-		// ? cart view or something different (maybe new view like 'cart.submitted')
+        // ? cart view or something different (maybe new view like 'cart.submitted')
         return view('cart', $result);
     }
 }

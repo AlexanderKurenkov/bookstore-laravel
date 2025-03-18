@@ -3,14 +3,14 @@
 <div class="col-md-3 mb-4">
     <div class="card h-100 d-flex">
         <div class="d-flex justify-content-end" style="height: 100%;">
-            <a href="{{ route('catalog.show', $id) }}">
+            <a href="{{ route('catalog.book', $id) }}">
                 <img src="{{ $imagePath }}" class="card-img-top" alt="{{ $title }}">
             </a>
         </div>
 
         <div class="card-body d-flex flex-column justify-content-end">
             <div>
-                <a href="{{ route('catalog.show', $id) }}" class="text-dark text-decoration-none">
+                <a href="{{ route('catalog.book', $id) }}" class="text-dark text-decoration-none">
                     <h5 class="card-title fw-bold">{{ $title }}</h5>
                 </a>
 
@@ -22,7 +22,7 @@
                         href="javascript:void(0)"
                         class="btn btn-outline-secondary"
                         onclick="addToCart({{ $id }})"
-                        data-href="{{ route('catalog.show', $id) }}"
+                        data-href="{{ route('catalog.book', $id) }}"
                     >
                         {{__('Add to cart')}}
                     </a>
