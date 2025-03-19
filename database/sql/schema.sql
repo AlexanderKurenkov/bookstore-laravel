@@ -53,9 +53,11 @@ CREATE TABLE books (
     publication_type VARCHAR(50) NOT NULL,	-- тип издания: печатное, цифровое, аудиокнига (physical, ebook, audiobook)
     isbn VARCHAR(20) NOT NULL,				-- International Standard Book Number
     edition VARCHAR(50),            		-- издание (например, "2-е издание")
+	circulation INT, 						-- тираж
     language VARCHAR(50) NOT NULL,			-- язык (например, русский, английский)
     pages SMALLINT,                 		-- общее число страниц
 	weight DECIMAL(10, 2),					-- вес книги
+	size VARCHAR(20),
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
