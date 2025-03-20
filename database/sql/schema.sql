@@ -5,7 +5,8 @@
 -- 	$ psql -U <user> -d postgres -c "DROP DATABASE IF EXISTS bookstore;"
 -- 	NOTE: cannot execute the DROP DATABASE command while connected to the database you want to drop
 -- 2) create `bookstore` database:
--- 	$ psql -U <user> -d postgres -c "CREATE DATABASE bookstore WITH ENCODING 'UTF8' LC_COLLATE 'ru_RU.UTF-8' LC_CTYPE 'ru_RU.UTF-8' TEMPLATE template_utf8;"
+-- 	$ psql -U <user> -d postgres -c "CREATE DATABASE bookstore WITH ENCODING 'UTF8';"
+-- 		??? $ psql -U <user> -d postgres -c "CREATE DATABASE bookstore WITH ENCODING 'UTF8' LC_COLLATE 'ru_RU.UTF-8' LC_CTYPE 'ru_RU.UTF-8' TEMPLATE template_utf8;"
 -- 3) cd into a folder with a schema.sql file
 -- 4) execute schema.sql
 -- 	$ psql -U <user> -d bookstore -f schema.sql
@@ -147,7 +148,7 @@ DROP TABLE IF EXISTS card_payments;
 CREATE TABLE card_payments (
     id BIGSERIAL PRIMARY KEY,
     payment_id BIGINT NOT NULL,
-    card_type VARCHAR(50) NOT NULL,      	-- e.g., Visa, MasterCard
+    card_type VARCHAR(50) NOT NULL,        -- тип платежной системы, например: МИР, Visa, MasterCard, Золотая Корона
     card_last_four CHAR(4) NOT NULL,       -- Last four digits of the card number
     card_expiry_month SMALLINT,            -- Expiration month (1-12)
     card_expiry_year SMALLINT,             -- Expiration year (YYYY)
@@ -230,9 +231,9 @@ ALTER TABLE orders
 		ON DELETE CASCADE;
 --
 ALTER TABLE orders
-    ADD CONSTRAINT FK_orders_delivery_addresses FOREIGN KEY (delivery_address_id) REFERENCES delivery_addresses(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE;
+    ADD CONSTRAINT FK_orders_delivery_details FOREIGN KEY (delivery_detail_id) REFERENCES delivery_details(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 --
 ALTER TABLE payments
 	ADD CONSTRAINT FK_payments_orders FOREIGN KEY (order_id) REFERENCES orders(id)
@@ -257,13 +258,13 @@ ALTER TABLE books_categories
 -- Foreign key constraint linking to the users table
 ALTER TABLE users_favorite_books
     ADD CONSTRAINT FK_users_favorite_books_users FOREIGN KEY (user_id) REFERENCES users(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE;
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 -- Foreign key constraint linking to the books table
 ALTER TABLE users_favorite_books
     ADD CONSTRAINT FK_users_favorite_books_books FOREIGN KEY (book_id) REFERENCES books(id)
-    ON UPDATE CASCADE
-    ON DELETE CASCADE;
+		ON UPDATE CASCADE
+		ON DELETE CASCADE;
 --
 ALTER TABLE orders_books
 	ADD CONSTRAINT FK_orders_books_books FOREIGN KEY (book_id) REFERENCES books(id)
@@ -277,11 +278,6 @@ ALTER TABLE orders_books
 
 ALTER TABLE delivery_details
     ADD CONSTRAINT FK_delivery_details_users FOREIGN KEY (user_id) REFERENCES users(id)
-		ON UPDATE CASCADE
-		ON DELETE CASCADE;
-
-LTER TABLE orders
-    ADD CONSTRAINT FK_orders_delivery_details FOREIGN KEY (delivery_detail_id) REFERENCES delivery_details(id)
 		ON UPDATE CASCADE
 		ON DELETE CASCADE;
 
@@ -381,3 +377,7 @@ CREATE INDEX idx_order_cancellations_order_id ON order_cancellations(order_id);
 -- order_returns (order_id, book_id)
 CREATE INDEX idx_order_returns_order_id ON order_returns(order_id);
 CREATE INDEX idx_order_returns_book_id ON order_returns(book_id);
+
+-- Adding indexes on commonly searched fields can improve performance.
+CREATE INDEX idx_books_title ON books(title);
+CREATE INDEX idx_books_author ON books(author);
