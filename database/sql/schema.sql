@@ -15,12 +15,18 @@
 ----------------------------------------------------------
 -- users
 -- books
+-- users_favorite_books -- join table
 -- categories
 -- books_categories -- join table
 -- orders
 -- orders_books -- join table
 -- reviews
 -- payments
+-- card_payments
+-- delivery_details
+-- deliveries
+-- order_cancellations
+-- order_returns
 ----------------------------------------------------------
 -- Create the users table
 DROP TABLE IF EXISTS users;
@@ -62,9 +68,9 @@ CREATE TABLE books (
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the user_favorites table to track favorite books for each user
-DROP TABLE IF EXISTS user_favorites;
-CREATE TABLE user_favorites (
+-- Create the users_favorite_books table to track favorite books for each user
+DROP TABLE IF EXISTS users_favorite_books;
+CREATE TABLE users_favorite_books (
     user_id BIGINT NOT NULL,
     book_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -97,7 +103,7 @@ CREATE TABLE orders (
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	user_id BIGINT NOT NULL,
-	delivery_detail_id BIGINT NOT NULL;
+	delivery_detail_id BIGINT NOT NULL
 );
 -- Create the orders_books table
 -- modeling a many-to-many relationship between orders and books
@@ -130,7 +136,7 @@ CREATE TABLE payments (
 	id BIGSERIAL PRIMARY KEY,
 	amount DECIMAL(19, 2) NOT NULL,
 	transaction_id VARCHAR(255) NOT NULL,
-	payment_method VARCHAR(20) DEFAULT 'card' NOT NULL; 	-- card, cash
+	payment_method VARCHAR(20) DEFAULT 'card' NOT NULL, 	-- card, cash
 	payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL, 	-- success, pending, failed
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -249,13 +255,13 @@ ALTER TABLE books_categories
 		ON DELETE CASCADE;
 --
 -- Foreign key constraint linking to the users table
-ALTER TABLE user_favorites
-    ADD CONSTRAINT FK_user_favorites_users FOREIGN KEY (user_id) REFERENCES users(id)
+ALTER TABLE users_favorite_books
+    ADD CONSTRAINT FK_users_favorite_books_users FOREIGN KEY (user_id) REFERENCES users(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE;
 -- Foreign key constraint linking to the books table
-ALTER TABLE user_favorites
-    ADD CONSTRAINT FK_user_favorites_books FOREIGN KEY (book_id) REFERENCES books(id)
+ALTER TABLE users_favorite_books
+    ADD CONSTRAINT FK_users_favorite_books_books FOREIGN KEY (book_id) REFERENCES books(id)
     ON UPDATE CASCADE
     ON DELETE CASCADE;
 --

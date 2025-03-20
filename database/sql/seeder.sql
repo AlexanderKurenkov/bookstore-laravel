@@ -38,18 +38,60 @@ VALUES (
 		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW'
 	);
 
-INSERT INTO books (title, author, publisher, image_path, publication_year, price, quantity_in_stock, description)
+INSERT INTO books (
+    title, author, publisher, image_path, sample_page_images, publication_year, price, quantity_in_stock,
+    description, binding_type, publication_type, isbn, edition, circulation, language, pages, weight, size
+)
 VALUES
-    ('Мёртвые души', 'Николай Гоголь', 'Эксмо', '/images/books/1.webp', 1842, 720.30, 9, 'Сатирическая поэма о российском чиновничестве.'),
-    ('Мастер и Маргарита', 'Михаил Булгаков', 'Эксмо', '/images/books/10.webp', 1967, 990.99, 5, 'Мистический роман о визите дьявола в Москву.');
-    ('Евгений Онегин', 'Александр Пушкин', 'Эксмо', '/images/books/3.webp', 1833, 480.99, 20, 'Роман в стихах о судьбе светского молодого человека.'),
-    ('Отцы и дети', 'Иван Тургенев', 'АСТ', '/images/books/4.webp', 1862, 650.75, 8, 'Роман о столкновении поколений и нигилизме.'),
-   	('Преступление и наказание', 'Фёдор Достоевский', 'Азбука', '/images/books/5.webp', 1866, 799.99, 15, 'Роман о внутренней борьбе студента Раскольникова после убийства.'),
-	('Война и мир', 'Лев Толстой', 'Эксмо', '/images/books/6.webp', 1869, 1499.50, 10, 'Эпопея о жизни русской аристократии в эпоху Наполеоновских войн.'),
-    ('Анна Каренина', 'Лев Толстой', 'Азбука', '/images/books/7.webp', 1877, 899.00, 12, 'Трагическая история любви Анны Карениной и Вронского.'),
-    ('Человек в футляре', 'Антон Чехов', 'АСТ', '/images/books/8.webp', 1898, 350.00, 18, 'Повесть о замкнутом и боязливом человеке Беликове.'),
-    ('Доктор Живаго', 'Борис Пастернак', 'Азбука', '/images/books/9.webp', 1957, 1100.75, 7, 'Историко-романтическая драма на фоне революции.'),
-    ('Герой нашего времени', 'Михаил Лермонтов', 'Азбука', '/images/books/2.webp', 1840, 560.20, 14, 'Психологический портрет офицера Печорина.'),
+    ('Мёртвые души', 'Николай Гоголь', 'Эксмо', '/images/books/1.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1842, 720.30, 9,
+     'Сатирическая поэма о российском чиновничестве.', 'hardcover', 'physical', '978-5-04-001234-5',
+     '1-е издание', 10000, 'Русский', 384, 500.25, '20x30 cm'),
+
+    ('Мастер и Маргарита', 'Михаил Булгаков', 'Эксмо', '/images/books/10.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1967, 990.99, 5,
+     'Мистический роман о визите дьявола в Москву.', 'hardcover', 'physical', '978-5-04-009876-4',
+     '1-е издание', 15000, 'Русский', 448, 650.50, '22x30 cm'),
+
+    ('Евгений Онегин', 'Александр Пушкин', 'Эксмо', '/images/books/3.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1833, 480.99, 20,
+     'Роман в стихах о судьбе светского молодого человека.', 'hardcover', 'physical', '978-5-04-003456-7',
+     '2-е издание', 20000, 'Русский', 320, 300.30, '19x28 cm'),
+
+    ('Отцы и дети', 'Иван Тургенев', 'АСТ', '/images/books/4.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1862, 650.75, 8,
+     'Роман о столкновении поколений и нигилизме.', 'hardcover', 'physical', '978-5-04-004567-8',
+     '1-е издание', 12000, 'Русский', 352, 400.40, '21x30 cm'),
+
+    ('Преступление и наказание', 'Фёдор Достоевский', 'Азбука', '/images/books/5.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1866, 799.99, 15,
+     'Роман о внутренней борьбе студента Раскольникова после убийства.', 'hardcover', 'physical',
+     '978-5-04-005678-9', '1-е издание', 25000, 'Русский', 512, 600.60, '23x33 cm'),
+
+    ('Война и мир', 'Лев Толстой', 'Эксмо', '/images/books/6.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1869, 1499.50, 10,
+     'Эпопея о жизни русской аристократии в эпоху Наполеоновских войн.', 'hardcover', 'physical',
+     '978-5-04-006789-0', '1-е издание', 50000, 'Русский', 1200, 1500.75, '25x35 cm'),
+
+    ('Анна Каренина', 'Лев Толстой', 'Азбука', '/images/books/7.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1877, 899.00, 12,
+     'Трагическая история любви Анны Карениной и Вронского.', 'hardcover', 'physical',
+     '978-5-04-007890-1', '1-е издание', 18000, 'Русский', 864, 750.80, '20x30 cm'),
+
+    ('Человек в футляре', 'Антон Чехов', 'АСТ', '/images/books/8.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1898, 350.00, 18,
+     'Повесть о замкнутом и боязливом человеке Беликове.', 'paperback', 'physical',
+     '978-5-04-008901-2', '1-е издание', 8000, 'Русский', 192, 250.10, '18x28 cm'),
+
+    ('Доктор Живаго', 'Борис Пастернак', 'Азбука', '/images/books/9.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1957, 1100.75, 7,
+     'Историко-романтическая драма на фоне революции.', 'hardcover', 'physical',
+     '978-5-04-009012-3', '1-е издание', 10000, 'Русский', 672, 800.40, '22x32 cm'),
+
+    ('Герой нашего времени', 'Михаил Лермонтов', 'Азбука', '/images/books/2.webp',
+     ARRAY['/images/books/page_1.jpg', '/images/books/page_2.jpg', '/images/books/page_3.jpg', '/images/books/page_4.jpg', '/images/books/page_5.jpg'], 1840, 560.20, 14,
+     'Психологический портрет офицера Печорина.', 'hardcover', 'physical',
+     '978-5-04-003123-4', '1-е издание', 12000, 'Русский', 320, 400.25, '21x30 cm');
 
 INSERT INTO categories (name, description) VALUES
 	('Фантастика', 'Книги о вымышленных мирах и технологиях будущего'),
@@ -68,7 +110,7 @@ INSERT INTO books_categories (book_id, category_id) VALUES
     (1, 2),  -- "Мёртвые души" -> Детектив
     (2, 9), -- "Мастер и Маргарита" -> Классика
     (2, 3), -- "Мастер и Маргарита" -> Фэнтези
-    (2, 7); -- "Мастер и Маргарита" -> Философия
+    (2, 7), -- "Мастер и Маргарита" -> Философия
     (3, 9),  -- "Евгений Онегин" -> Классика
     (3, 10), -- "Евгений Онегин" -> Поэзия
     (4, 9),  -- "Отцы и дети" -> Классика
@@ -85,15 +127,21 @@ INSERT INTO books_categories (book_id, category_id) VALUES
     (9, 2),  -- "Доктор Живаго" -> Детектив
     (10, 9),  -- "Герой нашего времени" -> Классика
     (10, 7),  -- "Герой нашего времени" -> Философия
-    (10, 4),  -- "Герой нашего времени" -> История
+    (10, 4);  -- "Герой нашего времени" -> История
 
-INSERT INTO orders (order_status, order_total, user_id)
+INSERT INTO users_favorite_books (user_id, book_id)
 VALUES
-    ('pending', 2499.75, 3),
-    ('completed', 1499.50, 4),
-    ('pending', 799.99, 3),
-    ('cancelled', 899.00, 4),
-    ('completed', 2799.00, 3);
+    (2, 1), (2, 3), (2, 5), (2, 7),
+    (3, 2), (3, 4), (3, 6), (3, 8), (3, 10),
+    (4, 1), (4, 5), (4, 6);
+
+INSERT INTO orders (order_status, order_total, user_id, delivery_detail_id)
+VALUES
+    ('pending', 2499.75, 3, 1),
+    ('completed', 1499.50, 4, 2),
+    ('pending', 799.99, 3, 3),
+    ('cancelled', 899.00, 4, 4),
+    ('completed', 2799.00, 3, 5);
 
 INSERT INTO orders_books (quantity, price, order_id, book_id)
 VALUES
@@ -141,10 +189,10 @@ VALUES
     (4, 'Очень хорошая книга, но мне не хватило некоторой логики в сюжете.', 10, 4),
     (5, 'Книга потрясающая, впечатлила!', 10, 3);
 
-INSERT INTO payments (amount, transaction_id, payment_status, order_id)
+INSERT INTO payments (amount, transaction_id, payment_method, payment_status, order_id)
 VALUES
-    (2499.75, 'TX123456789', 'pending', 1),  -- Order ID 1
-    (1499.50, 'TX987654321', 'success', 2),   -- Order ID 2
-    (799.99, 'TX112233445', 'pending', 3),   -- Order ID 3
-    (899.00, 'TX556677889', 'failed', 4),   -- Order ID 4
-    (2799.00, 'TX998877665', 'success', 5);  -- Order ID 5
+    (2499.75, 'TX123456789', 'card', 'pending', 1),  -- Order ID 1
+    (1499.50, 'TX987654321', 'card', 'success', 2),   -- Order ID 2
+    (799.99, 'TX112233445', 'card', 'pending', 3),   -- Order ID 3
+    (899.00, 'TX556677889', 'card', 'failed', 4),   -- Order ID 4
+    (2799.00, 'TX998877665', 'card', 'success', 5);  -- Order ID 5
