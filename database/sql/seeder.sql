@@ -1,7 +1,9 @@
+-- $ chcp 65001
 -- $ psql -U <user> -d <database> -f seeder.sql
 -- example: $ psql -U postgres -d bookstore -f seeder.sql
 -- Seeding the users table
-SET client_encoding TO 'UTF8'; -- If the data was inserted when the client encoding was incorrect, the text might have been stored incorrectly.
+
+-- SET client_encoding TO 'UTF8'; -- If the data was inserted when the client encoding was incorrect, the text might have been stored incorrectly.
 
 INSERT INTO users (
 		first_name,
@@ -135,6 +137,15 @@ VALUES
     (3, 2), (3, 4), (3, 6), (3, 8), (3, 10),
     (4, 1), (4, 5), (4, 6);
 
+
+-- Seeding the delivery_details table (IDs 1 to 5)
+INSERT INTO delivery_details (user_id, address_line1, address_line2, city, state, postal_code, country, phone, user_comment)
+VALUES
+    (3, '123 Main St', 'Apt 1', 'CityA', 'StateA', '12345', 'CountryA', '1234567890', 'Leave at door'),
+    (4, '456 Elm St', 'Suite 200', 'CityB', 'StateB', '23456', 'CountryB', '2345678901', 'Ring bell'),
+    (3, '789 Oak St', NULL, 'CityC', 'StateC', '34567', 'CountryC', '3456789012', ''),
+    (4, '321 Pine St', 'Floor 3', 'CityD', 'StateD', '45678', 'CountryD', '4567890123', ''),
+    (3, '654 Cedar St', NULL, 'CityE', 'StateE', '56789', 'CountryE', '5678901234', 'Call on arrival');
 INSERT INTO orders (order_status, order_total, user_id, delivery_detail_id)
 VALUES
     ('pending', 2499.75, 3, 1),
@@ -199,15 +210,6 @@ VALUES
     (899.00, 'txn_1005', 'card', 'success', 4),
     (2799.00, 'txn_1006', 'card', 'success', 5);
 
--- Seeding the delivery_details table (IDs 1 to 5)
-INSERT INTO delivery_details (user_id, address_line1, address_line2, city, state, postal_code, country, phone, user_comment)
-VALUES
-    (3, '123 Main St', 'Apt 1', 'CityA', 'StateA', '12345', 'CountryA', '1234567890', 'Leave at door'),
-    (4, '456 Elm St', 'Suite 200', 'CityB', 'StateB', '23456', 'CountryB', '2345678901', 'Ring bell'),
-    (3, '789 Oak St', NULL, 'CityC', 'StateC', '34567', 'CountryC', '3456789012', ''),
-    (4, '321 Pine St', 'Floor 3', 'CityD', 'StateD', '45678', 'CountryD', '4567890123', ''),
-    (3, '654 Cedar St', NULL, 'CityE', 'StateE', '56789', 'CountryE', '5678901234', 'Call on arrival');
-
 -- Seeding the deliveries table for orders (skipping order with cancelled status if desired)
 INSERT INTO deliveries (order_id, courier, tracking_number, delivery_status, shipped_at, expected_delivery, delivered_at)
 VALUES
@@ -234,5 +236,5 @@ VALUES
 -- Seeding the order_returns table with sample return records
 INSERT INTO order_returns (order_id, book_id, return_quantity, return_reason, return_status)
 VALUES
-    (1, 1, 1, 'Damaged copy' 'pending'),
-    (3, 3, 2, 'Incorrect item delivered', 'pending');,
+    (1, 1, 1, 'Damaged copy', 'pending'),
+    (3, 3, 2, 'Incorrect item delivered', 'pending');
