@@ -257,19 +257,20 @@
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Избранное</h5>
                                 @if(auth()->user()->favorites->count() > 0)
-                                    <span class="badge bg-primary">{{ auth()->user()->favorites->count() }} {{ trans_choice('книга|книги|книг', auth()->user()->favorites->count()) }}</span>
+                                    <span class="badge bg-primary">Всего: {{ auth()->user()->favorites->count() }}</span>
                                 @endif
                             </div>
                             <div class="card-body">
                                 @if(auth()->user()->favorites->count() > 0)
                                     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                                        @foreach(auth()->user()->favorites as $favorite)
-                                            <div class="col">
+                                        @foreach(auth()->user()->favorites as $book)
+                                            {{-- LEGACY --}}
+                                            {{-- <div class="col">
                                                 <div class="card h-100 book-card">
                                                     <div class="position-relative">
                                                         <img src="{{ $favorite->image_path ?? '/placeholder.svg?height=300&width=200' }}"
                                                              class="card-img-top" alt="{{ $favorite->title }}"
-                                                             style="height: 300px; object-fit: cover;">
+                                                             style="height: 440px; object-fit: cover;">
                                                         <form action="{{ route('favorites.toggle', $favorite->id) }}"
                                                               method="POST" class="position-absolute top-0 end-0 m-2">
                                                             @csrf
@@ -284,20 +285,31 @@
                                                         <div class="d-flex justify-content-between align-items-center">
                                                             <span class="fs-5 fw-bold text-primary">{{ number_format($favorite->price, 2) }} ₽</span>
                                                             <div class="d-flex">
-                                                                <form action="{{ route('cart.add', $favorite->id) }}" method="POST">
+                                                                <form action="{{ route('cart.item.store', $favorite->id) }}" method="POST">
                                                                     @csrf
                                                                     <button type="submit" class="btn btn-sm btn-primary me-2">
                                                                         <i class="bi bi-cart-plus"></i>
                                                                     </button>
                                                                 </form>
-                                                                <a href="{{ route('books.show', $favorite->id) }}" class="btn btn-sm btn-outline-secondary">
+                                                                <a href="{{ route('catalog.book', $favorite->id) }}" class="btn btn-sm btn-outline-secondary">
                                                                     <i class="bi bi-eye"></i>
                                                                 </a>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> --}}
+
+                                            <x-book-card
+                                                :id="$book->id"
+                                                :title="$book->title"
+                                                :author="$book->author"
+                                                :price="$book->price"
+                                                :imagePath="$book->image_path"
+                                                :publisher="$book->publisher"
+                                                :publication_year="$book->publication_year"
+                                            />
+
                                         @endforeach
                                     </div>
                                 @else

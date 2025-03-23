@@ -189,7 +189,7 @@
                         <i class="bi bi-cart-x fs-1 text-muted mb-3"></i>
                         <h3>Ваша корзина пуста</h3>
                         <p class="text-muted mb-4">Похоже, вы еще не добавили товары в корзину</p>
-                        <a href="{{ route('home') }}" class="btn btn-primary">
+                        <a href="{{ route('index') }}" class="btn btn-primary">
                             Начать покупки
                         </a>
                     </div>

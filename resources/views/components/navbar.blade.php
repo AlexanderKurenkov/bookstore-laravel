@@ -118,8 +118,10 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><h6 class="dropdown-header">{{ Auth::user()->name }}</h6></li>
                             <li><a class="dropdown-item" href="{{ route('dashboard.index') }}">Мой профиль</a></li>
-                            <li><a class="dropdown-item" href="{{ route('dashboard.orders') }}">Мои заказы</a></li>
-                            <li><a class="dropdown-item" href="{{ route('dashboard.wishlist') }}">Избранное</a></li>
+                            {{-- TODO Why links don't work? --}}
+                            {{-- <li><a class="dropdown-item" href="{{ route('dashboard.index') }}#orders">Мои заказы</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dashboard.index') }}#wishlist">Избранное</a></li> --}}
+
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">
@@ -222,7 +224,7 @@
                                                 </a>
                                                 <form action="{{ route('favorites.toggle', $favorite->id) }}" method="POST">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger mb-2">
                                                         <i class="bi bi-trash"></i> Удалить
                                                     </button>
                                                 </form>
