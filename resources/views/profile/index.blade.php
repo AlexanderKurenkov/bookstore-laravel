@@ -125,7 +125,7 @@
                                                                     Отменить
                                                                 </button>
                                                             @elseif($order->order_status === 'delivered')
-                                                                <a href="{{ route('returns.create', ['order_id' => $order->id]) }}" class="btn btn-sm btn-outline-warning ms-1">
+                                                                <a href="{{ route('returns.edit', ['id' => $order->id]) }}" class="btn btn-sm btn-outline-warning ms-1">
                                                                     Возврат
                                                                 </a>
                                                             @endif
@@ -222,7 +222,7 @@
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Избранное</h5>
                                 @if(auth()->user()->favorites->count() > 0)
-                                    <span class="badge bg-primary">{{ auth()->user()->favorites->count() }} {{ trans_choice('книга|книги|книг', auth()->user()->favorites->count()) }}</span>
+                                    <span class="badge bg-primary">Всего: {{ auth()->user()->favorites->count() }}</span>
                                 @endif
                             </div>
                             <div class="card-body">
@@ -423,23 +423,6 @@
                                 </form>
 
                                 <hr class="my-4">
-
-                                <h6 class="mb-3">Двухфакторная аутентификация</h6>
-                                <p class="text-muted mb-3">
-                                    Повысьте безопасность вашего аккаунта, включив двухфакторную аутентификацию.
-                                </p>
-
-                                <div class="form-check form-switch mb-3">
-                                    <input class="form-check-input" type="checkbox" id="two_factor_auth"
-                                           {{ auth()->user()->two_factor_auth ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="two_factor_auth">
-                                        Включить двухфакторную аутентификацию
-                                    </label>
-                                </div>
-
-                                <button type="button" class="btn btn-outline-primary" id="setup2fa" style="display: none;">
-                                    Настроить двухфакторную аутентификацию
-                                </button>
                             </div>
                         </div>
                     </div>

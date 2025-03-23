@@ -14,8 +14,10 @@ class ReturnController extends Controller
     /**
      * Display the return form.
      */
-    public function edit()
+    public function edit($id)
     {
+        // TODO why $id param not used below?
+
         // Get all delivered orders for the authenticated user
         $deliveredOrders = Order::where('user_id', auth()->id())
             ->where('order_status', 'delivered')

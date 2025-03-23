@@ -21,7 +21,7 @@
 
                         <form action="{{ route('returns.store') }}" method="POST">
                             @csrf
-                            
+
                             <div class="mb-4">
                                 <label for="order_id" class="form-label">Номер заказа <span class="text-danger">*</span></label>
                                 <select class="form-select @error('order_id') is-invalid @enderror" id="order_id" name="order_id" required>
@@ -104,7 +104,7 @@
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">Отправить заявку на возврат</button>
-                                <a href="{{ route('profile.orders') }}" class="btn btn-outline-secondary">Отмена</a>
+                                <a href="{{ route('dashboard.index')}}#orders" class="btn btn-outline-secondary">Отмена</a>
                             </div>
                         </form>
                     </div>
@@ -124,24 +124,24 @@
             // Handle order selection change
             orderSelect.addEventListener('change', function() {
                 const orderId = this.value;
-                
+
                 // Reset and disable book select if no order is selected
                 if (!orderId) {
                     bookSelect.innerHTML = '<option value="">Сначала выберите заказ</option>';
                     bookSelect.disabled = true;
                     return;
                 }
-                
+
                 // Enable book select and fetch books for this order
                 bookSelect.disabled = true; // Temporarily disable while loading
                 bookSelect.innerHTML = '<option value="">Загрузка книг...</option>';
-                
+
                 // Fetch books for the selected order via AJAX
                 fetch(`/api/orders/${orderId}/books`)
                     .then(response => response.json())
                     .then(data => {
                         bookSelect.innerHTML = '<option value="">Выберите книгу</option>';
-                        
+
                         if (data.length === 0) {
                             bookSelect.innerHTML = '<option value="">Нет доступных книг для возврата</option>';
                             bookSelect.disabled = true;
@@ -161,12 +161,12 @@
                         bookSelect.innerHTML = '<option value="">Ошибка загрузки книг</option>';
                     });
             });
-            
+
             // Handle book selection change
             bookSelect.addEventListener('change', function() {
                 const selectedOption = this.options[this.selectedIndex];
                 const returnQuantityInput = document.getElementById('return_quantity');
-                
+
                 if (selectedOption && selectedOption.dataset.maxQuantity) {
                     const maxQuantity = parseInt(selectedOption.dataset.maxQuantity);
                     returnQuantityInput.max = maxQuantity;
@@ -194,4 +194,3 @@
         });
     </script>
 </x-layout>
-

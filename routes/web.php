@@ -84,7 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::prefix('returns')->name('returns.')->group(function () {
-        Route::get('/edit', [ReturnController::class, 'edit'])->name('edit');
+        Route::get('/edit/{id}', [ReturnController::class, 'edit'])->name('edit');
         Route::post('/', [ReturnController::class, 'store'])->name('store');
         Route::get('/{id}/confirmation', [ReturnController::class, 'confirmation'])->name('confirmation');
     });

@@ -147,13 +147,14 @@ VALUES
     (3, '789 Oak St', NULL, 'CityC', 'StateC', '34567', 'CountryC', '3456789012', ''),
     (4, '321 Pine St', 'Floor 3', 'CityD', 'StateD', '45678', 'CountryD', '4567890123', ''),
     (3, '654 Cedar St', NULL, 'CityE', 'StateE', '56789', 'CountryE', '5678901234', 'Call on arrival');
+
 INSERT INTO orders (order_status, order_total, user_id, delivery_detail_id)
 VALUES
     ('pending', 2499.75, 3, 1),
-    ('completed', 1499.50, 4, 2),
+    ('delivered', 1499.50, 4, 2),
     ('pending', 799.99, 3, 3),
     ('cancelled', 899.00, 4, 4),
-    ('completed', 2799.00, 3, 5);
+    ('delivered', 2799.00, 3, 5);
 
 INSERT INTO orders_books (quantity, price, order_id, book_id)
 VALUES
