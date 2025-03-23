@@ -23,7 +23,13 @@ class ProfileController extends Controller
      */
     public function index(Request $request): View
     {
-        return view('profile.index');
+
+        // TODO put into service
+        // Get all orders for the currently authenticated user
+        $orders = auth()->user()->orders;
+
+        // Pass orders to the view
+        return view('profile.index', compact('orders'));
     }
 
     /**

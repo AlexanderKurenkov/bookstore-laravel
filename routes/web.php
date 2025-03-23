@@ -6,6 +6,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
@@ -74,14 +76,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     });
 
-    // TODO
+    // TODO API?
     Route::prefix('addresses')->name('addresses.')->group(function () {
         Route::post('/', [ProfileController::class, 'storeAddress'])->name('store');
         Route::delete('/{id}', [ProfileController::class, 'destroyAddress'])->name('destroy');
 
     });
 
+    Route::prefix('returns')->name('returns.')->group(function () {
+        Route::get('/edit', [ReturnController::class, 'edit'])->name('edit');
+        Route::post('/', [ReturnController::class, 'store'])->name('store');
+        Route::get('/{id}/confirmation', [ReturnController::class, 'confirmation'])->name('confirmation');
+    });
+});
 
+
+// API route for getting books from an order
+Route::middleware(['auth'])->prefix('api')->group(function () {
+    Route::get('/orders/{orderId}/books', [ReturnController::class, 'getOrderBooks']);
+});
+
+// Order cancellation
+Route::middleware(['auth'])->group(function () {
+    Route::post('/orders/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
 
 // Route::get('/dashboard', function () {

@@ -88,11 +88,11 @@
                                                     <tr>
                                                         <td>{{ $order->order_number }}</td>
                                                         <td>{{ $order->created_at->format('d.m.Y') }}</td>
-                                                        <td>{{ number_format($order->order_total, 2) }} ₽</td>
+                                                        <td>{{ number_format($order->total, 2) }} ₽</td>
                                                         <td>
-                                                            @switch($order->order_status)
+                                                            @switch($order->status)
                                                                 @case('pending')
-                                                                    <span class="badge bg-warning text-dark">Оформляется</span>
+                                                                    <span class="badge bg-warning text-dark">В обработке</span>
                                                                     @break
                                                                 @case('processing')
                                                                     <span class="badge bg-info">Комплектуется</span>
@@ -106,32 +106,67 @@
                                                                 @case('cancelled')
                                                                     <span class="badge bg-danger">Отменен</span>
                                                                     @break
-                                                                @case('returned')
-                                                                    <span class="badge bg-secondary">Возвращен</span>
-                                                                    @break
                                                                 @default
-                                                                    <span class="badge bg-secondary">{{ $order->order_status }}</span>
+                                                                    <span class="badge bg-secondary">{{ $order->status }}</span>
                                                             @endswitch
                                                         </td>
                                                         <td>
-                                                            {{-- <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary">
+                                                            <a href="{{ route('orders.show', $order->id) }}" class="btn btn-sm btn-outline-primary">
                                                                 Подробнее
-                                                            </a> --}}
-
-                                                            @if(in_array($order->order_status, ['pending', 'processing', 'shipped']))
-                                                                <button type="button" class="btn btn-sm btn-outline-danger ms-1"
-                                                                        data-bs-toggle="modal" data-bs-target="#cancelOrderModal"
-                                                                        data-order-id="{{ $order->id }}">
-                                                                    Отменить
-                                                                </button>
-                                                            @elseif($order->order_status === 'delivered')
-                                                                <a href="{{ route('returns.create', ['order_id' => $order->id]) }}" class="btn btn-sm btn-outline-warning ms-1">
-                                                                    Возврат
-                                                                </a>
-                                                            @endif
+                                                            </a>
                                                         </td>
                                                     </tr>
                                                 @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                @else
+                                    <!-- Sample data for preview -->
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>№ заказа</th>
+                                                    <th>Дата</th>
+                                                    <th>Сумма</th>
+                                                    <th>Статус</th>
+                                                    <th>Действия</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>ORD-12345</td>
+                                                    <td>15.03.2025</td>
+                                                    <td>1,250.00 ₽</td>
+                                                    <td><span class="badge bg-success">Доставлен</span></td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-sm btn-outline-primary">
+                                                            Подробнее
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>ORD-12346</td>
+                                                    <td>10.03.2025</td>
+                                                    <td>850.00 ₽</td>
+                                                    <td><span class="badge bg-primary">Отправлен</span></td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-sm btn-outline-primary">
+                                                            Подробнее
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>ORD-12347</td>
+                                                    <td>05.03.2025</td>
+                                                    <td>2,100.00 ₽</td>
+                                                    <td><span class="badge bg-info">Комплектуется</span></td>
+                                                    <td>
+                                                        <a href="#" class="btn btn-sm btn-outline-primary">
+                                                            Подробнее
+                                                        </a>
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -222,7 +257,7 @@
                             <div class="card-header bg-white d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Избранное</h5>
                                 @if(auth()->user()->favorites->count() > 0)
-                                    <span class="badge bg-primary">{{ auth()->user()->favorites->count() }} {{ trans_choice('книга|книги|книг', auth()->user()->favorites->count()) }}</span>
+                                    <span class="badge bg-primary">Всего: {{ auth()->user()->favorites->count() }}</span>
                                 @endif
                             </div>
                             <div class="card-body">
@@ -235,7 +270,7 @@
                                                     <div class="position-relative">
                                                         <img src="{{ $favorite->image_path ?? '/placeholder.svg?height=300&width=200' }}"
                                                              class="card-img-top" alt="{{ $favorite->title }}"
-                                                             style="height: 300px; object-fit: cover;">
+                                                             style="height: 440px; object-fit: cover;">
                                                         <form action="{{ route('favorites.toggle', $favorite->id) }}"
                                                               method="POST" class="position-absolute top-0 end-0 m-2">
                                                             @csrf
@@ -274,7 +309,6 @@
                                                 :publisher="$book->publisher"
                                                 :publication_year="$book->publication_year"
                                             />
-
 
                                         @endforeach
                                     </div>
@@ -494,61 +528,9 @@
             </div>
         </div>
     </div>
-
-    <!-- Cancel Order Modal -->
-    <div class="modal fade" id="cancelOrderModal" tabindex="-1" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cancelOrderModalLabel">Отмена заказа</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <form id="cancelOrderForm" action="{{ route('orders.cancel') }}" method="POST">
-                    @csrf
-                    <input type="hidden" name="order_id" id="cancelOrderId">
-                    <div class="modal-body">
-                        <p>Вы уверены, что хотите отменить этот заказ?</p>
-                        <p class="text-danger small">Внимание: После отмены заказа его нельзя будет восстановить.</p>
-
-                        <div class="mb-3">
-                            <label for="cancellation_reason" class="form-label">Причина отмены</label>
-                            <textarea class="form-control" id="cancellation_reason" name="cancellation_reason" rows="3" required></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                        <button type="submit" class="btn btn-danger">Подтвердить отмену</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Order Cancellation Success Modal -->
-    <div class="modal fade" id="cancellationSuccessModal" tabindex="-1" aria-labelledby="cancellationSuccessModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="cancellationSuccessModalLabel">Заказ отменен</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <div class="mb-3">
-                        <i class="bi bi-check-circle-fill text-success fs-1"></i>
-                    </div>
-                    <h5>Заказ успешно отменен</h5>
-                    <p>Ваш заказ был успешно отменен. Если вы оплатили заказ, средства будут возвращены в соответствии с нашей политикой возврата.</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="window.location.reload()">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
         // Handle 2FA toggle
         const twoFactorToggle = document.getElementById('two_factor_auth');
         const setup2faButton = document.getElementById('setup2fa');
@@ -593,61 +575,22 @@
                 e.target.value = !x[2] ? x[1] : '+' + x[1] + ' (' + x[2] + ') ' + (x[3] ? x[3] + '-' + x[4] : (x[3] ? x[3] : '')) + (x[5] ? '-' + x[5] : '');
             });
         }
-
-        // Handle order cancellation modal
-        const cancelOrderModal = document.getElementById('cancelOrderModal');
-        if (cancelOrderModal) {
-            cancelOrderModal.addEventListener('show.bs.modal', function(event) {
-                const button = event.relatedTarget;
-                const orderId = button.getAttribute('data-order-id');
-                document.getElementById('cancelOrderId').value = orderId;
-            });
-        }
-
-        // Handle order cancellation form submission
-        const cancelOrderForm = document.getElementById('cancelOrderForm');
-        if (cancelOrderForm) {
-            cancelOrderForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                const formData = new FormData(this);
-
-                fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Hide the cancellation modal
-                    const cancelModal = bootstrap.Modal.getInstance(cancelOrderModal);
-                    cancelModal.hide();
-
-                    // Show success modal
-                    const successModal = new bootstrap.Modal(document.getElementById('cancellationSuccessModal'));
-                    successModal.show();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Произошла ошибка при отмене заказа. Пожалуйста, попробуйте еще раз.');
-                });
-            });
-        }
-
-        // Check for cancellation success message in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('cancellation_success')) {
-            const successModal = new bootstrap.Modal(document.getElementById('cancellationSuccessModal'));
-            successModal.show();
-        }
     });
     </script>
 @endpush
 
 @push('head')
+    <style>
+    .book-card {
+        transition: all 0.3s ease;
+    }
+
+    .book-  : '');
+            });
+        }
+    });
+    </script>
+
     <style>
     .book-card {
         transition: all 0.3s ease;

@@ -103,7 +103,7 @@ CREATE TABLE books_categories (
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
-    order_status VARCHAR(20) DEFAULT 'pending' NOT NULL,
+    order_status VARCHAR(20) DEFAULT 'pending' NOT NULL, -- оформляется (pending), комплектуется, отправлен, доставлен
     order_total DECIMAL(19, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

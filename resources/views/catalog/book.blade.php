@@ -368,7 +368,7 @@
                               <div class="d-flex justify-content-between mb-2">
                                   {{-- <h5 class="card-title">{{ $review->user->name }}</h5> --}}
                                   <h5 class="card-title">
-                                    <i class="bi bi-person-circle me-2"></i>{{ $review->user->first_name }} {{ $review->user->first_name }}
+                                    <i class="bi bi-person-circle me-2"></i>{{ $review->user->first_name }} {{ $review->user->last_name }}
                                 </h5>
 
                                   <div class="text-warning">
