@@ -41,4 +41,15 @@ class ReviewService
         // Using type casting because Model::delete() returns bool|null.
         return (bool)$review->delete();
     }
+
+    public function getBookRating(int $bookId): ?float
+    {
+        $book = Book::with('reviews')->find($bookId);
+
+        if (!$book || $book->reviews->isEmpty()) {
+            return null; // No reviews, so no rating available
+        }
+
+        return round($book->reviews->avg('rating'), 2);
+    }
 }

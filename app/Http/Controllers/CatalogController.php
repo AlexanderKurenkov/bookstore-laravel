@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\Category;
 use App\Services\CatalogService;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -26,34 +27,25 @@ class CatalogController extends Controller
 		return view('catalog.index', compact('books'));
 	}
 
-	public function showCategory(string $name): View
-	{
-		$books = Book::whereHas('categories', function ($query) use ($name) {
-			$query->where('name', $name);
-		})->paginate(10);
+	public function showCategory(string $url_slug): View
+    {
+        // $data = $this->catalogService->getBooksByCategory($url_slug);
 
-		return view('catalog.index', [
-			'books' => $books,
-			'categoryName' => ucfirst($name), // Format name if needed
-		]);
-	}
+        // return view('catalog.index', $data);
+
+		$sort = request('sort', 'default');
+
+		$data = $this->catalogService->getBooksByCategory($url_slug, $sort);
+
+		return view('catalog.index', $data);
+    }
 
 	public function showBook(int $id): View
 	{
 		// TODO not only authenticated user can view the catalog - maybe no need to pass user to the view at all?
 		// ?
 		$book = $this->catalogService->getBookById($id); // Find the book by ID or fail with 404
-		// $qtyList = range(1, 10); // Generate a list of quantities
 
 		return view('catalog.book', compact('book'));
-		// return view('catalog.book', [
-		// 	'id' => $book->id,
-		// 	'title' => $book->title,
-		// 	'author' => $book->author,
-		// 	'price' => $book->price,
-		// 	'publisher' => $book->publisher,
-		// 	'publication_year' => $book->publication_year,
-		// 	'imagePath' => $book->image_path, // Assuming image_path is the attribute
-		// ]);
 	}
 }

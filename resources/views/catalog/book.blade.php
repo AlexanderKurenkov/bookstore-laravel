@@ -1,387 +1,484 @@
 <x-layout>
+    @inject('reviewService', 'App\Services\ReviewService')
 
-<div class="container my-5">
-    <div class="row">
-        <!-- Book Image Column with Gallery -->
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <div id="bookImageCarousel" class="carousel slide" data-bs-ride="false">
-                    <!-- Carousel Images -->
-                    <div class="carousel-inner">
-                        <div class="carousel-item active">
-                            <img src="{{ $book->image_path ?? asset('images/placeholder-book.jpg') }}"
-                                class="d-block w-100 img-fluid"
-                                alt="{{ $book->title ?? 'Book Cover' }}">
-                        </div>
-                        @if($book->sample_page_images)
-                            <!-- Navigation arrows -->
-                            <button class="carousel-control-prev" type="button" data-bs-target="#bookImageCarousel" data-bs-slide="prev">
-                                <span class="carousel-control-prev-icon bg-secondary rounded-circle" aria-hidden="true"></span>
-                                <span class="visually-hidden">Предыдущая</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#bookImageCarousel" data-bs-slide="next">
-                                <span class="carousel-control-next-icon bg-secondary rounded-circle" aria-hidden="true"></span>
-                                <span class="visually-hidden">Следующая</span>
-                            </button>
+    @php
+        // Get book rating
+        $bookRating = $reviewService->getBookRating($book->id);
+        $ratingValue = $bookRating ? number_format($bookRating, 1) : null;
+        $reviewCount = $book->reviews->count();
+    @endphp
 
-                            @foreach($book->sample_page_images as $index => $image)
-                                <div class="carousel-item">
-                                    <img src="{{ $image }}"
-                                        class="d-block w-100 img-fluid"
-                                        alt="Страница {{ $index + 1 }}">
-                                </div>
-                            @endforeach
-                        @endif
-                    </div>
+    <div class="container my-5">
+      <div class="row">
+          <!-- Book Image Column with Gallery -->
+          <div class="col-md-4 mb-4">
+              <div class="card h-100">
+                  <div id="bookImageCarousel" class="carousel slide" data-bs-ride="false">
+                      <!-- Carousel Images -->
+                      <div class="carousel-inner">
+                          <div class="carousel-item active">
+                              <img src="{{ $book->image_path ?? asset('images/placeholder-book.jpg') }}"
+                                   class="d-block w-100 img-fluid"
+                                   alt="{{ $book->title ?? 'Book Cover' }}">
+                          </div>
+                          @if($book->sample_page_images)
+                              @foreach($book->sample_page_images as $index => $image)
+                                  <div class="carousel-item">
+                                      <img src="{{ $image }}"
+                                           class="d-block w-100 img-fluid"
+                                           alt="Страница {{ $index + 1 }}">
+                                  </div>
+                              @endforeach
+                          @endif
+                      </div>
 
-                    <!-- Caption below image -->
-                    <div class="carousel-caption position-static d-block bg-light text-dark p-2 mb-2">
-                        <p class="mb-0" id="carousel-caption-text">Обложка</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+                      <!-- Caption below image -->
+                      <div class="carousel-caption position-static d-block bg-light text-dark p-2 mb-2">
+                          <p class="mb-0" id="carousel-caption-text">Обложка</p>
+                      </div>
 
-        <!-- Book Details Column -->
-        <div class="col-md-8">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h1 class="card-title mb-4">{{ $book->title }}</h1>
+                      <!-- Navigation arrows -->
+                      <button class="carousel-control-prev" type="button" data-bs-target="#bookImageCarousel" data-bs-slide="prev">
+                          <span class="carousel-control-prev-icon bg-secondary rounded-circle" aria-hidden="true"></span>
+                          <span class="visually-hidden">Предыдущая</span>
+                      </button>
+                      <button class="carousel-control-next" type="button" data-bs-target="#bookImageCarousel" data-bs-slide="next">
+                          <span class="carousel-control-next-icon bg-secondary rounded-circle" aria-hidden="true"></span>
+                          <span class="visually-hidden">Следующая</span>
+                      </button>
 
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Название:</div>
-                        <div class="col-md-8">{{ $book->title }}</div>
-                    </div>
+                      <!-- Navigation dots -->
+                      <div class="carousel-indicators position-static mt-2">
+                          <button type="button" data-bs-target="#bookImageCarousel" data-bs-slide-to="0" class="active bg-primary" aria-current="true" aria-label="Cover"></button>
+                          @if($book->sample_page_images)
+                              @foreach($book->sample_page_images as $index => $image)
+                                  <button type="button" data-bs-target="#bookImageCarousel" data-bs-slide-to="{{ $index + 1 }}" class="bg-primary" aria-label="Page {{ $index + 1 }}"></button>
+                              @endforeach
+                          @endif
+                      </div>
+                  </div>
+              </div>
+          </div>
 
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Автор:</div>
-                        <div class="col-md-8">{{ $book->author }}</div>
-                    </div>
+          <!-- Book Details Column -->
+          <div class="col-md-8">
+              <div class="card h-100">
+                  <div class="card-body">
+                      <h1 class="card-title mb-3">{{ $book->title }}</h1>
 
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Издательство:</div>
-                        <div class="col-md-8">{{ $book->publisher }}</div>
-                    </div>
+                      <!-- Rating Display -->
+                      <div class="mb-4">
+                          <div class="d-flex align-items-center">
+                              <div class="rating-stars me-2">
+                                  @if($ratingValue)
+                                      @for($i = 1; $i <= 5; $i++)
+                                          @if($i <= floor($ratingValue))
+                                              <i class="bi bi-star-fill text-warning"></i>
+                                          @elseif($i - 0.5 <= $ratingValue)
+                                              <i class="bi bi-star-half text-warning"></i>
+                                          @else
+                                              <i class="bi bi-star text-warning"></i>
+                                          @endif
+                                      @endfor
+                                      <span class="ms-2">{{ $ratingValue }} из 5</span>
+                                  @else
+                                      @for($i = 1; $i <= 5; $i++)
+                                          <i class="bi bi-star text-warning"></i>
+                                      @endfor
+                                      <span class="ms-2">Нет оценок</span>
+                                  @endif
+                              </div>
 
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Год издания:</div>
-                        <div class="col-md-8">{{ $book->publication_year }}</div>
-                    </div>
+                              @if($reviewCount > 0)
+                                  <a href="#reviews" class="ms-3 text-decoration-none">
+                                      {{ $reviewCount }} {{ trans_choice('отзыв|отзыва|отзывов', $reviewCount) }}
+                                  </a>
+                              @endif
+                          </div>
+                      </div>
 
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">ISBN:</div>
-                        <div class="col-md-8">{{ $book->isbn }}</div>
-                    </div>
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">Название:</div>
+                          <div class="col-md-8">{{ $book->title }}</div>
+                      </div>
 
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Язык:</div>
-                        <div class="col-md-8">{{ $book->language }}</div>
-                    </div>
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">Автор:</div>
+                          <div class="col-md-8">{{ $book->author }}</div>
+                      </div>
 
-                    @if($book->edition)
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Издание:</div>
-                        <div class="col-md-8">{{ $book->edition }}</div>
-                    </div>
-                    @endif
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">Издательство:</div>
+                          <div class="col-md-8">{{ $book->publisher }}</div>
+                      </div>
 
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Тип издания:</div>
-                        <div class="col-md-8">
-                            @switch($book->publication_type)
-                                @case('physical')
-                                    Печатная книга
-                                    @break
-                                @case('ebook')
-                                    Электронная книга
-                                    @break
-                                @case('audiobook')
-                                    Аудиокнига
-                                    @break
-                                @default
-                                    {{ $book->publication_type }}
-                            @endswitch
-                        </div>
-                    </div>
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">Год издания:</div>
+                          <div class="col-md-8">{{ $book->publication_year }}</div>
+                      </div>
 
-                    @if($book->publication_type == 'physical')
-                        @if($book->binding_type)
-                        <div class="row mb-2">
-                            <div class="col-md-4 fw-bold">Тип переплета:</div>
-                            <div class="col-md-8">
-                                @switch($book->binding_type)
-                                    @case('hardcover')
-                                        Твердый переплет
-                                        @break
-                                    @case('paperback')
-                                        Мягкая обложка
-                                        @break
-                                    @default
-                                        {{ $book->binding_type }}
-                                @endswitch
-                            </div>
-                        </div>
-                        @endif
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">ISBN:</div>
+                          <div class="col-md-8">{{ $book->isbn }}</div>
+                      </div>
 
-                        @if($book->pages)
-                        <div class="row mb-2">
-                            <div class="col-md-4 fw-bold">Количество страниц:</div>
-                            <div class="col-md-8">{{ $book->pages }}</div>
-                        </div>
-                        @endif
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">Язык:</div>
+                          <div class="col-md-8">{{ $book->language }}</div>
+                      </div>
 
-                        @if($book->weight)
-                        <div class="row mb-2">
-                            <div class="col-md-4 fw-bold">Вес:</div>
-                            <div class="col-md-8">{{ $book->weight }} г</div>
-                        </div>
-                        @endif
-                    @endif
+                      @if($book->edition)
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">Издание:</div>
+                          <div class="col-md-8">{{ $book->edition }}</div>
+                      </div>
+                      @endif
 
-                    <div class="row mb-2">
-                        <div class="col-md-4 fw-bold">Наличие:</div>
-                        <div class="col-md-8">
-                            @if($book->publication_type == 'physical')
-                                @if($book->quantity_in_stock > 10)
-                                    <span class="badge bg-success">В наличии</span>
-                                @elseif($book->quantity_in_stock > 0)
-                                    <span class="badge bg-warning text-dark">Осталось мало ({{ $book->quantity_in_stock }} шт.)</span>
-                                @else
-                                    <span class="badge bg-danger">Нет в наличии</span>
-                                @endif
-                            @else
-                                <span class="badge bg-success">Доступно для скачивания</span>
-                            @endif
-                        </div>
-                    </div>
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">Тип издания:</div>
+                          <div class="col-md-8">
+                              @switch($book->publication_type)
+                                  @case('physical')
+                                      Печатная книга
+                                      @break
+                                  @case('ebook')
+                                      Электронная книга
+                                      @break
+                                  @case('audiobook')
+                                      Аудиокнига
+                                      @break
+                                  @default
+                                      {{ $book->publication_type }}
+                              @endswitch
+                          </div>
+                      </div>
 
-                    <div class="row mb-4">
-                        <div class="col-md-4 fw-bold">Цена:</div>
-                        <div class="col-md-8">
-                            <span class="fs-4 text-primary">{{ number_format($book->price, 2) }} ₽</span>
-                        </div>
-                    </div>
+                      @if($book->publication_type == 'physical')
+                          @if($book->binding_type)
+                          <div class="row mb-2">
+                              <div class="col-md-4 fw-bold">Тип переплета:</div>
+                              <div class="col-md-8">
+                                  @switch($book->binding_type)
+                                      @case('hardcover')
+                                          Твердый переплет
+                                          @break
+                                      @case('paperback')
+                                          Мягкая обложка
+                                          @break
+                                      @default
+                                          {{ $book->binding_type }}
+                                  @endswitch
+                              </div>
+                          </div>
+                          @endif
 
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
-                        @if($book->publication_type == 'physical' && $book->quantity_in_stock <= 0)
-                            <button class="btn btn-secondary" type="button" disabled>
-                                <i class="bi bi-cart-plus"></i> Нет в наличии
-                            </button>
-                        @else
-                            @if(session()->has('cart') && in_array($book->id, session('cart')))
-                                <a href="{{ route('checkout') }}" class="btn btn-success" type="button">
-                                    <i class="bi bi-bag-check"></i> Оформить
-                                </a>
-                            @else
-                                <form action="{{ route('cart.item.store', $book->id) }}" method="POST">
-                                    @csrf
-                                    <button class="btn btn-primary" type="submit">
-                                        <i class="bi bi-cart-plus"></i> Добавить в корзину
-                                    </button>
-                                </form>
-                            @endif
-                        @endif
+                          @if($book->pages)
+                          <div class="row mb-2">
+                              <div class="col-md-4 fw-bold">Количество страниц:</div>
+                              <div class="col-md-8">{{ $book->pages }}</div>
+                          </div>
+                          @endif
 
-                        <form action="" method="POST" class="d-inline">
-                        {{-- <form action="{{ route('favorites.toggle', $book->id) }}" method="POST" class="d-inline"> --}}
-                            <a class="nav-link position-relative" href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
-                            {{-- <i class="bi bi-heart fs-5"></i> --}}
-                            @csrf
-                            <button type="submit" class="btn btn-outline-secondary">
-                                @if(auth()->check() && auth()->user()->favorites->contains($book->id))
-                                    <i class="bi bi-heart-fill text-danger"></i> В избранном
-                                @else
-                                    <i class="bi bi-heart"></i> В избранное
-                                @endif
-                            </button>
-                            </a>
-                        </form>
-                    </div>
+                          @if($book->weight)
+                          <div class="row mb-2">
+                              <div class="col-md-4 fw-bold">Вес:</div>
+                              <div class="col-md-8">{{ $book->weight }} г</div>
+                          </div>
+                          @endif
+                      @endif
 
-                    <div class="row mb-2">
-                        <div class="col-12 fw-bold fs-5 mb-2">Описание:</div>
-                        <div class="col-12">
-                            <p>{{ $book->description }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                      <div class="row mb-2">
+                          <div class="col-md-4 fw-bold">Наличие:</div>
+                          <div class="col-md-8">
+                              @if($book->publication_type == 'physical')
+                                  @if($book->quantity_in_stock > 10)
+                                      <span class="badge bg-success">В наличии</span>
+                                  @elseif($book->quantity_in_stock > 0)
+                                      <span class="badge bg-warning text-dark">Осталось мало ({{ $book->quantity_in_stock }} шт.)</span>
+                                  @else
+                                      <span class="badge bg-danger">Нет в наличии</span>
+                                  @endif
+                              @else
+                                  <span class="badge bg-success">Доступно для скачивания</span>
+                              @endif
+                          </div>
+                      </div>
 
-    <!-- Book Specifications Section -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="mb-0">Характеристики</h2>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-striped">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">ISBN</th>
-                                        <td>{{ $book->isbn }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Автор</th>
-                                        <td>{{ $book->author }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Издательство</th>
-                                        <td>{{ $book->publisher }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Год издания</th>
-                                        <td>{{ $book->publication_year }}</td>
-                                    </tr>
-                                    @if($book->edition)
-                                    <tr>
-                                        <th scope="row">Издание</th>
-                                        <td>{{ $book->edition }}</td>
-                                    </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-striped">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Язык</th>
-                                        <td>{{ $book->language }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Тип издания</th>
-                                        <td>
-                                            @switch($book->publication_type)
-                                                @case('physical')
-                                                    Печатная книга
-                                                    @break
-                                                @case('ebook')
-                                                    Электронная книга
-                                                    @break
-                                                @case('audiobook')
-                                                    Аудиокнига
-                                                    @break
-                                                @default
-                                                    {{ $book->publication_type }}
-                                            @endswitch
-                                        </td>
-                                    </tr>
-                                    @if($book->publication_type == 'physical')
-                                        @if($book->binding_type)
-                                        <tr>
-                                            <th scope="row">Тип переплета</th>
-                                            <td>
-                                                @switch($book->binding_type)
-                                                    @case('hardcover')
-                                                        Твердый переплет
-                                                        @break
-                                                    @case('paperback')
-                                                        Мягкая обложка
-                                                        @break
-                                                    @default
-                                                        {{ $book->binding_type }}
-                                                @endswitch
-                                            </td>
-                                        </tr>
-                                        @endif
-                                        @if($book->pages)
-                                        <tr>
-                                            <th scope="row">Количество страниц</th>
-                                            <td>{{ $book->pages }}</td>
-                                        </tr>
-                                        @endif
-                                        @if($book->weight)
-                                        <tr>
-                                            <th scope="row">Вес</th>
-                                            <td>{{ $book->weight }} г</td>
-                                        </tr>
-                                        @endif
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                      <div class="row mb-4">
+                          <div class="col-md-4 fw-bold">Цена:</div>
+                          <div class="col-md-8">
+                              <span class="fs-4 text-primary">{{ number_format($book->price, 2) }} ₽</span>
+                          </div>
+                      </div>
 
-    <!-- Reviews Section -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <h2 class="mb-4">Отзывы</h2>
+                      <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+                          @if($book->publication_type == 'physical' && $book->quantity_in_stock <= 0)
+                              <button class="btn btn-secondary" type="button" disabled>
+                                  <i class="bi bi-cart-plus"></i> Нет в наличии
+                              </button>
+                          @else
+                              @if(session()->has('cart') && in_array($book->id, session('cart')))
+                                  <a href="{{ route('checkout') }}" class="btn btn-success" type="button">
+                                      <i class="bi bi-bag-check"></i> Оформить
+                                  </a>
+                              @else
+                                  <form action="{{ route('cart.item.store', $book->id) }}" method="POST">
+                                      @csrf
+                                      <button class="btn btn-primary" type="submit">
+                                          <i class="bi bi-cart-plus"></i> Добавить в корзину
+                                      </button>
+                                  </form>
+                              @endif
+                          @endif
 
-            @if($book->reviews->count() > 0)
-                @foreach($book->reviews as $review)
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between mb-2">
-                                <h5 class="card-title">{{ $review->user->name }}</h5>
-                                <div class="text-warning">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= $review->rating)
-                                            <i class="bi bi-star-fill"></i>
-                                        @else
-                                            <i class="bi bi-star"></i>
-                                        @endif
-                                    @endfor
-                                    <span class="ms-2 text-muted">({{ $review->rating }}/5)</span>
-                                </div>
-                            </div>
-                            <h6 class="card-subtitle mb-2 text-muted">{{ $review->created_at->format('d.m.Y') }}</h6>
-                            <p class="card-text">{{ $review->review_comment }}</p>
-                        </div>
-                    </div>
-                @endforeach
-            @else
-                <div class="alert alert-info">
-                    У этой книги пока нет отзывов. Будьте первым, кто оставит отзыв!
-                </div>
-            @endif
+                          <form action="{{ route('favorites.toggle', $book->id) }}" method="POST" class="d-inline">
+                              @csrf
+                              <button type="submit" class="btn btn-outline-secondary">
+                                  @if(auth()->check() && auth()->user()->favorites->contains($book->id))
+                                      <i class="bi bi-heart-fill text-danger"></i> В избранном
+                                  @else
+                                      <i class="bi bi-heart"></i> В избранное
+                                  @endif
+                              </button>
+                          </form>
+                      </div>
+
+                      <div class="row mb-2">
+                          <div class="col-12 fw-bold fs-5 mb-2">Описание:</div>
+                          <div class="col-12">
+                              <p>{{ $book->description }}</p>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Book Specifications Section -->
+      <div class="row mt-5">
+          <div class="col-12">
+              <div class="card">
+                  <div class="card-header">
+                      <h2 class="mb-0">Характеристики</h2>
+                  </div>
+                  <div class="card-body">
+                      <div class="row">
+                          <div class="col-md-6">
+                              <table class="table table-striped">
+                                  <tbody>
+                                      <tr>
+                                          <th scope="row">ISBN</th>
+                                          <td>{{ $book->isbn }}</td>
+                                      </tr>
+                                      <tr>
+                                          <th scope="row">Автор</th>
+                                          <td>{{ $book->author }}</td>
+                                      </tr>
+                                      <tr>
+                                          <th scope="row">Издательство</th>
+                                          <td>{{ $book->publisher }}</td>
+                                      </tr>
+                                      <tr>
+                                          <th scope="row">Год издания</th>
+                                          <td>{{ $book->publication_year }}</td>
+                                      </tr>
+                                      @if($book->edition)
+                                      <tr>
+                                          <th scope="row">Издание</th>
+                                          <td>{{ $book->edition }}</td>
+                                      </tr>
+                                      @endif
+                                  </tbody>
+                              </table>
+                          </div>
+                          <div class="col-md-6">
+                              <table class="table table-striped">
+                                  <tbody>
+                                      <tr>
+                                          <th scope="row">Язык</th>
+                                          <td>{{ $book->language }}</td>
+                                      </tr>
+                                      <tr>
+                                          <th scope="row">Тип издания</th>
+                                          <td>
+                                              @switch($book->publication_type)
+                                                  @case('physical')
+                                                      Печатная книга
+                                                      @break
+                                                  @case('ebook')
+                                                      Электронная книга
+                                                      @break
+                                                  @case('audiobook')
+                                                      Аудиокнига
+                                                      @break
+                                                  @default
+                                                      {{ $book->publication_type }}
+                                              @endswitch
+                                          </td>
+                                      </tr>
+                                      @if($book->publication_type == 'physical')
+                                          @if($book->binding_type)
+                                          <tr>
+                                              <th scope="row">Тип переплета</th>
+                                              <td>
+                                                  @switch($book->binding_type)
+                                                      @case('hardcover')
+                                                          Твердый переплет
+                                                          @break
+                                                      @case('paperback')
+                                                          Мягкая обложка
+                                                          @break
+                                                      @default
+                                                          {{ $book->binding_type }}
+                                                  @endswitch
+                                              </td>
+                                          </tr>
+                                          @endif
+                                          @if($book->pages)
+                                          <tr>
+                                              <th scope="row">Количество страниц</th>
+                                              <td>{{ $book->pages }}</td>
+                                          </tr>
+                                          @endif
+                                          @if($book->weight)
+                                          <tr>
+                                              <th scope="row">Вес</th>
+                                              <td>{{ $book->weight }} г</td>
+                                          </tr>
+                                          @endif
+                                      @endif
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="row mt-5" id="reviews">
+          <div class="col-12">
+              <h2 class="mb-4">Отзывы</h2>
+
+              @if($book->reviews->count() > 0)
+                  @foreach($book->reviews as $review)
+                      <div class="card mb-3">
+                          <div class="card-body">
+                              <div class="d-flex justify-content-between mb-2">
+                                  {{-- <h5 class="card-title">{{ $review->user->name }}</h5> --}}
+                                  <h5 class="card-title">
+                                    <i class="bi bi-person-circle me-2"></i>{{ $review->user->first_name }} {{ $review->user->first_name }}
+                                </h5>
+
+                                  <div class="text-warning">
+                                      @for($i = 1; $i <= 5; $i++)
+                                          @if($i <= $review->rating)
+                                              <i class="bi bi-star-fill"></i>
+                                          @elseif($i - 0.5 <= $review->rating)
+                                              <i class="bi bi-star-half"></i>
+                                          @else
+                                              <i class="bi bi-star"></i>
+                                          @endif
+                                      @endfor
+                                      <span class="ms-2 text-muted">({{ $review->rating }}/5)</span>
+                                  </div>
+                              </div>
+                              <h6 class="card-subtitle mb-2 text-muted">{{ $review->created_at->format('d.m.Y') }}</h6>
+                              <p class="card-text">{{ $review->review_comment }}</p>
+                          </div>
+                      </div>
+                  @endforeach
+              @else
+                  <div class="alert alert-info">
+                      У этой книги пока нет отзывов. Будьте первым, кто оставит отзыв!
+                  </div>
+              @endif
 
             <!-- Add Review Button and Form -->
             <div class="mt-4">
+            @if(auth()->check())
+                @php
+                    $userHasReviewed = $book->reviews->contains('user_id', auth()->id());
+                @endphp
+
+                @if($userHasReviewed)
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>Вы уже оставили отзыв на эту книгу. Вы можете оставить только один отзыв для каждой книги.
+                    </div>
+                @else
+                    <button id="writeReviewBtn" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Написать отзыв
+                    </button>
+
+                    <div id="reviewFormContainer" class="mt-3" style="display: none;">
+                        <div class="card">
+                            <div class="card-body">
+                                {{-- <form id="reviewForm" action="{{ route('reviews.store', $book->id) }}" method="POST"> --}}
+                                <form id="reviewForm" action="{{ route('reviews.store', ['id' => $book->id]) }}" method="POST">
+
+                                    @csrf
+                                    <input type="hidden" name="book_id" value="{{ $book->id }}">
+                                    <div class="mb-3">
+                                        <label for="rating" class="form-label">Рейтинг</label>
+                                        <div class="rating-stars mb-2">
+                                            @for($i = 5; $i >= 1; $i--)
+                                                <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" class="visually-hidden" {{ $i == 5 ? 'checked' : '' }}>
+                                                <label for="star{{ $i }}" class="star-label" title="{{ $i }} звезд"><i class="bi bi-star"></i></label>
+                                            @endfor
+                                        </div>
+                                        <div class="selected-rating">Выбрано: <span id="ratingValue">5</span> из 5</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="comment" class="form-label">Ваш отзыв</label>
+                                        <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Отправить</button>
+                                    <button type="button" id="cancelReviewBtn" class="btn btn-outline-secondary ms-2">Отмена</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            @else
                 <button id="writeReviewBtn" class="btn btn-outline-primary">
                     <i class="bi bi-pencil"></i> Написать отзыв
                 </button>
-
-                <div id="reviewFormContainer" class="mt-3" style="display: none;">
-                    <div class="card">
-                        <div class="card-body">
-                            <form action="{{ route('reviews.store', $book->id) }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="rating" class="form-label">Рейтинг</label>
-                                    <div class="rating-stars mb-2">
-                                        @for($i = 5; $i >= 1; $i--)
-                                            <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" class="visually-hidden" {{ $i == 5 ? 'checked' : '' }}>
-                                            <label for="star{{ $i }}" class="star-label" title="{{ $i }} звезд"><i class="bi bi-star"></i></label>
-                                        @endfor
-                                    </div>
-                                    <div class="selected-rating">Выбрано: <span id="ratingValue">5</span> из 5</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="content" class="form-label">Ваш отзыв</label>
-                                    <textarea class="form-control" id="content" name="content" rows="3" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Отправить</button>
-                                <button type="button" id="cancelReviewBtn" class="btn btn-outline-secondary ms-2">Отмена</button>
-                            </form>
+            @endif
+            </div>
+        </div>
+      </div>
+      <!-- Login Modal for Reviews -->
+        <div class="modal fade" id="loginReviewModal" tabindex="-1" aria-labelledby="loginReviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="loginReviewModalLabel">
+                            <i class="bi bi-person-lock me-2"></i>Требуется авторизация
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center py-4">
+                            <i class="bi bi-person-lock fs-1 text-muted"></i>
+                            <p class="mt-3">Чтобы оставить отзыв, необходимо войти в аккаунт</p>
+                            <div class="mt-3">
+                                <a href="{{ route('login') }}" class="btn btn-primary me-2">Войти</a>
+                                <a href="{{ route('register') }}" class="btn btn-outline-primary">Регистрация</a>
+                            </div>
                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
+
+    @push('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
     // Carousel caption update
     const carousel = document.getElementById('bookImageCarousel');
     const captionText = document.getElementById('carousel-caption-text');
@@ -404,19 +501,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const ratingStars = document.querySelectorAll('.star-label');
     const ratingValue = document.getElementById('ratingValue');
 
-    if (writeReviewBtn && reviewFormContainer && cancelReviewBtn) {
+    if (writeReviewBtn) {
         writeReviewBtn.addEventListener('click', function() {
-            reviewFormContainer.style.display = 'block';
-            writeReviewBtn.style.display = 'none';
+            @if(auth()->check())
+                @if(!$book->reviews->contains('user_id', auth()->id()))
+                    reviewFormContainer.style.display = 'block';
+                    writeReviewBtn.style.display = 'none';
 
-            // Initialize stars
-            updateStars(5);
+                    // Initialize stars
+                    updateStars(5);
+                @else
+                    // User has already reviewed this book
+                    alert('Вы уже оставили отзыв на эту книгу. Вы можете оставить только один отзыв для каждой книги.');
+                @endif
+            @else
+                // Show the login modal
+                var loginModal = new bootstrap.Modal(document.getElementById('loginReviewModal'));
+                loginModal.show();
+            @endif
         });
 
-        cancelReviewBtn.addEventListener('click', function() {
-            reviewFormContainer.style.display = 'none';
-            writeReviewBtn.style.display = 'inline-block';
-        });
+        if (cancelReviewBtn) {
+            cancelReviewBtn.addEventListener('click', function() {
+                reviewFormContainer.style.display = 'none';
+                writeReviewBtn.style.display = 'inline-block';
+            });
+        }
     }
 
     // Star rating functionality
@@ -482,83 +592,102 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
-</script>
-@endpush
-@push('head')
-<style>
-/* Carousel styling */
-.carousel-item img {
-    height: 400px;
-    object-fit: contain;
-    background-color: #f8f9fa;
-}
 
-.carousel-caption {
-    position: static !important;
-    padding: 10px !important;
-    margin-bottom: 0 !important;
-    border-radius: 0 0 4px 4px;
-}
+    // Check authentication before submitting review
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(event) {
+            // Check if user is authenticated
+            const isAuthenticated = {{ auth()->check() ? 'true' : 'false' }};
 
-.carousel-indicators {
-    position: static !important;
-    margin: 10px 0 !important;
-    justify-content: center;
-}
+            if (!isAuthenticated) {
+                event.preventDefault();
 
-.carousel-indicators [data-bs-target] {
-    width: 12px !important;
-    height: 12px !important;
-    border-radius: 50% !important;
-    margin: 0 5px !important;
-    border: none !important;
-    opacity: 0.5;
-}
+                // Show login modal
+                const loginModal = new bootstrap.Modal(document.getElementById('loginReviewModal'));
+                loginModal.show();
+            }
+        });
+    }
+    });
+    </script>
+    @endpush
 
-.carousel-indicators .active {
-    opacity: 1;
-}
+    @push('head')
+    <style>
+    /* Carousel styling */
+    .carousel-item img {
+      height: 400px;
+      object-fit: contain;
+      background-color: #f8f9fa;
+    }
 
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-    padding: 15px;
-}
+    .carousel-caption {
+      position: static !important;
+      padding: 10px !important;
+      margin-bottom: 0 !important;
+      border-radius: 0 0 4px 4px;
+    }
 
-/* Rating stars styling */
-.rating-stars {
-    display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-start;
-}
+    .carousel-indicators {
+      position: static !important;
+      margin: 10px 0 !important;
+      justify-content: center;
+    }
 
-.star-label {
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #ffc107;
-    margin-right: 5px;
-}
+    .carousel-indicators [data-bs-target] {
+      width: 12px !important;
+      height: 12px !important;
+      border-radius: 50% !important;
+      margin: 0 5px !important;
+      border: none !important;
+      opacity: 0.5;
+    }
 
-.star-label:hover ~ .star-label i,
-.star-label:hover i {
-    color: #ffc107;
-}
+    .carousel-indicators .active {
+      opacity: 1;
+    }
 
-.selected-rating {
-    font-size: 0.9rem;
-    color: #6c757d;
-}
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+      padding: 15px;
+    }
 
-.visually-hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-}
-</style>
-@endpush
+    /* Rating stars styling */
+    .rating-stars {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: flex-start;
+    }
+
+    .star-label {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #ffc107;
+      margin-right: 5px;
+    }
+
+    .star-label:hover ~ .star-label i,
+    .star-label:hover i {
+      color: #ffc107;
+    }
+
+    .selected-rating {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+    </style>
+    @endpush
+
 </x-layout>

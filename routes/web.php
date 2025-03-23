@@ -15,18 +15,19 @@ Route::get('/faq', [HomeController::class, 'faq'])->name('faq');
 
 Route::prefix('catalog')->name('catalog.')->group(function () {
     Route::get('/', [CatalogController::class, 'index'])->name('index'); // displays all books
-    Route::get('/category/{name}', [CatalogController::class, 'showCategory'])->name('category');
+    Route::get('/category/{url_slug}', [CatalogController::class, 'showCategory'])->name('category');
     Route::get('/book/{id}', [CatalogController::class, 'showBook'])->name('book');
 });
 
 Route::prefix('favorites')->name('favorites.')->group(function () {
     // TODO
+    Route::get('/', [CatalogController::class, 'TODO'])->name('index');
     Route::get('/toggle', [CatalogController::class, 'TODO'])->name('toggle');
 });
 
 Route::prefix('reviews')->name('reviews.')->group(function () {
-    Route::get('/', [ReviewController::class, 'index'])->name('index');
-    Route::post('/', [ReviewController::class, 'store'])->name('store');
+    Route::get('/{id}', [ReviewController::class, 'index'])->name('index');
+    Route::post('/{id}', [ReviewController::class, 'store'])->name('store');
     Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
     Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
 });

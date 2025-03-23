@@ -21,13 +21,15 @@
 
                     <select class="form-select flex-shrink-1" name="category" style="max-width: 250px;">
                         <option value="">Все категории</option>
-                        <option value="Классика">Художественная литература</option>
-                        <option value="Детектив">Детектив</option>
-                        <option value="Философия">Философия</option>
-                        <option value="Поэзия">Поэзия</option>
-                        <option value="История">История</option>
-                        <option value="Фэнтези">Фэнтези</option>
-                        <option value="Биография">Биография</option>
+                        <option value="classics">Художественная литература</option>
+                        <option value="detective">Детектив</option>
+                        <option value="philosophy">Философия</option>
+                        <option value="poetry">Поэзия</option>
+                        <option value="history">История</option>
+                        <option value="fantasy">Фэнтези</option>
+                        <option value="biography">Биография</option>
+                        <option value="fiction">Фантастика</option>
+                        <option value="science">Наука</option>
                     </select>
 
                     <button class="btn btn-light" type="submit">
@@ -170,10 +172,13 @@
                         <a class="nav-link text-dark" href="{{ route('catalog.category', 'fantasy') }}">Фэнтези</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="{{ route('catalog.category', 'biography') }}">Биографии</a>
+                        <a class="nav-link text-dark" href="{{ route('catalog.category', 'biography') }}">Биография</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="{{ route('catalog.category', 'education') }}">Учебная</a>
+                        <a class="nav-link text-dark" href="{{ route('catalog.category', 'fiction') }}">Фантастика</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{{ route('catalog.category', 'science') }}">Наука</a>
                     </li>
                 </ul>
             </div>
@@ -212,7 +217,7 @@
                                         </div>
                                         <div class="col-md-2 d-flex align-items-center justify-content-center">
                                             <div class="btn-group-vertical">
-                                                <a href="{{ route('books.show', $favorite->id) }}" class="btn btn-sm btn-outline-primary mb-2">
+                                                <a href="{{ route('catalog.book', $favorite->id) }}" class="btn btn-sm btn-outline-primary mb-2">
                                                     <i class="bi bi-eye"></i> Просмотр
                                                 </a>
                                                 <form action="{{ route('favorites.toggle', $favorite->id) }}" method="POST">

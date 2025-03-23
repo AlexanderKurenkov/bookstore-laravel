@@ -18,7 +18,7 @@ class SearchService
         $category = null;
         // Get category information if specified
         if ($categorySlug) {
-            $category = Category::where('name', $categorySlug)->first(); // first() returns null when no record is found.
+            $category = Category::where('url_slug', $categorySlug)->first(); // first() returns null when no record is found.
             if ($category) {
                 $booksQuery->whereHas('categories', fn(Builder $q) => $q->where('categories.id', $category->id));
             }
@@ -49,7 +49,10 @@ class SearchService
                 $booksQuery->orderBy('title', 'asc');
                 break;
             case 'rating':
-                $booksQuery->orderBy('rating', 'desc');
+                $booksQuery->leftJoin('reviews', 'books.id', '=', 'reviews.book_id')
+                    ->selectRaw('books.*, COALESCE(AVG(reviews.rating), 0) as avg_rating')
+                    ->groupBy('books.id')
+                    ->orderByRaw('avg_rating DESC, books.created_at DESC');
                 break;
             default:
                 // Default sorting by relevance (for search) or newest
@@ -74,6 +77,6 @@ class SearchService
         }
 
         // Get paginated results
-        return [$booksQuery->paginate(12)->withQueryString(), $category];
+        return [$booksQuery->paginate(8)->withQueryString(), $category];
     }
 }

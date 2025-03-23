@@ -3,19 +3,20 @@
         <!-- Search Results Header -->
         <div class="mb-4">
             <h1 class="mb-2">Результаты поиска по запросу: <span class="text-primary">{{ request('query') }}</span></h1>
-            <p class="text-muted">
-                Найдено {{ $books->total() }} {{ trans_choice('книга|книги|книг', $books->total()) }}
-            </p>
+            {{-- <p class="text-muted">
+                Найдено книг: {{ $books->total() }}
+            </p> --}}
         </div>
-        
+
         <!-- Sorting Controls -->
         <div class="card mb-4">
             <div class="card-body">
                 <div class="d-flex flex-wrap justify-content-between align-items-center">
                     <div class="mb-2 mb-md-0">
-                        <span class="text-muted">Показано {{ $books->firstItem() ?? 0 }} - {{ $books->lastItem() ?? 0 }} из {{ $books->total() }}</span>
+                        {{-- <span class="text-muted">Показано {{ $books->firstItem() ?? 0 }} - {{ $books->lastItem() ?? 0 }} из {{ $books->total() }}</span> --}}
+                        <span class="text-muted">Показано книг: {{ $books->firstItem() ?? 0 }} - {{ $books->lastItem() ?? 0 }} из {{ $books->total() }}</span>
                     </div>
-                    
+
                     <div class="d-flex align-items-center">
                         <label for="sort-select" class="me-2 text-nowrap">Сортировать:</label>
                         <form action="{{ route('search.results') }}" method="GET" class="d-flex">
@@ -24,7 +25,7 @@
                             @foreach(request()->except(['sort', 'page', 'query']) as $key => $value)
                                 <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                             @endforeach
-                            
+
                             <select id="sort-select" name="sort" class="form-select" onchange="this.form.submit()">
                                 <option value="default" {{ request('sort') == 'default' || !request('sort') ? 'selected' : '' }}>По умолчанию</option>
                                 <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>По возрастанию цены</option>
@@ -38,7 +39,7 @@
                 </div>
             </div>
         </div>
-        
+
         @if($books->isEmpty())
             <!-- No Results Message -->
             <div class="text-center py-5">
@@ -62,14 +63,14 @@
                     />
                 @endforeach
             </div>
-            
+
             <!-- Pagination -->
             <div class="d-flex justify-content-center mt-4">
                 {{ $books->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
             </div>
         @endif
     </div>
-    
+
     @push('head')
         <style>
             /* Highlight search terms in results */
@@ -80,7 +81,7 @@
             }
         </style>
     @endpush
-    
+
     @push('scripts')
         <script>
             // Optional: Highlight search terms in results
@@ -88,11 +89,11 @@
                 const searchQuery = "{{ request('query') }}";
                 if (searchQuery) {
                     const terms = searchQuery.split(' ').filter(term => term.length > 2);
-                    
+
                     if (terms.length > 0) {
                         const bookTitles = document.querySelectorAll('.card-title');
                         const bookAuthors = document.querySelectorAll('.card-text');
-                        
+
                         const highlightText = (elements, terms) => {
                             elements.forEach(element => {
                                 let html = element.innerHTML;
@@ -103,7 +104,7 @@
                                 element.innerHTML = html;
                             });
                         };
-                        
+
                         highlightText(bookTitles, terms);
                         highlightText(bookAuthors, terms);
                     }
@@ -112,4 +113,3 @@
         </script>
     @endpush
 </x-layout>
-

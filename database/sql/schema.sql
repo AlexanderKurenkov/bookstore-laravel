@@ -85,7 +85,8 @@ CREATE TABLE users_favorite_books (
 DROP TABLE IF EXISTS categories;
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(20) UNIQUE NOT NULL,
+    url_slug VARCHAR(20) UNIQUE NOT NULL,
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
