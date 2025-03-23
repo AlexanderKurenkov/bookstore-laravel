@@ -21,11 +21,13 @@
 
                     <select class="form-select flex-shrink-1" name="category" style="max-width: 250px;">
                         <option value="">Все категории</option>
-                        <option value="fiction">Художественная литература</option>
-                        <option value="non-fiction">Нон-фикшн</option>
-                        <option value="science">Наука</option>
-                        <option value="children">Детские книги</option>
-                        <option value="business">Бизнес</option>
+                        <option value="Классика">Художественная литература</option>
+                        <option value="Детектив">Детектив</option>
+                        <option value="Философия">Философия</option>
+                        <option value="Поэзия">Поэзия</option>
+                        <option value="История">История</option>
+                        <option value="Фэнтези">Фэнтези</option>
+                        <option value="Биография">Биография</option>
                     </select>
 
                     <button class="btn btn-light" type="submit">
@@ -113,9 +115,9 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><h6 class="dropdown-header">{{ Auth::user()->name }}</h6></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.index') }}">Мой профиль</a></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.orders') }}">Мои заказы</a></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.wishlist') }}">Избранное</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dashboard.index') }}">Мой профиль</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dashboard.orders') }}">Мои заказы</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dashboard.wishlist') }}">Избранное</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">

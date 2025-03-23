@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -57,12 +58,12 @@ class User extends Authenticatable
 	 *
 	 * @var array<int, string>
 	 */
-	protected $fillable = [
-		'first_name',
-		'last_name',
-		'email',
-		'password',
-	];
+	// protected $fillable = [
+	// 	'first_name',
+	// 	'last_name',
+	// 	'email',
+	// 	'password',
+	// ];
 
 	public function reviews(): HasMany
 	{
@@ -73,4 +74,11 @@ class User extends Authenticatable
 	{
 		return $this->hasMany(Order::class);
 	}
+
+	public function favorites(): BelongsToMany
+	{
+		return $this->belongsToMany(Book::class, 'users_favorite_books')
+			->withPivot('created_at');
+	}
+
 }

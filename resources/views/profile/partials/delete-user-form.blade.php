@@ -30,7 +30,7 @@
         <div class="mb-3">
             {{ __('Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.') }}
         </div>
-        <form id="deleteAccountForm" method="post" action="{{ route('profile.destroy') }}" class="p-6">
+        <form id="deleteAccountForm" method="post" action="{{ route('dashboard.destroy') }}" class="p-6">
             @csrf
             @method('delete')
 

@@ -34,11 +34,11 @@ class Order extends Model
 		'user_id' => 'int'
 	];
 
-	protected $fillable = [
-		'order_status',
-		'order_total',
-		'user_id'
-	];
+	// protected $fillable = [
+	// 	'order_status',
+	// 	'order_total',
+	// 	'user_id'
+	// ];
 
 	public function user(): BelongsTo
 	{
@@ -52,7 +52,12 @@ class Order extends Model
 
 	public function books(): BelongsToMany
 	{
-		return $this->belongsToMany(Book::class, 'order_books')
-			->withPivot('quantity', 'price');
+		return $this->belongsToMany(Book::class, 'orders_books')
+			->withPivot('quantity', 'price', 'created_at', 'updated_at');
 	}
+
+	public function deliveryDetail(): BelongsTo
+    {
+        return $this->belongsTo(DeliveryDetail::class, 'delivery_detail_id');
+    }
 }

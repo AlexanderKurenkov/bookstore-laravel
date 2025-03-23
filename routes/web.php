@@ -19,6 +19,11 @@ Route::prefix('catalog')->name('catalog.')->group(function () {
     Route::get('/book/{id}', [CatalogController::class, 'showBook'])->name('book');
 });
 
+Route::prefix('favorites')->name('favorites.')->group(function () {
+    // TODO
+    Route::get('/toggle', [CatalogController::class, 'TODO'])->name('toggle');
+});
+
 Route::prefix('reviews')->name('reviews.')->group(function () {
     Route::get('/', [ReviewController::class, 'index'])->name('index');
     Route::post('/', [ReviewController::class, 'store'])->name('store');
@@ -60,7 +65,7 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // No need to include {id} in the URL path for the profile routes because
     // profile belongs to the authenticated user.
-    Route::prefix('profile')->name('profile.')->group(function () {
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
 
         // TODO

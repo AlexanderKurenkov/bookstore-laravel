@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Book;
 use App\Services\SearchService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class SearchController extends Controller
@@ -28,16 +26,13 @@ class SearchController extends Controller
 	 */
 	public function results(Request $request): View
 	{
-		$query = $request->input('query'); // Get search term
-		$user = Auth::user();
+		$query = $request->input('query');
+		$categorySlug = $request->input('category');
+        $sort = $request->input('sort', 'default');
 
 		// Get the list of books based on the query
-		$bookList = $this->searchService->searchBooks($query);
+		[$books, $category] = $this->searchService->searchBooks($query, $sort, $categorySlug);
 
-		// Prepare the view data
-		$viewData = $this->searchService->prepareViewData($user, $bookList);
-
-		// Return the appropriate view with the data
-		return view('catalog.index', $viewData);
+        return view('search.results', compact('books', 'category'));
 	}
 }

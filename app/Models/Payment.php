@@ -27,15 +27,16 @@ class Payment extends Model
 
 	protected $casts = [
 		'amount' => 'float',
-		'order_id' => 'int'
+		'order_id' => 'int',
+		'payment_method' => 'string'
 	];
 
-	protected $fillable = [
-		'amount',
-		'transaction_id',
-		'payment_status',
-		'order_id'
-	];
+	// protected $fillable = [
+	// 	'amount',
+	// 	'transaction_id',
+	// 	'payment_status',
+	// 	'order_id'
+	// ];
 
 	public function order(): BelongsTo
 	{

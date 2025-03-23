@@ -158,38 +158,38 @@ function initBookReviewFeatures() {
     });
 }
 
-// Add to cart functionality
-function addToCart(id) {
-    let button = document.getElementById('addToCartBtn' + id);
+// // Add to cart functionality
+// function addToCart(id) {
+//     let button = document.getElementById('addToCartBtn' + id);
 
-    // Check if the button is clicked for the first time
-    if (!button.classList.contains('added')) {
-        // Change the button text and class when clicked for the first time
-        button.textContent = "{{__('Checkout')}}";
-        button.classList.remove('btn-outline-secondary');
-        button.classList.add('btn-secondary');
-        button.classList.add('added');  // Mark the button as added
+//     // Check if the button is clicked for the first time
+//     if (!button.classList.contains('added')) {
+//         // Change the button text and class when clicked for the first time
+//         button.textContent = "{{__('Checkout')}}";
+//         button.classList.remove('btn-outline-secondary');
+//         button.classList.add('btn-secondary');
+//         button.classList.add('added');  // Mark the button as added
 
-        // Send a request to add the item to the cart
-        let data = {
-            "bookId": id,
-            "quantity": 1
-        };
+//         // Send a request to add the item to the cart
+//         let data = {
+//             "bookId": id,
+//             "quantity": 1
+//         };
 
-        // Send the AJAX request using fetch
-        fetch("{{ route('cart.item.store') }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(data => console.log(data.message))
-            .catch(error => console.error('Error:', error));
-    } else {
-        // On the second click, navigate to the item page
-        window.location.href = button.getAttribute('data-href');
-    }
-}
+//         // Send the AJAX request using fetch
+//         fetch("{{ route('cart.item.store') }}", {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//                 "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+//             },
+//             body: JSON.stringify(data)
+//         })
+//             .then(response => response.json())
+//             .then(data => console.log(data.message))
+//             .catch(error => console.error('Error:', error));
+//     } else {
+//         // On the second click, navigate to the item page
+//         window.location.href = button.getAttribute('data-href');
+//     }
+// }

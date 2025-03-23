@@ -32,12 +32,12 @@ class Review extends Model
 		'user_id' => 'int'
 	];
 
-	protected $fillable = [
-		'rating',
-		'review_comment',
-		'book_id',
-		'user_id'
-	];
+	// protected $fillable = [
+	// 	'rating',
+	// 	'review_comment',
+	// 	'book_id',
+	// 	'user_id'
+	// ];
 
 	public function book(): BelongsTo
 	{

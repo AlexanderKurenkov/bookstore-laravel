@@ -43,7 +43,7 @@ class ProfileController extends Controller
     {
         $this->profileService->updateProfile($request->user(), $request->validated());
 
-        return redirect()->route('profile.edit')->with('status', 'profile-updated');
+        return redirect()->route('dashboard.edit')->with('status', 'profile-updated');
     }
 
     /**

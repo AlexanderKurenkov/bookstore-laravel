@@ -113,9 +113,9 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><h6 class="dropdown-header">{{ Auth::user()->name }}</h6></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.index') }}">Мой профиль</a></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.orders') }}">Мои заказы</a></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.wishlist') }}">Избранное</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dashboard.index') }}">Мой профиль</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dashboard.orders') }}">Мои заказы</a></li>
+                            <li><a class="dropdown-item" href="{{ route('dashboard.wishlist') }}">Избранное</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form action="{{ route('logout') }}" method="POST">

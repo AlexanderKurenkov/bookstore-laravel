@@ -33,20 +33,35 @@ class Book extends Model
 	protected $table = 'books';
 
 	protected $casts = [
-		'publication_year' => 'int',
-		'price' => 'float',
-		'quantity_in_stock' => 'int'
-	];
+        'publication_year' => 'integer',
+        'price' => 'float',
+        'quantity_in_stock' => 'integer',
+        'circulation' => 'integer',
+        'pages' => 'integer',
+        'weight' => 'float',
+        'sample_page_images' => 'array', // Since PostgreSQL uses TEXT[], storing it as JSON
+    ];
 
-	protected $fillable = [
-		'title',
-		'author',
-		'publisher',
-		'publication_year',
-		'price',
-		'quantity_in_stock',
-		'description'
-	];
+	// protected $fillable = [
+    //     'title',
+    //     'author',
+    //     'publisher',
+    //     'image_path',
+    //     'sample_page_images',
+    //     'publication_year',
+    //     'price',
+    //     'quantity_in_stock',
+    //     'description',
+    //     'binding_type',
+    //     'publication_type',
+    //     'isbn',
+    //     'edition',
+    //     'circulation',
+    //     'language',
+    //     'pages',
+    //     'weight',
+    //     'size',
+    // ];
 
 	public function reviews(): HasMany
 	{
@@ -60,7 +75,7 @@ class Book extends Model
 
 	public function orders(): BelongsToMany
 	{
-		return $this->belongsToMany(Order::class, 'order_books')
-			->withPivot('quantity', 'price');
+		return $this->belongsToMany(Order::class, 'orders_books')
+			->withPivot('quantity', 'price', 'created_at', 'updated_at');
 	}
 }
