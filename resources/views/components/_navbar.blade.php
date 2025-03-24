@@ -35,7 +35,7 @@
                         </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard.index') }}">Профиль</a>
+                            <a class="nav-link" href="{{ route('profile.index') }}">Профиль</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('logout') }}"

@@ -68,7 +68,7 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // No need to include {id} in the URL path for the profile routes because
     // profile belongs to the authenticated user.
-    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+    Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('update');
@@ -101,8 +101,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/orders/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 });
 
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/profile', function () {
+//     return view('profile');
+// })->middleware(['auth', 'verified'])->name('profile');
 
 require __DIR__ . '/auth.php';

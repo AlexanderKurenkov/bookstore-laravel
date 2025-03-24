@@ -148,15 +148,21 @@
                                 <h5 class="mb-0">Редактировать профиль</h5>
                             </div>
                             <div class="card-body">
-                                <form action="{{ route('dashboard.update') }}" method="POST">
+                                <form action="{{ route('profile.update') }}" method="POST">
                                     @csrf
                                     @method('PATCH')
 
                                     <div class="row g-3">
                                         <div class="col-md-6">
-                                            <label for="name" class="form-label">Имя</label>
-                                            <input type="text" class="form-control" id="name" name="name"
-                                                   value="{{ auth()->user()->name }}" required>
+                                            <label for="first_name" class="form-label">Имя</label>
+                                            <input type="text" class="form-control" id="first_name" name="first_name"
+                                                   value="{{ auth()->user()->first_name }}">
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label for="last_name" class="form-label">Фамилия</label>
+                                            <input type="text" class="form-control" id="last_name" name="last_name"
+                                                   value="{{ auth()->user()->last_name }}">
                                         </div>
 
                                         <div class="col-md-6">
@@ -173,9 +179,9 @@
                                         </div>
 
                                         <div class="col-md-6">
-                                            <label for="birth_date" class="form-label">Дата рождения</label>
-                                            <input type="date" class="form-control" id="birth_date" name="birth_date"
-                                                   value="{{ auth()->user()->birth_date ?? '' }}">
+                                            <label for="date_of_birth" class="form-label">Дата рождения</label>
+                                            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
+                                                    value="{{ auth()->user()->date_of_birth ?? '' }}">
                                         </div>
 
                                         <div class="col-12">
@@ -193,16 +199,6 @@
                                                            {{ auth()->user()->gender == 'female' ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="gender_female">Женский</label>
                                                 </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-12">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter"
-                                                       {{ auth()->user()->newsletter ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="newsletter">
-                                                    Получать новости и специальные предложения
-                                                </label>
                                             </div>
                                         </div>
 

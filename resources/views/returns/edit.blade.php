@@ -104,7 +104,7 @@
 
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">Отправить заявку на возврат</button>
-                                <a href="{{ route('dashboard.index')}}#orders" class="btn btn-outline-secondary">Отмена</a>
+                                <a href="{{ route('profile.index')}}#orders" class="btn btn-outline-secondary">Отмена</a>
                             </div>
                         </form>
                     </div>

@@ -58,7 +58,7 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-3">
-                            <a href="{{ route('dashboard.index')}}#orders" class="btn btn-primary">
+                            <a href="{{ route('profile.index')}}#orders" class="btn btn-primary">
                                 Мои заказы
                             </a>
                             <a href="{{ route('index') }}" class="btn btn-outline-secondary">

@@ -35,21 +35,24 @@ class ProfileController extends Controller
     /**
      * Display the form to edit user's profile.
      */
-    public function edit(Request $request): View
-    {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
-    }
+    // public function edit(Request $request): View
+    // {
+    //     return view('profile.edit', [
+    //         'user' => $request->user(),
+    //     ]);
+    // }
 
     /**
      * Update the user's profile information.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
+        // Debug the request data
+        // dd($request->all());  // Check if 'date_of_birth' is in the request data
+
         $this->profileService->updateProfile($request->user(), $request->validated());
 
-        return redirect()->route('dashboard.edit')->with('status', 'profile-updated');
+        return redirect()->to(route('profile.index') . '#edit-profile')->with('status', 'profile-updated');
     }
 
     /**
@@ -71,14 +74,14 @@ class ProfileController extends Controller
         return redirect()->to('/');
     }
 
-    private function validateDeletionRequest(Request $request) : void
+    private function validateDeletionRequest(Request $request): void
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
     }
 
-    private function invalidateSession(Request $request) : void
+    private function invalidateSession(Request $request): void
     {
         $request->session()->invalidate();    // Invalidate session
         $request->session()->regenerateToken(); // Regenerate CSRF token
