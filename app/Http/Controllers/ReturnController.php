@@ -27,40 +27,38 @@ class ReturnController extends Controller
         return view('returns.edit', compact('deliveredOrders'));
     }
 
-    /**
-     * Get books from an order for the return form (AJAX endpoint).
-     */
     public function getOrderBooks($orderId)
     {
-        // Verify the order belongs to the authenticated user
+        // Verify the order belongs to the authenticated user and is delivered
         $order = Order::where('id', $orderId)
             ->where('user_id', auth()->id())
             ->where('order_status', 'delivered')
             ->firstOrFail();
 
-        // Get books from this order that can be returned
-        // This would need to be adjusted based on your actual database structure
-        // and how you track order items and previous returns
-        $books = $order->items()
-            ->with('book')
+        // Get books from this order via pivot table (orders_books)
+        $books = $order->books()
+            ->withPivot('quantity', 'price') // Ensure we get pivot data
             ->get()
-            ->map(function ($item) {
-                // Calculate remaining quantity that can be returned
-                // (original quantity minus already returned quantity)
-                $returnedQuantity = OrderReturn::where('order_id', $item->order_id)
-                    ->where('book_id', $item->book_id)
-                    ->where('return_status', '!=', 'rejected')
+            ->map(function ($book) use ($orderId) {
+                // Calculate the quantity already returned
+                $returnedQuantity = OrderReturn::where('order_id', $orderId)
+                    ->where('book_id', $book->id)
+                    ->whereIn('return_status', ['approved', 'processed']) // Only valid returns
                     ->sum('return_quantity');
 
-                $remainingQuantity = $item->quantity - $returnedQuantity;
+                // Get ordered quantity from pivot table
+                $orderedQuantity = $book->pivot->quantity;
+
+                // Calculate remaining returnable quantity
+                $remainingQuantity = $orderedQuantity - $returnedQuantity;
 
                 if ($remainingQuantity <= 0) {
-                    return null;
+                    return null; // Skip books that can't be returned
                 }
 
                 return [
-                    'id' => $item->book_id,
-                    'title' => $item->book->title,
+                    'id' => $book->id,
+                    'title' => $book->title,
                     'quantity' => $remainingQuantity
                 ];
             })
@@ -70,9 +68,6 @@ class ReturnController extends Controller
         return response()->json($books);
     }
 
-    /**
-     * Store a new return request.
-     */
     public function store(Request $request)
     {
         // Validate the request
@@ -81,7 +76,7 @@ class ReturnController extends Controller
             'book_id' => 'required|exists:books,id',
             'return_quantity' => 'required|integer|min:1',
             'return_reason_type' => 'required|string',
-            'return_reason' => 'required_if:return_reason_type,other|string|nullable',
+            'return_reason' => 'nullable|required_if:return_reason_type,other|string',
             'agree_terms' => 'required|accepted',
         ]);
 
@@ -98,18 +93,21 @@ class ReturnController extends Controller
             ->firstOrFail();
 
         // Verify the book is part of this order and can be returned
-        // This would need to be adjusted based on your actual database structure
-        $orderItem = $order->items()
-            ->where('book_id', $request->book_id)
+        $orderItem = $order->books()
+            ->where('books.id', $request->book_id)
             ->firstOrFail();
 
-        // Check if the requested return quantity is valid
+        // Get ordered quantity from the pivot table
+        $orderedQuantity = $orderItem->pivot->quantity;
+
+        // Check how many copies have already been returned
         $returnedQuantity = OrderReturn::where('order_id', $order->id)
             ->where('book_id', $request->book_id)
-            ->where('return_status', '!=', 'rejected')
+            ->whereIn('return_status', ['approved', 'processed']) // Only valid returns
             ->sum('return_quantity');
 
-        $remainingQuantity = $orderItem->quantity - $returnedQuantity;
+        // Calculate remaining quantity available for return
+        $remainingQuantity = $orderedQuantity - $returnedQuantity;
 
         if ($request->return_quantity > $remainingQuantity) {
             return redirect()->back()
@@ -118,20 +116,15 @@ class ReturnController extends Controller
         }
 
         // Format the return reason
-        $returnReason = $request->return_reason_type;
-        if ($request->return_reason_type === 'other') {
-            $returnReason = $request->return_reason;
-        } else {
-            // Map reason type to human-readable text
-            $reasonMap = [
-                'damaged' => 'Товар поврежден',
-                'wrong_item' => 'Получен не тот товар',
-                'quality_issue' => 'Проблема с качеством',
-                'not_as_described' => 'Не соответствует описанию',
-                'changed_mind' => 'Передумал(а)'
-            ];
-            $returnReason = $reasonMap[$request->return_reason_type] ?? $request->return_reason_type;
-        }
+        $reasonMap = [
+            'damaged' => 'Товар поврежден',
+            'wrong_item' => 'Получен не тот товар',
+            'quality_issue' => 'Проблема с качеством',
+            'not_as_described' => 'Не соответствует описанию',
+            'changed_mind' => 'Передумал(а)'
+        ];
+
+        $returnReason = $reasonMap[$request->return_reason_type] ?? $request->return_reason;
 
         // Create the return record
         $return = OrderReturn::create([
@@ -142,19 +135,42 @@ class ReturnController extends Controller
             'return_status' => 'pending'
         ]);
 
+        // Ограничение по функционалу: возврат на заказ можно оформить только 1 раз
+        // ->
+        // Check if all books in the order have been fully returned
+        // $allBooksReturned = $order->books()->get()->every(function ($book) use ($order) {
+        //     $orderedQuantity = $book->pivot->quantity;
+        //     $returnedQuantity = OrderReturn::where('order_id', $order->id)
+        //         ->where('book_id', $book->id)
+        //         ->whereIn('return_status', ['approved', 'processed'])
+        //         ->sum('return_quantity');
+
+        //     return $orderedQuantity <= $returnedQuantity; // Check if all copies of the book were returned
+        // });
+
+        // If all books are returned, update the order status to 'returned'
+        // if ($allBooksReturned) {
+        //     $order->update(['order_status' => 'returned']);
+        // }
+        // <-
+
+        $order->update(['order_status' => 'returned']);
+
         // Send email notification
         try {
             Mail::to('returns@' . config('app.domain'))
                 ->send(new ReturnRequestSubmitted($return));
         } catch (\Exception $e) {
-            // Log the error but don't fail the request
             \Log::error('Failed to send return request email: ' . $e->getMessage());
+            return redirect()->route('returns.confirmation', $return->id)
+                ->with('warning', 'Ваша заявка на возврат отправлена, но не удалось отправить email.');
         }
 
         // Redirect with success message
         return redirect()->route('returns.confirmation', $return->id)
             ->with('success', 'Ваша заявка на возврат успешно отправлена. Мы свяжемся с вами в ближайшее время.');
     }
+
 
     /**
      * Display return confirmation page.

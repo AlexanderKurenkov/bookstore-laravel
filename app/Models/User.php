@@ -58,12 +58,15 @@ class User extends Authenticatable
 	 *
 	 * @var array<int, string>
 	 */
-	// protected $fillable = [
-	// 	'first_name',
-	// 	'last_name',
-	// 	'email',
-	// 	'password',
-	// ];
+	protected $fillable = [
+		'first_name',
+		'last_name',
+		'email',
+		'password',
+		'phone',
+		'date_of_birth',
+		'gender'
+	];
 
 	public function reviews(): HasMany
 	{

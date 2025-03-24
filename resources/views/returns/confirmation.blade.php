@@ -9,10 +9,10 @@
                                 <i class="bi bi-check-circle-fill text-success fs-1"></i>
                             </div>
                         </div>
-                        
+
                         <h1 class="h3 mb-3">Заявка на возврат принята</h1>
                         <p class="text-muted mb-4">Номер заявки: #{{ $return->id }}</p>
-                        
+
                         <div class="card mb-4">
                             <div class="card-body text-start">
                                 <h5 class="card-title">Информация о возврате</h5>
@@ -44,7 +44,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="card mb-4 bg-light">
                             <div class="card-body">
                                 <h5 class="card-title">Что дальше?</h5>
@@ -56,12 +56,12 @@
                                 </ol>
                             </div>
                         </div>
-                        
+
                         <div class="d-flex justify-content-center gap-3">
-                            <a href="{{ route('profile.orders') }}" class="btn btn-primary">
+                            <a href="{{ route('dashboard.index')}}#orders" class="btn btn-primary">
                                 Мои заказы
                             </a>
-                            <a href="{{ route('home') }}" class="btn btn-outline-secondary">
+                            <a href="{{ route('index') }}" class="btn btn-outline-secondary">
                                 На главную
                             </a>
                         </div>
@@ -71,4 +71,3 @@
         </div>
     </div>
 </x-layout>
-

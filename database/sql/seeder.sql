@@ -9,35 +9,50 @@ INSERT INTO users (
 		first_name,
 		last_name,
 		email,
-		password
+		password,
+        phone,
+		date_of_birth,
+		gender
 	)
 VALUES (
 		'Александр',
 		'Александров',
 		'admin@example.com',
 		-- hashed word 'password'
-		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW'
+		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW',
+        '+7 912 345-67-89',
+		'1990-05-12',
+		'male'
 	),
 	(
 		'Борис',
 		'Борисов',
 		'boris@example.com',
 		-- hashed word 'password' (bcrypt)
-		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW'
+		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW',
+        '+7 911 234-56-78',
+		'1985-11-24',
+		'male'
 	),
 	(
 		'Василий',
 		'Васильев',
 		'vasiliy@example.com',
 		-- hashed word 'password'
-		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW'
+		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW',
+        '+7 913 456-78-90',
+		'1992-08-30',
+		'male'
 	),
 	(
 		'Григорий',
 		'Григорьев',
 		'grigoriy@example.com',
 		-- hashed word 'password'
-		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW'
+		'$2y$13$GeXsv/KQR7cFm/qNpdRraOCGAcSSBoOhsl56qS3IGw/zPcPbisENW',
+        '+7 914 567-89-01',
+		'1993-02-14',
+		'male'
 	);
 
 INSERT INTO books (

@@ -41,6 +41,9 @@ CREATE TABLE users (
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
     email_verified_at TIMESTAMP,
+    phone VARCHAR(20),
+    date_of_birth DATE,
+    gender VARCHAR(10) CHECK (gender IN ('male', 'female') OR gender IS NULL);
     remember_token VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -103,7 +106,8 @@ CREATE TABLE books_categories (
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
-    order_status VARCHAR(20) DEFAULT 'pending' NOT NULL, -- оформляется (pending), комплектуется, отправлен, доставлен
+    -- оформляется (pending), комплектуется (processing), отправлен (shipped), доставлен (delivered), отменен (cancelled), возвращен (returned)
+    order_status VARCHAR(20) DEFAULT 'pending' NOT NULL,
     order_total DECIMAL(19, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -209,7 +213,7 @@ CREATE TABLE order_returns (
     book_id BIGINT NOT NULL,
     return_quantity SMALLINT NOT NULL,
     return_reason TEXT,
-    return_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- e.g., pending, approved, rejected, processed
+    return_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- pending, approved, rejected
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

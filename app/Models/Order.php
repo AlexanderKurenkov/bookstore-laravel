@@ -34,11 +34,12 @@ class Order extends Model
 		'user_id' => 'int'
 	];
 
-	// protected $fillable = [
-	// 	'order_status',
-	// 	'order_total',
-	// 	'user_id'
-	// ];
+	protected $fillable = [
+		'order_status',
+		'order_total',
+		'user_id',
+		'delivery_detail_id'
+	];
 
 	public function user(): BelongsTo
 	{

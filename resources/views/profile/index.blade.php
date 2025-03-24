@@ -86,7 +86,8 @@
                                             <tbody>
                                                 @foreach($orders as $order)
                                                     <tr>
-                                                        <td>{{ $order->order_number }}</td>
+
+                                                        <td>ORD-{{ str_pad($order->id, 6, "0", STR_PAD_LEFT) }}</td>
                                                         <td>{{ $order->created_at->format('d.m.Y') }}</td>
                                                         <td>{{ number_format($order->order_total, 2) }} ₽</td>
                                                         <td>
