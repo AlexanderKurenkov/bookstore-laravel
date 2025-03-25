@@ -74,14 +74,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/', [ProfileController::class, 'update'])->name('update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
 
+        Route::patch('/update-password', [ProfileController::class, 'updatePassword'])->name('password.update');
     });
 
     // TODO API?
-    Route::prefix('addresses')->name('addresses.')->group(function () {
-        Route::post('/', [ProfileController::class, 'storeAddress'])->name('store');
-        Route::delete('/{id}', [ProfileController::class, 'destroyAddress'])->name('destroy');
+    // Route::prefix('addresses')->name('addresses.')->group(function () {
+    //     Route::post('/', [ProfileController::class, 'storeAddress'])->name('store');
+    //     Route::delete('/{id}', [ProfileController::class, 'destroyAddress'])->name('destroy');
 
-    });
+    // });
 
     Route::prefix('returns')->name('returns.')->group(function () {
         Route::get('/edit/{id}', [ReturnController::class, 'edit'])->name('edit');
@@ -104,5 +105,21 @@ Route::middleware(['auth'])->group(function () {
 // Route::get('/profile', function () {
 //     return view('profile');
 // })->middleware(['auth', 'verified'])->name('profile');
+
+// Cart API routes for dynamic updates
+Route::prefix('api/cart')->group(function () {
+    Route::get('/', [CartController::class, 'getCart'])->name('cart.api.get');
+    Route::post('/add', [CartController::class, 'addItem'])->name('cart.api.add');
+    Route::post('/remove', [CartController::class, 'removeItem'])->name('cart.api.destroy');
+    Route::post('/update', [CartController::class, 'updateItem'])->name('cart.api.update');
+});
+
+// DEV
+if (app()->environment('local')) {
+    Route::get('/clear-session', function () {
+        session()->flush();
+        return "Session cleared.";
+    });
+}
 
 require __DIR__ . '/auth.php';

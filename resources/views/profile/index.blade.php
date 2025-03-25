@@ -42,10 +42,6 @@
                                 @endif
                             </a>
                             <a class="list-group-item list-group-item-action d-flex align-items-center"
-                               id="addresses-tab" data-bs-toggle="list" href="#addresses" role="tab" aria-controls="addresses">
-                                <i class="bi bi-geo-alt me-2"></i> Адреса доставки
-                            </a>
-                            <a class="list-group-item list-group-item-action d-flex align-items-center"
                                id="security-tab" data-bs-toggle="list" href="#security" role="tab" aria-controls="security">
                                 <i class="bi bi-shield-lock me-2"></i> Безопасность
                             </a>
@@ -226,42 +222,6 @@
                                 @if(auth()->user()->favorites->count() > 0)
                                     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
                                         @foreach(auth()->user()->favorites as $book)
-                                            {{-- LEGACY --}}
-                                            {{-- <div class="col">
-                                                <div class="card h-100 book-card">
-                                                    <div class="position-relative">
-                                                        <img src="{{ $favorite->image_path ?? '/placeholder.svg?height=300&width=200' }}"
-                                                             class="card-img-top" alt="{{ $favorite->title }}"
-                                                             style="height: 300px; object-fit: cover;">
-                                                        <form action="{{ route('favorites.toggle', $favorite->id) }}"
-                                                              method="POST" class="position-absolute top-0 end-0 m-2">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-sm btn-danger rounded-circle">
-                                                                <i class="bi bi-heart-fill"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">{{ $favorite->title }}</h5>
-                                                        <p class="card-text text-muted">{{ $favorite->author }}</p>
-                                                        <div class="d-flex justify-content-between align-items-center">
-                                                            <span class="fs-5 fw-bold text-primary">{{ number_format($favorite->price, 2) }} ₽</span>
-                                                            <div class="d-flex">
-                                                                <form action="{{ route('cart.item.store', $favorite->id) }}" method="POST">
-                                                                    @csrf
-                                                                    <button type="submit" class="btn btn-sm btn-primary me-2">
-                                                                        <i class="bi bi-cart-plus"></i>
-                                                                    </button>
-                                                                </form>
-                                                                <a href="{{ route('catalog.book', $favorite->id) }}" class="btn btn-sm btn-outline-secondary">
-                                                                    <i class="bi bi-eye"></i>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> --}}
-
                                             <x-book-card
                                                 :id="$book->id"
                                                 :title="$book->title"
@@ -271,8 +231,6 @@
                                                 :publisher="$book->publisher"
                                                 :publication_year="$book->publication_year"
                                             />
-
-
                                         @endforeach
                                     </div>
                                 @else
@@ -280,101 +238,9 @@
                                         <i class="bi bi-heart fs-1 text-muted"></i>
                                         <p class="mt-3">У вас пока нет избранных книг</p>
                                         <p class="text-muted mb-4">Добавляйте понравившиеся книги в избранное, чтобы вернуться к ним позже</p>
-                                        <a href="{{ route('home') }}" class="btn btn-primary">
+                                        <a href="{{ route('index') }}" class="btn btn-primary">
                                             Перейти к каталогу
                                         </a>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Addresses Tab -->
-                    <div class="tab-pane fade" id="addresses" role="tabpanel" aria-labelledby="addresses-tab">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                                <h5 class="mb-0">Адреса доставки</h5>
-                                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addAddressModal">
-                                    <i class="bi bi-plus-lg me-1"></i>Добавить адрес
-                                </button>
-                            </div>
-                            <div class="card-body">
-                                @if(isset($addresses) && count($addresses) > 0)
-                                    <div class="row row-cols-1 row-cols-md-2 g-4">
-                                        @foreach($addresses as $address)
-                                            <div class="col">
-                                                <div class="card h-100">
-                                                    <div class="card-body">
-                                                        @if($address->is_default)
-                                                            <span class="badge bg-primary mb-2">Основной адрес</span>
-                                                        @endif
-                                                        <h6 class="card-title">{{ $address->name }}</h6>
-                                                        <p class="card-text">
-                                                            {{ $address->address }}<br>
-                                                            {{ $address->city }}, {{ $address->region }}<br>
-                                                            {{ $address->postal_code }}
-                                                        </p>
-                                                        <div class="d-flex justify-content-end mt-3">
-                                                            <button type="button" class="btn btn-sm btn-outline-primary me-2">
-                                                                Редактировать
-                                                            </button>
-                                                            <form action="{{ route('addresses.destroy', $address->id) }}" method="POST">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                                    Удалить
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <!-- Sample data for preview -->
-                                    <div class="row row-cols-1 row-cols-md-2 g-4">
-                                        <div class="col">
-                                            <div class="card h-100">
-                                                <div class="card-body">
-                                                    <span class="badge bg-primary mb-2">Основной адрес</span>
-                                                    <h6 class="card-title">Домашний</h6>
-                                                    <p class="card-text">
-                                                        ул. Примерная, д. 123, кв. 45<br>
-                                                        Москва, Московская область<br>
-                                                        123456
-                                                    </p>
-                                                    <div class="d-flex justify-content-end mt-3">
-                                                        <button type="button" class="btn btn-sm btn-outline-primary me-2">
-                                                            Редактировать
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger">
-                                                            Удалить
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <div class="card h-100">
-                                                <div class="card-body">
-                                                    <h6 class="card-title">Рабочий</h6>
-                                                    <p class="card-text">
-                                                        ул. Деловая, д. 78, офис 42<br>
-                                                        Москва, Московская область<br>
-                                                        123789
-                                                    </p>
-                                                    <div class="d-flex justify-content-end mt-3">
-                                                        <button type="button" class="btn btn-sm btn-outline-primary me-2">
-                                                            Редактировать
-                                                        </button>
-                                                        <button type="button" class="btn btn-sm btn-outline-danger">
-                                                            Удалить
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 @endif
                             </div>
@@ -385,31 +251,40 @@
                     <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
                         <div class="card shadow-sm">
                             <div class="card-header bg-white">
-                                <h5 class="mb-0">Безопасность</h5>
+                                <h5 class="mb-0">Изменить пароль</h5>
                             </div>
                             <div class="card-body">
-                                <form action="{{ route('password.update') }}" method="POST">
+                                @if(session('status') === 'password-updated')
+                                    <div class="alert alert-success">
+                                        Пароль был успешно обновлен.
+                                    </div>
+                                @endif
+
+                                <form id="password-update-form" action="{{ route('profile.password.update') }}" method="POST">
                                     @csrf
                                     @method('PATCH')
+
+                                    <div class="alert alert-success d-none" id="password-update-success"></div>
 
                                     <div class="row g-3">
                                         <div class="col-12">
                                             <label for="current_password" class="form-label">Текущий пароль</label>
                                             <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                            <div class="invalid-feedback"></div> <!-- Placeholder for error messages -->
                                         </div>
 
                                         <div class="col-md-6">
                                             <label for="password" class="form-label">Новый пароль</label>
                                             <input type="password" class="form-control" id="password" name="password" required>
-                                            <div class="form-text">
-                                                Пароль должен содержать не менее 8 символов
-                                            </div>
+                                            <div class="invalid-feedback"></div>
                                         </div>
 
                                         <div class="col-md-6">
                                             <label for="password_confirmation" class="form-label">Подтверждение пароля</label>
                                             <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                                            <div class="invalid-feedback"></div>
                                         </div>
+
 
                                         <div class="col-12">
                                             <button type="submit" class="btn btn-primary">
@@ -419,57 +294,25 @@
                                     </div>
                                 </form>
 
+
                                 <hr class="my-4">
+
+                            </div>
+                            <div class="card-header bg-white">
+                                <h5 class="mb-0 text-danger">Удаление аккаунта</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted mb-3">
+                                    <b>Внимание!</b> Удаление аккаунта приведет к безвозвратной потере всех Ваших данных, включая историю заказов, избранное и личную информацию.
+                                </p>
+
+                                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                    <i class="bi bi-trash me-2"></i>Удалить аккаунт
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Add Address Modal -->
-    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addAddressModalLabel">Добавить адрес</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form action="{{ route('addresses.store') }}" method="POST" id="addAddressForm">
-                        @csrf
-                        <div class="mb-3">
-                            <label for="address_name" class="form-label">Название адреса</label>
-                            <input type="text" class="form-control" id="address_name" name="name" placeholder="Например: Домашний, Рабочий" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="address" class="form-label">Адрес</label>
-                            <input type="text" class="form-control" id="address" name="address" placeholder="Улица, дом, квартира" required>
-                        </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="city" class="form-label">Город</label>
-                                <input type="text" class="form-control" id="city" name="city" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="region" class="form-label">Область/Край</label>
-                                <input type="text" class="form-control" id="region" name="region">
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="postal_code" class="form-label">Индекс</label>
-                            <input type="text" class="form-control" id="postal_code" name="postal_code" required>
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="is_default" name="is_default">
-                            <label class="form-check-label" for="is_default">Использовать как адрес по умолчанию</label>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="submit" form="addAddressForm" class="btn btn-primary">Сохранить</button>
                 </div>
             </div>
         </div>
@@ -526,42 +369,71 @@
         </div>
     </div>
 
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="deleteAccountModalLabel">Удаление аккаунта</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="deleteAccountForm" action="{{ route('profile.destroy') }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <i class="bi bi-exclamation-triangle-fill text-danger fs-1"></i>
+                            <h5 class="mt-3 text-danger">Это действие необратимо</h5>
+                        </div>
+
+                        <p>Вы собираетесь удалить свой аккаунт. Это приведет к удалению:</p>
+                        <ul>
+                            <li>Вашей личной информации</li>
+                            <li>Истории заказов</li>
+                            <li>Избранных товаров</li>
+                            <li>Сохраненных адресов</li>
+                        </ul>
+                        <p>Для подтверждения введите ваш текущий пароль:</p>
+
+                        <div class="mb-3">
+                            <label for="password_confirm_deletion" class="form-label">Пароль</label>
+                            <input type="password" class="form-control" id="password_confirm_deletion" name="password" required>
+                            <div class="invalid-feedback" id="password-error"></div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirm_deletion" name="confirm_deletion" required>
+                            <label class="form-check-label" for="confirm_deletion">
+                                Я понимаю, что это действие необратимо и все мои данные будут удалены
+                            </label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-danger">Удалить аккаунт</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-        // Handle 2FA toggle
-        const twoFactorToggle = document.getElementById('two_factor_auth');
-        const setup2faButton = document.getElementById('setup2fa');
 
-        if (twoFactorToggle && setup2faButton) {
-            twoFactorToggle.addEventListener('change', function() {
-                if (this.checked) {
-                    setup2faButton.style.display = 'inline-block';
-                } else {
-                    setup2faButton.style.display = 'none';
-                }
-            });
-
-            // Initialize on page load
-            if (twoFactorToggle.checked) {
-                setup2faButton.style.display = 'inline-block';
-            }
-        }
-
-        // Handle tab persistence with URL hash
+        // Function to activate tab based on hash
         const hash = window.location.hash;
         if (hash) {
+            // alert(hash);
             const tab = document.querySelector(`#profile-tabs a[href="${hash}"]`);
             if (tab) {
-                tab.click();
+                new bootstrap.Tab(tab).show();
             }
         }
 
-        // Update URL hash when tab changes
-        const tabLinks = document.querySelectorAll('#profile-tabs a');
-        tabLinks.forEach(link => {
-            link.addEventListener('shown.bs.tab', function(e) {
-                window.location.hash = e.target.getAttribute('href');
+        // Update URL hash when a new tab is clicked
+        document.querySelectorAll('#profile-tabs a').forEach(link => {
+            link.addEventListener('shown.bs.tab', function (e) {
+                history.replaceState(null, null, e.target.getAttribute('href'));
             });
         });
 
@@ -622,6 +494,96 @@
         if (urlParams.has('cancellation_success')) {
             const successModal = new bootstrap.Modal(document.getElementById('cancellationSuccessModal'));
             successModal.show();
+        }
+
+        // AJAX call
+        const form = document.querySelector('#password-update-form');
+
+        if(form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Reset error messages
+                    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+                    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+
+                    if (data.success) {
+                        // Show success message
+                        const successAlert = document.querySelector('#password-update-success');
+                        successAlert.textContent = data.message;
+                        successAlert.classList.remove('d-none');
+
+                        // Optionally reset the form
+                        form.reset();
+                    } else if (data.errors) {
+                        // Show validation errors
+                        for (const field in data.errors) {
+                            const input = form.querySelector(`[name="${field}"]`);
+                            if (input) {
+                                input.classList.add('is-invalid');
+                                const feedback = input.nextElementSibling;
+                                if (feedback) {
+                                    feedback.textContent = data.errors[field][0];
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert('Произошла ошибка. Попробуйте еще раз.');
+                });
+            });
+        }
+
+        // Handle account deletion form
+        const deleteAccountForm = document.getElementById('deleteAccountForm');
+        if (deleteAccountForm) {
+            deleteAccountForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                if (!document.getElementById('confirm_deletion').checked) {
+                    alert('Пожалуйста, подтвердите, что вы понимаете последствия удаления аккаунта.');
+                    return;
+                }
+
+                const formData = new FormData(this);
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '{{ route("index") }}?account_deleted=true';
+                    } else {
+                        return response.json().then(data => {
+                            throw new Error(data.message || 'Произошла ошибка при удалении аккаунта.');
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('password-error').textContent = error.message;
+                    document.getElementById('password_confirm_deletion').classList.add('is-invalid');
+                });
+            });
         }
     });
     </script>

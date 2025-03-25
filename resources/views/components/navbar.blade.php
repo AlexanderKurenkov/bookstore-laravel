@@ -56,55 +56,54 @@
 
                 <!-- Cart Dropdown -->
                 <li class="nav-item dropdown me-2">
-                    <a class="nav-link position-relative" href="#" id="cartDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-cart fs-5"></i>
-                        @if(session()->has('cart') && count(session('cart')) > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ count(session('cart')) }}
-                                <span class="visually-hidden">товаров в корзине</span>
-                            </span>
+                    <a class="nav-link position-relative" href="#" id="cartDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="bi bi-cart fs-5"></span>
+
+                        @if(session()->has('cart'))
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill
+                            {{ count(session('cart')) > 0 ? 'bg-danger' : 'bg-secondary' }} cart-badge" id="cartBadgeCount">
+                            {{ count(session('cart')) }}
+                        </span>
                         @endif
+
                     </a>
                     <div class="dropdown-menu dropdown-menu-end p-3" aria-labelledby="cartDropdown" style="min-width: 300px;">
                         <h6 class="dropdown-header">Корзина</h6>
 
-                        @if(session()->has('cart') && count(session('cart')) > 0)
-                            <div class="cart-items mb-3" style="max-height: 300px; overflow-y: auto;">
-                                @foreach(session('cart') as $item)
-                                    <div class="d-flex align-items-center mb-2 pb-2 border-bottom">
-                                        <img src="{{ $item['image'] ?? '/placeholder.svg?height=50&width=40' }}"
-                                             alt="{{ $item['title'] ?? 'Книга' }}" class="me-2"
-                                             style="width: 40px; height: 50px; object-fit: cover;">
-                                        <div class="flex-grow-1">
-                                            <div class="small fw-bold">{{ $item['title'] ?? 'Название книги' }}</div>
-                                            <div class="small text-muted">{{ $item['price'] ?? '0.00' }} ₽ × {{ $item['quantity'] ?? 1 }}</div>
-                                        </div>
-                                        <form action="{{ route('cart.item.destroy', $item['id'] ?? 1) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm text-danger">
+                        <div id="cartDropdownContent">
+                            @if(session()->has('cart') && count(session('cart')) > 0)
+                                <div class="cart-items mb-3" style="max-height: 300px; overflow-y: auto;" id="cartItemsList">
+                                    @foreach(session('cart') as $item)
+                                        <div class="d-flex align-items-center mb-2 pb-2 border-bottom cart-item" data-item-id="{{ $item['id'] ?? 0 }}">
+                                            <img src="{{ $item['image'] ?? '' }}"
+                                                    alt="{{ $item['title'] ?? 'Книга' }}" class="me-2"
+                                                    style="width: 40px; height: 50px; object-fit: cover;">
+                                            <div class="flex-grow-1">
+                                                <div class="small fw-bold">{{ $item['title'] ?? 'Название книги' }}</div>
+                                                <div class="small text-muted">{{ $item['price'] ?? '0.00' }} ₽ × {{ $item['quantity'] ?? 1 }}</div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm text-danger remove-cart-item" data-item-id="{{ $item['id'] ?? 1 }}">
                                                 <i class="bi bi-x"></i>
                                             </button>
-                                        </form>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <div class="d-flex justify-content-between mb-3">
-                                <span class="fw-bold">Итого:</span>
-                                <span class="fw-bold">{{ session('cart_total') ?? '0.00' }} ₽</span>
-                            </div>
-                            <div class="d-grid gap-2">
-                                <a href="{{ route('cart.index') }}" class="btn btn-outline-primary">Просмотр корзины</a>
-                                <a href="{{ route('checkout.index') }}" class="btn btn-primary">Оформить заказ</a>
-                            </div>
-                        @else
-                            <div class="text-center py-4">
-                                <i class="bi bi-cart-x fs-1 text-muted"></i>
-                                <p class="mt-2">Ваша корзина пуста</p>
-                                <a href="{{ route('index') }}" class="btn btn-sm btn-outline-primary">Начать покупки</a>
-                            </div>
-                        @endif
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="fw-bold">Итого:</span>
+                                    <span class="fw-bold" id="cartTotalPrice">{{ session('cart_total') ?? '0.00' }} ₽</span>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ route('cart.index') }}" class="btn btn-outline-primary">Просмотр корзины</a>
+                                    <a href="{{ route('checkout.index') }}" class="btn btn-primary">Оформить заказ</a>
+                                </div>
+                            @else
+                                <div class="text-center py-4" id="emptyCartMessage">
+                                    <i class="bi bi-cart-x fs-1 text-muted"></i>
+                                    <p class="mt-2">Ваша корзина пуста</p>
+                                    <a href="{{ route('index') }}" class="btn btn-sm btn-outline-primary">Начать покупки</a>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </li>
 
@@ -263,3 +262,311 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function addToCartButtonClicked(id) {
+        let button = document.getElementById('addToCartBtn' + id);
+
+        // Check if the button is clicked for the first time
+        if (!button.classList.contains('added')) {
+            // Add loading state
+            button.disabled = true;
+            // const originalText = button.innerHTML;
+            button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Добавляем';
+
+            // Use the global addToCart function from navbar.blade.php
+            try {
+                // Call the global addToCart function with the book ID
+                window.addToCart(id, 1);
+
+                // Change the button text and class when clicked for the first time
+                button.innerHTML = '<i class="bi bi-bag-check me-1"></i>Оформить';
+                button.classList.remove('btn-outline-primary');
+                button.classList.add('btn-primary');
+                button.classList.add('added');  // Mark the button as added
+                button.disabled = false;
+
+                // // Listen for cart updates to ensure UI is consistent
+                // document.addEventListener('cartUpdated', function updateButtonAfterCartChange(e) {
+                //     // Check if this book is in the updated cart
+                //     const isInCart = e.detail.items.some(item => item.id == id);
+                //     if (!isInCart) {
+                //         // If item was removed elsewhere, reset button
+                //         button.innerHTML = originalText;
+                //         button.classList.remove('btn-primary', 'added');
+                //         button.classList.add('btn-outline-primary');
+                //     }
+                //     // Remove this listener after first execution
+                //     document.removeEventListener('cartUpdated', updateButtonAfterCartChange);
+                // });
+            } catch (error) {
+                console.error('Error:', error);
+                // Remove loading state and restore original state on error
+                button.disabled = false;
+                button.innerHTML = originalText;
+                button.classList.remove('btn-primary', 'added');
+                button.classList.add('btn-outline-primary');
+            }
+        } else {
+            // On the second click, navigate to the checkout page
+            window.location.href = button.getAttribute('data-href');
+        }
+    }
+
+    function toggleFavorite(id) {
+        const button = document.getElementById('favoriteBtn' + id);
+        const icon = document.getElementById('favoriteIcon' + id);
+
+        // Add loading state
+        button.disabled = true;
+
+        // Send the AJAX request to toggle favorite status
+        fetch("{{ route('favorites.toggle') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ bookId: id })
+        })
+        .then(response => {
+            if (!response.ok) {
+                if (response.status === 401) {
+                    // User is not authenticated, redirect to login
+                    window.location.href = "{{ route('login') }}";
+                    throw new Error('Please login to add favorites');
+                }
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Remove loading state
+            button.disabled = false;
+
+            // Update icon based on response
+            if (data.isFavorite) {
+                icon.classList.remove('bi-heart');
+                icon.classList.add('bi-heart-fill', 'text-danger');
+            } else {
+                icon.classList.remove('bi-heart-fill', 'text-danger');
+                icon.classList.add('bi-heart');
+            }
+
+            // Update favorites count in navbar if needed
+            if (typeof updateFavoritesCount === 'function') {
+                updateFavoritesCount(data.favoritesCount);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            button.disabled = false;
+        });
+    }
+
+    document.addEventListener('cartUpdated', function (e) {
+        e.detail.items.forEach(item => {
+            let button = document.getElementById('addToCartBtn' + item.id);
+            if (button) {
+                button.innerHTML = '<i class="bi bi-bag-check me-1"></i> Оформить';
+                button.classList.remove('btn-outline-primary');
+                button.classList.add('btn-primary', 'added');
+            }
+        });
+
+        // Reset buttons for items that are no longer in the cart
+        document.querySelectorAll('.added').forEach(button => {
+            let id = button.id.replace('addToCartBtn', '');
+            const isInCart = e.detail.items.some(item => item.id == id);
+
+            if (!isInCart) {
+                button.innerHTML = '<i class="bi bi-cart-plus me-1"></i> Добавить'; // Original text
+                button.classList.remove('btn-primary', 'added');
+                button.classList.add('btn-outline-primary');
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Function to update cart count badge
+        window.updateCartCount = function(count) {
+            const cartBadge = document.getElementById('cartBadgeCount');
+
+            if (cartBadge) {
+                cartBadge.textContent = count;
+                // cartBadge.style.display = count > 0 ? 'inline-block' : 'none';
+                if(count > 0)
+                    cartBadge.classList.replace("bg-secondary", "bg-danger");
+                else
+                    cartBadge.classList.replace("bg-danger", "bg-secondary");
+            }
+        };
+
+        // Function to fetch cart data from server
+        window.fetchCartData = function() {
+            fetch('{{ route("cart.api.get") }}', {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateCartDropdown(data);
+            })
+            .catch(error => {
+                console.error('Error fetching cart data:', error);
+            });
+        };
+
+        // Function to update cart dropdown content
+        function updateCartDropdown(data) {
+            const cartItemsList = document.getElementById('cartItemsList');
+            const cartTotalPrice = document.getElementById('cartTotalPrice');
+            const emptyCartMessage = document.getElementById('emptyCartMessage');
+            const cartDropdownContent = document.getElementById('cartDropdownContent');
+
+            // Update cart count
+            updateCartCount(data.count);
+
+            // If cart is empty
+            if (data.count === 0) {
+                cartDropdownContent.innerHTML = `
+                    <div class="text-center py-4" id="emptyCartMessage">
+                        <i class="bi bi-cart-x fs-1 text-muted"></i>
+                        <p class="mt-2">Ваша корзина пуста</p>
+                        <a href="{{ route('index') }}" class="btn btn-sm btn-outline-primary">Начать покупки</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // Build cart items HTML
+            let cartItemsHtml = `
+                <div class="cart-items mb-3" style="max-height: 300px; overflow-y: auto;" id="cartItemsList">
+            `;
+
+            data.items.forEach(item => {
+                cartItemsHtml += `
+                    <div class="d-flex align-items-center mb-2 pb-2 border-bottom cart-item" data-item-id="${item.id}">
+                        <img src="${item.image || '/placeholder.svg?height=50&width=40'}"
+                             alt="${item.title || 'Книга'}" class="me-2"
+                             style="width: 40px; height: 50px; object-fit: cover;">
+                        <div class="flex-grow-1">
+                            <div class="small fw-bold">${item.title || 'Название книги'}</div>
+                            <div class="small text-muted">${item.price || '0.00'} ₽ × ${item.quantity || 1}</div>
+                        </div>
+                        <button type="button" class="btn btn-sm text-danger remove-cart-item" data-item-id="${item.id}">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            cartItemsHtml += `</div>`;
+
+            // Add total and buttons
+            cartItemsHtml += `
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="fw-bold">Итого:</span>
+                    <span class="fw-bold" id="cartTotalPrice">${data.total} ₽</span>
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{{ route('cart.index') }}" class="btn btn-outline-primary">Просмотр корзины</a>
+                    <a href="{{ route('checkout.index') }}" class="btn btn-primary">Оформить заказ</a>
+                </div>
+            `;
+
+            // Update the dropdown content
+            cartDropdownContent.innerHTML = cartItemsHtml;
+
+            // Add event listeners to new remove buttons
+            attachRemoveItemListeners();
+        }
+
+        // Function to attach event listeners to remove buttons
+        function attachRemoveItemListeners() {
+            const removeButtons = document.querySelectorAll('.remove-cart-item');
+            removeButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const itemId = this.getAttribute('data-item-id');
+                    removeCartItem(itemId);
+                });
+            });
+        }
+
+        // Function to remove item from cart
+        window.removeCartItem = function(itemId) {
+            fetch(`{{ route('cart.api.destroy') }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ id: itemId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart dropdown with new data
+                    updateCartDropdown(data);
+
+                    // Trigger custom event for other components to listen to
+                    document.dispatchEvent(new CustomEvent('cartUpdated', {
+                        detail: {
+                            count: data.count,
+                            total: data.total,
+                            items: data.items
+                        }
+                    }));
+                }
+            })
+            .catch(error => {
+                console.error('Error removing item from cart:', error);
+            });
+        };
+
+        // Function to add item to cart
+        window.addToCart = function(itemId, quantity = 1) {
+            fetch(`{{ route('cart.api.add') }}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ id: itemId, quantity: quantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update cart dropdown with new data
+                    updateCartDropdown(data);
+
+                    // Trigger custom event for other components to listen to
+                    document.dispatchEvent(new CustomEvent('cartUpdated', {
+                        detail: {
+                            count: data.count,
+                            total: data.total,
+                            items: data.items
+                        }
+                    }));
+                }
+            })
+            .catch(error => {
+                console.error('Error adding item to cart:', error);
+            });
+        };
+
+        // Attach event listeners to existing remove buttons
+        attachRemoveItemListeners();
+    });
+    </script>
+@endpush

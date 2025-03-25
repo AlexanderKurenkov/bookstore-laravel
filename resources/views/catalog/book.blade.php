@@ -211,23 +211,29 @@
                           </div>
                       </div>
 
-                      <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+                      {{-- <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
                           @if($book->publication_type == 'physical' && $book->quantity_in_stock <= 0)
                               <button class="btn btn-secondary" type="button" disabled>
                                   <i class="bi bi-cart-plus"></i> Нет в наличии
                               </button>
                           @else
                               @if(session()->has('cart') && in_array($book->id, session('cart')))
+                                <div>
                                   <a href="{{ route('checkout') }}" class="btn btn-success" type="button">
                                       <i class="bi bi-bag-check"></i> Оформить
                                   </a>
+                                </div>
                               @else
-                                  <form action="{{ route('cart.item.store', $book->id) }}" method="POST">
-                                      @csrf
-                                      <button class="btn btn-primary" type="submit">
-                                          <i class="bi bi-cart-plus"></i> Добавить в корзину
-                                      </button>
-                                  </form>
+                                  <div>
+                                    <button id="addToCartBtn{{ $book->id }}"
+                                        class="btn btn-outline-primary flex-grow-1"
+                                        onclick="addToCartButtonClicked({{ $book->id }})"
+                                        data-href="{{ route('checkout.index') }}"
+                                    >
+                                        <i class="bi bi-cart-plus me-1"></i>Добавить в корзину
+                                    </button>
+                                  </div>
+
                               @endif
                           @endif
 
@@ -241,7 +247,63 @@
                                   @endif
                               </button>
                           </form>
-                      </div>
+                      </div> --}}
+
+                        @php
+                            $cart = session('cart', []);
+                            $bookInCart = isset($cart[$book->id]); // Check if book exists in cart
+                        @endphp
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+                            @if($book->publication_type == 'physical' && $book->quantity_in_stock <= 0)
+                                <button class="btn btn-secondary" type="button" disabled>
+                                    <i class="bi bi-cart-plus"></i> Нет в наличии
+                                </button>
+                            @else
+                                {{-- `added` class indicated that book was added to cart  --}}
+                                {{-- <div>
+                                    @if($bookInCart)
+                                        <button id="addToCartBtn{{ $book->id }}"
+                                                class="btn btn-primary flex-grow-1 added"
+                                                onclick="addToCartButtonClicked({{ $book->id }})"
+                                                data-href="{{ route('checkout.index') }}">
+
+                                            <i class="bi bi-bag-check"></i> Оформить
+                                        </button>
+                                    @else
+                                        <button id="addToCartBtn{{ $book->id }}"
+                                                class="btn btn-outline-primary flex-grow-1"
+                                                onclick="addToCartButtonClicked({{ $book->id }})"
+                                                data-href="{{ route('checkout.index') }}">
+
+                                                <i class="bi bi-cart-plus me-1"></i> Добавить
+                                        </button>
+                                    @endif
+                                </div> --}}
+                                <div>
+                                    <button id="addToCartBtn{{ $book->id }}"
+                                            class="btn flex-grow-1 {{ $bookInCart ? 'btn-primary added' : 'btn-outline-primary' }}"
+                                            onclick="addToCartButtonClicked({{ $book->id }})"
+                                            data-href="{{ route('checkout.index') }}">
+
+                                        <i class="bi {{ $bookInCart ? 'bi-bag-check' : 'bi-cart-plus me-1' }}"></i>
+                                        {{ $bookInCart ? ' Оформить' : ' Добавить' }}
+                                    </button>
+                                </div>
+
+                            @endif
+
+                            <form action="{{ route('favorites.toggle', $book->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    @if(auth()->check() && auth()->user()->favorites->contains($book->id))
+                                        <i class="bi bi-heart-fill text-danger"></i> В избранном
+                                    @else
+                                        <i class="bi bi-heart"></i> В избранное
+                                    @endif
+                                </button>
+                            </form>
+                        </div>
 
                       <div class="row mb-2">
                           <div class="col-12 fw-bold fs-5 mb-2">Описание:</div>

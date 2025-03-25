@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class ProfileService
 {
@@ -18,10 +20,10 @@ class ProfileService
         return $user->save();
     }
 
-    public function deleteUser(User $user) : bool
-    {
-        Auth::logout();  // Log out the user
-        // Using type casting because Model::delete() returns bool|null.
-        return (bool)$user->delete(); // Delete the user
-    }
+    // public function deleteUser(User $user) : bool
+    // {
+    //     Auth::logout();  // Log out the user
+    //     // Using type casting because Model::delete() returns bool|null.
+    //     return (bool)$user->delete(); // Delete the user
+    // }
 }

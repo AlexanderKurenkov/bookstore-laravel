@@ -147,7 +147,7 @@
                             bookSelect.disabled = true;
                         } else {
                             data.forEach(book => {
-                                const option = document.createElement('option');
+                                const option = document.createElement('parser');
                                 option.value = book.id;
                                 option.textContent = `${book.title} (${book.quantity} шт.)`;
                                 option.dataset.maxQuantity = book.quantity;
