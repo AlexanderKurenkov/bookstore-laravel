@@ -30,52 +30,57 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 class Book extends Model
 {
-	protected $table = 'books';
+    protected $table = 'books';
 
-	protected $casts = [
+    protected $casts = [
         'publication_year' => 'integer',
         'price' => 'float',
         'quantity_in_stock' => 'integer',
         'circulation' => 'integer',
         'pages' => 'integer',
         'weight' => 'float',
-        'sample_page_images' => 'array', // Since PostgreSQL uses TEXT[], storing it as JSON
+        // 'sample_page_images' => 'array', // Since PostgreSQL uses TEXT[], storing it as JSON
     ];
 
-	// protected $fillable = [
-    //     'title',
-    //     'author',
-    //     'publisher',
-    //     'image_path',
-    //     'sample_page_images',
-    //     'publication_year',
-    //     'price',
-    //     'quantity_in_stock',
-    //     'description',
-    //     'binding_type',
-    //     'publication_type',
-    //     'isbn',
-    //     'edition',
-    //     'circulation',
-    //     'language',
-    //     'pages',
-    //     'weight',
-    //     'size',
-    // ];
+    protected $fillable = [
+        'title',
+        'author',
+        'publisher',
+        'image_path',
+        'sample_page_images',
+        'publication_year',
+        'price',
+        'quantity_in_stock',
+        'description',
+        'binding_type',
+        'publication_type',
+        'isbn',
+        'edition',
+        'circulation',
+        'language',
+        'pages',
+        'weight',
+        'size',
+    ];
 
-	public function reviews(): HasMany
-	{
-		return $this->hasMany(Review::class);
-	}
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
 
-	public function categories(): BelongsToMany
-	{
-		return $this->belongsToMany(Category::class, 'books_categories');
-	}
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class, 'books_categories');
+    }
 
-	public function orders(): BelongsToMany
-	{
-		return $this->belongsToMany(Order::class, 'orders_books')
-			->withPivot('quantity', 'price', 'created_at', 'updated_at');
-	}
+    public function orders(): BelongsToMany
+    {
+        return $this->belongsToMany(Order::class, 'orders_books')
+            ->withPivot('quantity', 'price', 'created_at', 'updated_at');
+    }
+
+    public function getSamplePageImagesAttribute($value)
+    {
+        return $value ? explode(',', trim($value, '{}')) : [];
+    }
 }

@@ -287,19 +287,6 @@
                 button.classList.add('added');  // Mark the button as added
                 button.disabled = false;
 
-                // // Listen for cart updates to ensure UI is consistent
-                // document.addEventListener('cartUpdated', function updateButtonAfterCartChange(e) {
-                //     // Check if this book is in the updated cart
-                //     const isInCart = e.detail.items.some(item => item.id == id);
-                //     if (!isInCart) {
-                //         // If item was removed elsewhere, reset button
-                //         button.innerHTML = originalText;
-                //         button.classList.remove('btn-primary', 'added');
-                //         button.classList.add('btn-outline-primary');
-                //     }
-                //     // Remove this listener after first execution
-                //     document.removeEventListener('cartUpdated', updateButtonAfterCartChange);
-                // });
             } catch (error) {
                 console.error('Error:', error);
                 // Remove loading state and restore original state on error

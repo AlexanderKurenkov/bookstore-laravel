@@ -8,15 +8,13 @@
                 <img src="{{ $imagePath }}" class="card-img-top book-image" alt="{{ $title }}">
             </a>
             <!-- Favorite Button (Absolute Position) -->
-
-                <button type="button"
-                        id="favoriteBtn{{ $id }}"
-                        class="btn btn-sm btn-light rounded-circle position-absolute top-0 end-0 m-2 favorite-btn"
-                        onclick="toggleFavorite({{ $id }})"
-                        href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
-                    <i id="favoriteIcon{{ $id }}" class="bi {{ auth()->check() && auth()->user()->favorites->contains($id) ? 'bi-heart-fill text-danger' : 'bi-heart' }}"></i>
-                </button>
-            </a>
+            <button type="button"
+                    id="favoriteBtn{{ $id }}"
+                    class="btn btn-sm btn-light rounded-circle position-absolute top-0 end-0 m-2 favorite-btn"
+                    onclick="toggleFavorite({{ $id }})"
+                    href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
+                <i id="favoriteIcon{{ $id }}" class="bi {{ auth()->check() && auth()->user()->favorites->contains($id) ? 'bi-heart-fill text-danger' : 'bi-heart' }}"></i>
+            </button>
         </div>
 
         <div class="card-body d-flex flex-column justify-content-between">
@@ -53,15 +51,6 @@
                         {{ $bookInCart ? ' Оформить' : ' Добавить' }}
                     </button>
                 </div>
-                {{-- <div class="d-flex">
-                    <button id="addToCartBtn{{ $id }}"
-                        class="btn btn-outline-primary flex-grow-1"
-                        onclick="addToCartButtonClicked({{ $id }})"
-                        data-href="{{ route('checkout.index') }}"
-                    >
-                        <i class="bi bi-cart-plus me-1"></i>Добавить в корзину
-                    </button>
-                </div> --}}
             </div>
         </div>
     </div>
