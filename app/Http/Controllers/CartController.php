@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class CartController extends Controller
@@ -84,20 +85,23 @@ class CartController extends Controller
 
 	public function destroyItem(Request $request): RedirectResponse
 	{
-		$user = Auth::user();
-		$bookId = $request->query('book_id');
+		// $user = Auth::user();
+		// $bookId = $request->query('book_id');
 
-		$this->cartService->removeCartItem($user, $bookId);
+		// $this->cartService->removeCartItem($user, $bookId);
 
+		// return redirect()->route('cart.index')->with('removeBookSuccess', true);
+		//
+
+		$this->removeItem($request);
 		return redirect()->route('cart.index')->with('removeBookSuccess', true);
 	}
 
 	public function clear(): RedirectResponse
 	{
-		$user = Auth::user();
-		$this->cartService->removeAllItems($user);
+		$this->cartService->removeAllItems();
 
-		return redirect()->route('cart.index')->with('clearCartSuccess', true);
+		return redirect()->route('cart.index');
 	}
 
 	//===============================

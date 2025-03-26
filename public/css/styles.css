@@ -1,3 +1,7 @@
+main {
+  min-height: 70vh;
+}
+
 :focus {
   outline: 0px solid rgb(128, 128, 128) !important;
   /* Change to your preferred color */

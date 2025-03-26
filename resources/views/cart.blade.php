@@ -68,9 +68,10 @@
 
                                                     <!-- Actions -->
                                                     <td class="text-center align-middle pe-4">
-                                                        <form action="{{ route('cart.item.destroy', $item['id'] ?? 1) }}" method="POST" class="d-inline-block">
+                                                        <form action="{{ route('cart.item.destroy') }}" method="POST" class="d-inline-block">
                                                             @csrf
                                                             @method('DELETE')
+                                                            <input type="hidden" name="id" value="{{ $item['id'] }}">
                                                             <button type="submit" class="btn btn-sm btn-outline-danger">
                                                                 <i class="bi bi-trash"></i>
                                                             </button>
@@ -83,7 +84,7 @@
                                 </div>
                             </div>
                             <div class="card-footer bg-white d-flex justify-content-between py-3">
-                                <a href="{{ route('index') }}" class="btn btn-outline-primary">
+                                <a href="{{ route('catalog.index') }}" class="btn btn-outline-primary">
                                     <i class="bi bi-arrow-left me-2"></i>Продолжить покупки
                                 </a>
                                 <form action="{{ route('cart.clear') }}" method="POST">
@@ -118,36 +119,6 @@
                                     <span>{{ $shippingCost > 0 ? number_format($shippingCost, 2) . ' ₽' : 'Бесплатно' }}</span>
                                 </div>
 
-                                <!-- Promo Code -->
-                                <div class="mb-3">
-                                    <form action="{{ route('cart.index') }}" method="POST">
-                                    {{-- <form action="{{ route('cart.promo') }}" method="POST"> --}}
-                                        @csrf
-                                        <div class="input-group mb-2">
-                                            <input type="text" class="form-control" placeholder="Промокод" name="promo_code"
-                                                   value="{{ session('promo_code') ?? '' }}">
-                                            <button class="btn btn-outline-secondary" type="submit">Применить</button>
-                                        </div>
-                                        @if(session('promo_discount'))
-                                            <div class="text-success small">
-                                                <i class="bi bi-check-circle me-1"></i>Промокод применен: скидка {{ session('promo_discount') }}%
-                                            </div>
-                                        @endif
-                                        @if(session('promo_error'))
-                                            <div class="text-danger small">
-                                                <i class="bi bi-exclamation-circle me-1"></i>{{ session('promo_error') }}
-                                            </div>
-                                        @endif
-                                    </form>
-                                </div>
-
-                                @if(session('promo_discount'))
-                                    <div class="d-flex justify-content-between mb-3 text-success">
-                                        <span>Скидка по промокоду</span>
-                                        <span>-{{ number_format((session('cart_total') ?? 0) * (session('promo_discount') / 100), 2) }} ₽</span>
-                                    </div>
-                                @endif
-
                                 <hr>
 
                                 <div class="d-flex justify-content-between mb-3 fw-bold">
@@ -175,9 +146,9 @@
                         <div class="card mt-3 shadow-sm">
                             <div class="card-body">
                                 <h6 class="mb-3"><i class="bi bi-truck me-2"></i>Информация о доставке</h6>
-                                <p class="small mb-1">Бесплатная доставка при заказе от 2000 ₽</p>
                                 <p class="small mb-1">Стандартная доставка: 2-4 рабочих дня</p>
-                                <p class="small mb-0">Экспресс-доставка: 1-2 рабочих дня (за дополнительную плату)</p>
+                                <p class="small mb-1">Самовывоз доступен из пунктов выдачи </p>
+                                <p class="small mb-1">Способ доставки можно выбрать при оформлении заказа</p>
                             </div>
                         </div>
                     </div>
@@ -189,40 +160,9 @@
                         <i class="bi bi-cart-x fs-1 text-muted mb-3"></i>
                         <h3>Ваша корзина пуста</h3>
                         <p class="text-muted mb-4">Похоже, вы еще не добавили товары в корзину</p>
-                        <a href="{{ route('index') }}" class="btn btn-primary">
+                        <a href="{{ route('catalog.index') }}" class="btn btn-primary">
                             Начать покупки
                         </a>
-                    </div>
-                </div>
-            @endif
-
-            <!-- Recommended Books -->
-            @if(session()->has('cart') && count(session('cart')) > 0)
-                <div class="mt-5">
-                    <h3 class="mb-4">Вам также может понравиться</h3>
-                    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                        @for($i = 0; $i < 4; $i++)
-                            <div class="col">
-                                <div class="card h-100 book-card">
-                                    <img src="/placeholder.svg?height=300&width=200" class="card-img-top" alt="Рекомендуемая книга" style="height: 300px; object-fit: cover;">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Рекомендуемая книга {{ $i + 1 }}</h5>
-                                        <p class="card-text text-muted">Автор книги</p>
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <span class="fs-5 fw-bold text-primary">{{ (400 + $i * 50) . '.00 ₽' }}</span>
-                                            <div class="d-flex">
-                                                <button type="button" class="btn btn-sm btn-primary me-2">
-                                                    <i class="bi bi-cart-plus"></i>
-                                                </button>
-                                                <a href="#" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="bi bi-eye"></i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endfor
                     </div>
                 </div>
             @endif

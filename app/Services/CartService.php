@@ -8,7 +8,7 @@ use App\Models\User;
 
 class CartService
 {
-	public function getAllItems(User $user) : \Illuminate\Support\Collection | \Illuminate\Database\Eloquent\Collection
+	public function getAllItems(User $user): \Illuminate\Support\Collection | \Illuminate\Database\Eloquent\Collection
 	{
 		$order = $this->getActiveOrder($user);
 		return $order ? $order->books : collect();
@@ -76,18 +76,23 @@ class CartService
 		return true;
 	}
 
-	public function removeAllItems(User $user): bool
+	public function removeAllItems(): bool
 	{
-		$order = $this->getActiveOrder($user);
+		// $order = $this->getActiveOrder($user);
 
-		if (!$order) {
-			return false;
-		}
+		// if (!$order) {
+		// 	return false;
+		// }
 
-		$order->books()->detach();
-		$this->updateOrderTotal($order);
+		// $order->books()->detach();
+		// $this->updateOrderTotal($order);
 
-		return true;
+		// return true;
+
+		if (session()->forget(['cart', 'cart_total']))
+			return true;
+
+		return false;
 	}
 
 	private function updateOrderTotal(Order $order): void

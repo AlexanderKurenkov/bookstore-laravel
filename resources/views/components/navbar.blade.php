@@ -17,7 +17,10 @@
             <!-- Search Form (Middle) -->
             <form action="{{ route('search.results') }}" method="GET" class="w-50 mx-auto">
                 <div class="input-group">
-                    <input type="text" class="form-control flex-grow-1" placeholder="Поиск книг..." name="query">
+                    <input type="text" class="form-control flex-grow-1" placeholder="Поиск книг..." name="query" required
+                        oninvalid="this.setCustomValidity('Введите запрос для поиска')"
+                        oninput="this.setCustomValidity('')"
+                    >
 
                     <select class="form-select flex-shrink-1" name="category" style="max-width: 250px;">
                         <option value="">Все категории</option>
@@ -503,6 +506,11 @@
                             items: data.items
                         }
                     }));
+
+                    // HACK Reload the page if the current URL is "/cart"
+                    if (window.location.pathname === '/cart') {
+                        window.location.reload();
+                    }
                 }
             })
             .catch(error => {
@@ -627,11 +635,11 @@
                 .then(data => {
                     // Toggle icon classes based on favorite status
                     if (data.isFavorite) {
-                        icon.classList.remove('bi-heart');
-                        icon.classList.add('bi-heart-fill', 'text-danger');
+                        icon?.classList?.remove('bi-heart');
+                        icon?.classList?.add('bi-heart-fill', 'text-danger');
                     } else {
-                        icon.classList.remove('bi-heart-fill', 'text-danger');
-                        icon.classList.add('bi-heart');
+                        icon?.classList?.remove('bi-heart-fill', 'text-danger');
+                        icon?.classList?.add('bi-heart');
                     }
 
                     // Refresh the favorites modal content
