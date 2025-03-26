@@ -93,7 +93,7 @@
                                 <div class="text-center py-4" id="emptyCartMessage">
                                     <i class="bi bi-cart-x fs-1 text-muted"></i>
                                     <p class="mt-2">Ваша корзина пуста</p>
-                                    <a href="{{ route('index') }}" class="btn btn-sm btn-outline-primary">Начать покупки</a>
+                                    <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-primary">Начать покупки</a>
                                 </div>
                             @endif
                         </div>
@@ -110,9 +110,6 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li><h6 class="dropdown-header">{{ Auth::user()->name }}</h6></li>
                             <li><a class="dropdown-item" href="{{ route('profile.index') }}">Мой профиль</a></li>
-                            {{-- TODO Why links don't work? --}}
-                            {{-- <li><a class="dropdown-item" href="{{ route('profile.index') }}#orders">Мои заказы</a></li>
-                            <li><a class="dropdown-item" href="{{ route('profile.index') }}#wishlist">Избранное</a></li> --}}
 
                             <li><hr class="dropdown-divider"></li>
                             <li>
@@ -214,8 +211,10 @@
                                                 <a href="{{ route('catalog.book', $favorite->id) }}" class="btn btn-sm btn-outline-primary mb-2">
                                                     <i class="bi bi-eye"></i> Просмотр
                                                 </a>
-                                                <form action="{{ route('favorites.toggle', $favorite->id) }}" method="POST">
+                                                <form action="{{ route('favorites.toggle')}}" method="POST">
                                                     @csrf
+                                                    <!-- Add the $favorite->id in the body of the request -->
+                                                    <input type="hidden" name="bookId" value="{{ $favorite->id }}">
                                                     <button type="submit" class="btn btn-sm btn-outline-danger mb-2">
                                                         <i class="bi bi-trash"></i> Удалить
                                                     </button>
@@ -245,11 +244,6 @@
                 @endauth
             </div>
             <div class="modal-footer">
-                @auth
-                    @if(auth()->user()->favorites->count() > 0)
-                        <a href="{{ route('favorites.list') }}" class="btn btn-primary">Перейти в избранное</a>
-                    @endif
-                @endauth
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
             </div>
         </div>
@@ -313,8 +307,12 @@
         .then(response => {
             if (!response.ok) {
                 if (response.status === 401) {
-                    // User is not authenticated, redirect to login
-                    window.location.href = "{{ route('login') }}";
+                    // window.location.href = "{{ route('login') }}";
+
+                    // User is not authenticated, ask to login
+                    const favoritesModal = new bootstrap.Modal(document.getElementById('favoritesModal'));
+                    favoritesModal.show(); // Show the modal
+
                     throw new Error('Please login to add favorites');
                 }
                 throw new Error('Network response was not ok');
@@ -418,7 +416,7 @@
                     <div class="text-center py-4" id="emptyCartMessage">
                         <i class="bi bi-cart-x fs-1 text-muted"></i>
                         <p class="mt-2">Ваша корзина пуста</p>
-                        <a href="{{ route('index') }}" class="btn btn-sm btn-outline-primary">Начать покупки</a>
+                        <a href="{{ route('catalog.index') }}" class="btn btn-sm btn-outline-primary">Начать покупки</a>
                     </div>
                 `;
                 return;
@@ -614,7 +612,8 @@
     function attachRemoveFavoriteListeners() {
         document.querySelectorAll('.remove-favorite').forEach(button => {
             button.addEventListener('click', function () {
-                const bookId = this.dataset.id;
+                const id = this.dataset.id;
+                const icon = document.getElementById('favoriteIcon' + id); // Get the corresponding icon
 
                 fetch('/favorites/toggle', {
                     method: 'POST',
@@ -622,10 +621,22 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({ id: bookId })
+                    body: JSON.stringify({ bookId: id })
                 })
                 .then(response => response.json())
-                .then(() => updateFavoritesModal())
+                .then(data => {
+                    // Toggle icon classes based on favorite status
+                    if (data.isFavorite) {
+                        icon.classList.remove('bi-heart');
+                        icon.classList.add('bi-heart-fill', 'text-danger');
+                    } else {
+                        icon.classList.remove('bi-heart-fill', 'text-danger');
+                        icon.classList.add('bi-heart');
+                    }
+
+                    // Refresh the favorites modal content
+                    updateFavoritesModal();
+                })
                 .catch(error => console.error('Ошибка удаления:', error));
             });
         });

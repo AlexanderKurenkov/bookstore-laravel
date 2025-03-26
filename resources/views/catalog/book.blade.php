@@ -241,13 +241,21 @@
 
                                     @endif
                                     <div>
+                                        {{-- <a class="nav-link position-relative" href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
+                                            <i class="bi bi-heart fs-3"></i>
+                                        </a> --}}
+                                        <!-- Favorite Button (Absolute Position) -->
                                         <button type="button"
-                                            id="favoriteBtn{{ $book->id }}"
-                                            class="btn btn-lg btn-light rounded-circle favorite-btn"
-                                            onclick="toggleFavorite({{ $book->id }})"
-                                            href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
-                                        <i id="favoriteIcon{{ $book->id }}" class="bi {{ auth()->check() && auth()->user()->favorites->contains($book->id) ? 'bi-heart-fill text-danger' : 'bi-heart' }}"></i>
+                                                id="favoriteBtn{{ $book->id }}"
+                                                class="btn btn-lg btn-light rounded-circle
+                                                    {{-- position-absolute top-0 end-0 m-2  --}}
+                                                    favorite-btn"
+                                                onclick="toggleFavorite({{ $book->id }})"
+                                                {{-- href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal" --}}
+                                            >
+                                            <i id="favoriteIcon{{ $book->id }}" class="bi {{ auth()->check() && auth()->user()->favorites->contains($book->id) ? 'bi-heart-fill text-danger' : 'bi-heart' }}"></i>
                                         </button>
+
                                     </div>
                                 </div>
 
