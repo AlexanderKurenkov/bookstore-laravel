@@ -44,13 +44,6 @@
                 <li class="nav-item me-2">
                     <a class="nav-link position-relative" href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
                         <i class="bi bi-heart fs-5"></i>
-                        {{-- TODO use session instead --}}
-                        {{-- @if(auth()->check() && auth()->user()->favorites->count() > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                {{ auth()->user()->favorites->count() }}
-                                <span class="visually-hidden">избранных книг</span>
-                            </span>
-                        @endif --}}
                     </a>
                 </li>
 
@@ -254,7 +247,7 @@
             <div class="modal-footer">
                 @auth
                     @if(auth()->user()->favorites->count() > 0)
-                        <a href="{{ route('favorites.index') }}" class="btn btn-primary">Перейти в избранное</a>
+                        <a href="{{ route('favorites.list') }}" class="btn btn-primary">Перейти в избранное</a>
                     @endif
                 @endauth
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
@@ -555,5 +548,92 @@
         // Attach event listeners to existing remove buttons
         attachRemoveItemListeners();
     });
+
+    // Function to update the favorites modal content
+    function updateFavoritesModal() {
+        fetch('/favorites') // Adjust the URL to your actual route
+            .then(response => response.json())
+            .then(data => {
+                const favoritesModalBody = document.querySelector('#favoritesModal .modal-body');
+
+                if (data.count === 0) {
+                    favoritesModalBody.innerHTML = `
+                        <div class="text-center py-5">
+                            <i class="bi bi-heart fs-1 text-muted"></i>
+                            <p class="mt-3">У вас пока нет избранных книг</p>
+                            <p class="text-muted">Добавляйте понравившиеся книги в избранное, чтобы вернуться к ним позже</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let favoritesHtml = `<div class="favorites-list" style="max-height: 400px; overflow-y: auto;">`;
+
+                data.favorites.forEach(item => {
+                    favoritesHtml += `
+                        <div class="card mb-3">
+                            <div class="row g-0">
+                                <div class="col-md-2">
+                                    <img src="${item.image || '/placeholder.svg?height=120&width=80'}"
+                                        class="img-fluid rounded-start" alt="${item.title}"
+                                        style="height: 120px; width: 80px; object-fit: cover;">
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body py-2">
+                                        <h5 class="card-title">${item.title}</h5>
+                                        <p class="card-text text-muted mb-1">${item.author}</p>
+                                        <p class="card-text"><strong class="text-primary">${item.price} ₽</strong></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                    <div class="btn-group-vertical">
+                                        <a href="/catalog/book/${item.id}" class="btn btn-sm btn-outline-primary mb-2">
+                                            <i class="bi bi-eye"></i> Просмотр
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger remove-favorite" data-id="${item.id}">
+                                            <i class="bi bi-trash"></i> Удалить
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                favoritesHtml += `</div>`;
+
+                favoritesModalBody.innerHTML = favoritesHtml;
+
+                // Reattach event listeners to the new remove buttons
+                attachRemoveFavoriteListeners();
+            })
+            .catch(error => console.error('Ошибка загрузки избранного:', error));
+    }
+
+    // Attach event listeners to remove buttons
+    function attachRemoveFavoriteListeners() {
+        document.querySelectorAll('.remove-favorite').forEach(button => {
+            button.addEventListener('click', function () {
+                const bookId = this.dataset.id;
+
+                fetch('/favorites/toggle', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ id: bookId })
+                })
+                .then(response => response.json())
+                .then(() => updateFavoritesModal())
+                .catch(error => console.error('Ошибка удаления:', error));
+            });
+        });
+    }
+
+
+    // Call update when modal opens
+    document.getElementById('favoritesModal').addEventListener('shown.bs.modal', updateFavoritesModal);
+
     </script>
 @endpush

@@ -21,10 +21,10 @@ Route::prefix('catalog')->name('catalog.')->group(function () {
     Route::get('/book/{id}', [CatalogController::class, 'showBook'])->name('book');
 });
 
+// TODO make API
 Route::prefix('favorites')->name('favorites.')->group(function () {
-    // TODO
-    Route::get('/', [CatalogController::class, 'TODO'])->name('index');
-    Route::get('/toggle', [CatalogController::class, 'TODO'])->name('toggle');
+    Route::get('/', [CatalogController::class, 'listFavorites'])->name('list');
+    Route::post('/toggle', [CatalogController::class, 'toggleFavorites'])->name('toggle');
 });
 
 Route::prefix('reviews')->name('reviews.')->group(function () {

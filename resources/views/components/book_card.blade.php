@@ -12,7 +12,8 @@
                     id="favoriteBtn{{ $id }}"
                     class="btn btn-sm btn-light rounded-circle position-absolute top-0 end-0 m-2 favorite-btn"
                     onclick="toggleFavorite({{ $id }})"
-                    href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
+                    {{-- href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal" --}}
+                >
                 <i id="favoriteIcon{{ $id }}" class="bi {{ auth()->check() && auth()->user()->favorites->contains($id) ? 'bi-heart-fill text-danger' : 'bi-heart' }}"></i>
             </button>
         </div>
