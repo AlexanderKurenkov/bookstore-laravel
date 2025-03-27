@@ -43,7 +43,7 @@
 
                                                     <!-- Quantity -->
                                                     <td class="text-center align-middle">
-                                                        <form action="{{ route('cart.item.update', $item['id'] ?? 1) }}" method="POST" class="d-inline-block">
+                                                        <form action="{{ route('cart.item.update', $item['id']) }}" method="POST" class="d-inline-block">
                                                             @csrf
                                                             @method('PATCH')
                                                             <div class="input-group input-group-sm" style="width: 120px;">

@@ -238,7 +238,7 @@
                                         <i class="bi bi-heart fs-1 text-muted"></i>
                                         <p class="mt-3">У вас пока нет избранных книг</p>
                                         <p class="text-muted mb-4">Добавляйте понравившиеся книги в избранное, чтобы вернуться к ним позже</p>
-                                        <a href="{{ route('index') }}" class="btn btn-primary">
+                                        <a href="{{ route('catalog.index') }}" class="btn btn-primary">
                                             Перейти к каталогу
                                         </a>
                                     </div>

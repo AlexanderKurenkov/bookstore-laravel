@@ -508,7 +508,7 @@
                     }));
 
                     // HACK Reload the page if the current URL is "/cart"
-                    if (window.location.pathname === '/cart') {
+                    if (window.location.pathname === '/cart' || window.location.pathname === '/checkout') {
                         window.location.reload();
                     }
                 }

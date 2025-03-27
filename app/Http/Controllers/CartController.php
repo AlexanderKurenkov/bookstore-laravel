@@ -97,6 +97,33 @@ class CartController extends Controller
 		return redirect()->route('cart.index')->with('removeBookSuccess', true);
 	}
 
+
+	public function updateItem(Request $request, int $id) : RedirectResponse
+	{
+		$request->validate([
+			// 'id' => 'required',
+			'quantity' => 'required|integer|min:1'
+		]);
+
+		$bookId = $id;
+		$quantity = $request->quantity;
+
+		// Get current cart
+		$cart = session('cart', []);
+
+		// Update quantity if item exists
+		if (isset($cart[$bookId])) {
+			$cart[$bookId]['quantity'] = $quantity;
+			session(['cart' => $cart]);
+
+			// Calculate cart total
+			$cartTotal = $this->calculateCartTotal($cart);
+			session(['cart_total' => $cartTotal]);
+
+			return redirect()->route('cart.index');
+		}
+	}
+
 	public function clear(): RedirectResponse
 	{
 		$this->cartService->removeAllItems();
@@ -187,45 +214,6 @@ class CartController extends Controller
 		// Remove item if exists
 		if (isset($cart[$bookId])) {
 			unset($cart[$bookId]);
-			session(['cart' => $cart]);
-
-			// Calculate cart total
-			$cartTotal = $this->calculateCartTotal($cart);
-			session(['cart_total' => $cartTotal]);
-
-			return response()->json([
-				'success' => true,
-				'count' => count($cart),
-				'total' => number_format($cartTotal, 2),
-				'items' => array_values($cart)
-			]);
-		}
-
-		return response()->json([
-			'success' => false,
-			'message' => 'Item not found in cart'
-		], 404);
-	}
-
-	/**
-	 * Update item quantity in cart via API
-	 */
-	public function updateItem(Request $request)
-	{
-		$request->validate([
-			'id' => 'required',
-			'quantity' => 'required|integer|min:1'
-		]);
-
-		$bookId = $request->id;
-		$quantity = $request->quantity;
-
-		// Get current cart
-		$cart = session('cart', []);
-
-		// Update quantity if item exists
-		if (isset($cart[$bookId])) {
-			$cart[$bookId]['quantity'] = $quantity;
 			session(['cart' => $cart]);
 
 			// Calculate cart total

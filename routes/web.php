@@ -49,21 +49,6 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
 });
 
-//TODO make '/checkout' protected
-Route::prefix('checkout')->name('checkout.')->group(function () {
-    //TODO
-    Route::get('/', [CheckoutController::class, 'index'])->name('index');
-    Route::get('/invoice', [CheckoutController::class, 'invoice'])->name('invoice');
-
-    Route::get('/{cartId}', [CheckoutController::class, 'show'])->name('show');
-    Route::post('/{cartId}', [CheckoutController::class, 'process'])->name('process');
-
-    Route::post('/{cartId}', [CheckoutController::class, 'destroy'])->name('destroy');
-
-    // Route::patch('/shipping', [CheckoutController::class, 'updateShipping'])->name('shipping');
-    // Route::patch('/payment', [CheckoutController::class, 'updatePayment'])->name('payment');
-});
-
 // Protected routes.
 Route::middleware(['auth', 'verified'])->group(function () {
     // No need to include {id} in the URL path for the profile routes because
@@ -83,6 +68,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //     Route::delete('/{id}', [ProfileController::class, 'destroyAddress'])->name('destroy');
 
     // });
+
+
+    //TODO make '/checkout' protected
+    Route::prefix('checkout')->name('checkout.')->group(function () {
+        //TODO
+        Route::get('/', [CheckoutController::class, 'index'])->name('index');
+        Route::get('/invoice', [CheckoutController::class, 'invoice'])->name('invoice');
+
+        Route::get('/{cartId}', [CheckoutController::class, 'show'])->name('show');
+        Route::post('/{cartId}', [CheckoutController::class, 'process'])->name('process');
+
+        Route::post('/{cartId}', [CheckoutController::class, 'destroy'])->name('destroy');
+
+        // Route::patch('/shipping', [CheckoutController::class, 'updateShipping'])->name('shipping');
+        // Route::patch('/payment', [CheckoutController::class, 'updatePayment'])->name('payment');
+    });
 
     Route::prefix('returns')->name('returns.')->group(function () {
         Route::get('/edit/{id}', [ReturnController::class, 'edit'])->name('edit');
