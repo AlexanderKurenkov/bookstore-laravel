@@ -14,7 +14,8 @@
         </div>
 
         @if(session()->has('cart') && count(session('cart')) > 0)
-            <form action="{{ route('index') }}" method="POST" id="checkout-form">
+            <span id="cart-total" data-total="{{ session('cart_total') ?? 0 }}"></span>
+            <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
                 @csrf
                 <div class="row">
                     <!-- Checkout Form -->
@@ -135,8 +136,7 @@
                                                                 </div>
                                                                 <div class="text-end">
                                                                     @php
-                                                                        $cartTotal = session('cart_total') ?? 0;
-                                                                        $standardShipping = $cartTotal >= 2000 ? 0 : 300;
+                                                                        $standardShipping = 300;
                                                                     @endphp
                                                                     <span class="fw-bold">{{ $standardShipping > 0 ? number_format($standardShipping, 2) . ' ₽' : 'Бесплатно' }}</span>
                                                                 </div>
@@ -303,26 +303,18 @@
                                     <span id="shipping-cost">
                                         @php
                                             $cartTotal = session('cart_total') ?? 0;
-                                            $standardShipping = $cartTotal >= 2000 ? 0 : 300;
+                                            $standardShipping = 300;
                                         @endphp
                                         {{ $standardShipping > 0 ? number_format($standardShipping, 2) . ' ₽' : 'Бесплатно' }}
                                     </span>
                                 </div>
-
-                                @if(session('promo_discount'))
-                                    <div class="d-flex justify-content-between mb-2 text-success">
-                                        <span>Скидка по промокоду</span>
-                                        <span>-{{ number_format((session('cart_total') ?? 0) * (session('promo_discount') / 100), 2) }} ₽</span>
-                                    </div>
-                                @endif
 
                                 <hr>
 
                                 <div class="d-flex justify-content-between mb-3 fw-bold">
                                     <span>Итого</span>
                                     @php
-                                        $discount = session('promo_discount') ? (session('cart_total') ?? 0) * (session('promo_discount') / 100) : 0;
-                                        $total = (session('cart_total') ?? 0) - $discount + $standardShipping;
+                                        $total = (session('cart_total') ?? 0) + $standardShipping;
                                     @endphp
                                     <span class="fs-5" id="total-amount">{{ number_format($total, 2) }} ₽</span>
                                 </div>
@@ -392,45 +384,59 @@
             });
 
             // Handle delivery method selection and update shipping cost
+            // const deliveryMethods = document.querySelectorAll('input[name="delivery_method"]');
+            // const shippingCostElement = document.getElementById('shipping-cost');
+            // const totalAmountElement = document.getElementById('total-amount');
+
+            // deliveryMethods.forEach(method => {
+            //     method.addEventListener('change', function () {
+            //         let shippingCost, shippingText;
+
+            //         if (this.value === 'standard') {
+            //             shippingCost = 300;
+            //             shippingText = shippingCost > 0 ? shippingCost.toFixed(2) + ' ₽' : 'Бесплатно';
+            //         } else if (this.value === 'pickup') {
+            //             shippingCost = 0;
+            //             shippingText = 'Бесплатно';
+            //         }
+
+            //         shippingCostElement.textContent = shippingText;
+
+            //         // Update total
+            //         @php
+            //             $cartTotal = session('cart_total') ?? 0;
+            //         @endphp
+
+            //         const total = cartTotal + shippingCost;
+            //         totalAmountElement.textContent = total.toFixed(2) + ' ₽';
+            //     });
+            // });
+
+            // Handle delivery method selection and update shipping cost
             const deliveryMethods = document.querySelectorAll('input[name="delivery_method"]');
             const shippingCostElement = document.getElementById('shipping-cost');
             const totalAmountElement = document.getElementById('total-amount');
 
+            // Get cart total from an HTML element instead of PHP inside JS
+            let cartTotal = parseFloat(document.getElementById('cart-total').dataset.total);
+
             deliveryMethods.forEach(method => {
                 method.addEventListener('change', function () {
                     let shippingCost = 0;
-                    let shippingText = 'Бесплатно';
 
                     if (this.value === 'standard') {
-                        // @php
-                        //     $cartTotal = session('cart_total') ?? 0;
-                        //     $standardShipping = $cartTotal >= 2000 ? 0 : 300;
-                        // @endphp
                         shippingCost = 300;
-                        shippingText = shippingCost > 0 ? shippingCost.toFixed(2) + ' ₽' : 'Бесплатно';
-                    } else if (this.value === 'express') {
-                        shippingCost = 500;
-                        shippingText = '500.00 ₽';
                     } else if (this.value === 'pickup') {
                         shippingCost = 0;
-                        shippingText = 'Бесплатно';
                     }
 
-                    shippingCostElement.textContent = shippingText;
+                    shippingCostElement.textContent = shippingCost > 0 ? shippingCost.toFixed(2) + ' ₽' : 'Бесплатно';
 
                     // Update total
-                    // @php
-                    //     $cartTotal = session('cart_total') ?? 0;
-                    //     $discount = session('promo_discount') ? $cartTotal * (session('promo_discount') / 100) : 0;
-                    //     $subtotal = $cartTotal - $discount;
-                    // @endphp
-                    //TODO retrieve $cartTotal via fetch call
-                    const cartTotal = 1000;
                     const total = cartTotal + shippingCost;
                     totalAmountElement.textContent = total.toFixed(2) + ' ₽';
                 });
             });
-
             // Form validation
             const form = document.getElementById('checkout-form');
 
@@ -483,6 +489,7 @@
     </script>
     @endpush
 
+    @push('head')
     <style>
     .delivery-option, .payment-option {
       cursor: pointer;
@@ -520,4 +527,5 @@
       cursor: pointer;
     }
     </style>
+    @endpush
 </x-layout>
