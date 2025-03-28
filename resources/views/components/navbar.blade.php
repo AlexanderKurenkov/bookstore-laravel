@@ -253,6 +253,34 @@
     </div>
 </div>
 
+
+<!-- Authentication Modal -->
+<div class="modal fade" id="authenticationModal" tabindex="-1" aria-labelledby="authenticationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="authenticationModalLabel">
+                    <i class="bi bi-heart-fill text-danger me-2"></i>Оформление заказа
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center py-5">
+                    <i class="bi bi-person-lock fs-1 text-muted"></i>
+                    <p class="mt-3">Войдите в аккаунт, чтобы перейти к оформлению заказа</p>
+                    <div class="mt-3">
+                        <a href="{{ route('login') }}" class="btn btn-primary me-2">Войти</a>
+                        <a href="{{ route('register') }}" class="btn btn-outline-primary">Регистрация</a>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
     function addToCartButtonClicked(id) {
@@ -286,8 +314,15 @@
                 button.classList.add('btn-outline-primary');
             }
         } else {
-            // On the second click, navigate to the checkout page
-            window.location.href = button.getAttribute('data-href');
+            const isAuthenticated = @json(auth()->check());
+            // On the second click, check if the user is authenticated & navigate to the checkout page if authenticated.
+            if (isAuthenticated) {
+                window.location.href = button.getAttribute('data-href');
+            } else {
+                // Show modal window if not authenticated
+                const authenticationModal = new bootstrap.Modal(document.getElementById('authenticationModal'));
+                authenticationModal.show();
+            }
         }
     }
 
