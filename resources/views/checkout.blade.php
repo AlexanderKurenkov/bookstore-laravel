@@ -1,4 +1,7 @@
 <x-layout>
+    @php
+        $user = Auth::user();
+    @endphp
     <div class="container py-5">
         <div class="row">
             <div class="col-12 mb-4">
@@ -30,7 +33,10 @@
                                     <div class="col-md-6">
                                         <label for="first_name" class="form-label">Имя <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('first_name') is-invalid @enderror"
-                                            id="first_name" name="first_name" value="{{ old('first_name') ?? (Auth::check() ? Auth::user()->first_name : '') }}" required>
+                                            id="first_name" name="first_name"
+                                            {{-- value="{{ old('first_name') ?? ($user->first_name : '') }}" --}}
+                                            value="{{ old('first_name') ?? ($user->first_name ?? '') }}"
+                                            required>
                                         @error('first_name')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -38,7 +44,7 @@
                                     <div class="col-md-6">
                                         <label for="last_name" class="form-label">Фамилия <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('last_name') is-invalid @enderror"
-                                            id="last_name" name="last_name" value="{{ old('last_name') ?? (Auth::check() ? Auth::user()->last_name : '') }}" required>
+                                            id="last_name" name="last_name" value="{{ old('last_name') ?? ($user->last_name ?? '') }}" required>
                                         @error('last_name')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -46,7 +52,7 @@
                                     <div class="col-md-6">
                                         <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
                                         <input type="email" class="form-control @error('email') is-invalid @enderror"
-                                            id="email" name="email" value="{{ old('email') ?? (Auth::check() ? Auth::user()->email : '') }}" required>
+                                            id="email" name="email" value="{{ old('email') ?? ($user->email ?? '') }}" required>
                                         @error('email')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -54,7 +60,7 @@
                                     <div class="col-md-6">
                                         <label for="phone" class="form-label">Телефон <span class="text-danger">*</span></label>
                                         <input type="tel" class="form-control @error('phone') is-invalid @enderror"
-                                            id="phone" name="phone" value="{{ old('phone') ?? (Auth::check() ? Auth::user()->phone : '') }}"
+                                            id="phone" name="phone" value="{{ old('phone') ?? ($user->phone ?? '') }}"
                                             placeholder="+7 (___) ___-__-__" required>
                                         @error('phone')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -74,7 +80,7 @@
                                     <div class="col-12">
                                         <label for="address" class="form-label">Адрес <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('address') is-invalid @enderror"
-                                            id="address" name="address" value="{{ old('address') ?? (Auth::check() && Auth::user()->address ? Auth::user()->address : '') }}"
+                                            id="address" name="address" value="{{ old('address') ?? '' }}"
                                             placeholder="Улица, дом, квартира" required>
                                         @error('address')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -83,7 +89,7 @@
                                     <div class="col-md-6">
                                         <label for="city" class="form-label">Город <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('city') is-invalid @enderror"
-                                            id="city" name="city" value="{{ old('city') ?? (Auth::check() && Auth::user()->city ? Auth::user()->city : '') }}" required>
+                                            id="city" name="city" value="{{ old('city') ?? '' }}" required>
                                         @error('city')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -91,7 +97,7 @@
                                     <div class="col-md-4">
                                         <label for="region" class="form-label">Область/Край <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('region') is-invalid @enderror"
-                                            id="region" name="region" value="{{ old('region') ?? (Auth::check() && Auth::user()->region ? Auth::user()->region : '') }}" required>
+                                            id="region" name="region" value="{{ old('region') ?? '' }}" required>
                                         @error('region')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -99,7 +105,7 @@
                                     <div class="col-md-2">
                                         <label for="postal_code" class="form-label">Индекс <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('postal_code') is-invalid @enderror"
-                                            id="postal_code" name="postal_code" value="{{ old('postal_code') ?? (Auth::check() && Auth::user()->postal_code ? Auth::user()->postal_code : '') }}" required>
+                                            id="postal_code" name="postal_code" value="{{ old('postal_code') ?? '' }}" required>
                                         @error('postal_code')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -382,35 +388,6 @@
                     }
                 });
             });
-
-            // Handle delivery method selection and update shipping cost
-            // const deliveryMethods = document.querySelectorAll('input[name="delivery_method"]');
-            // const shippingCostElement = document.getElementById('shipping-cost');
-            // const totalAmountElement = document.getElementById('total-amount');
-
-            // deliveryMethods.forEach(method => {
-            //     method.addEventListener('change', function () {
-            //         let shippingCost, shippingText;
-
-            //         if (this.value === 'standard') {
-            //             shippingCost = 300;
-            //             shippingText = shippingCost > 0 ? shippingCost.toFixed(2) + ' ₽' : 'Бесплатно';
-            //         } else if (this.value === 'pickup') {
-            //             shippingCost = 0;
-            //             shippingText = 'Бесплатно';
-            //         }
-
-            //         shippingCostElement.textContent = shippingText;
-
-            //         // Update total
-            //         @php
-            //             $cartTotal = session('cart_total') ?? 0;
-            //         @endphp
-
-            //         const total = cartTotal + shippingCost;
-            //         totalAmountElement.textContent = total.toFixed(2) + ' ₽';
-            //     });
-            // });
 
             // Handle delivery method selection and update shipping cost
             const deliveryMethods = document.querySelectorAll('input[name="delivery_method"]');

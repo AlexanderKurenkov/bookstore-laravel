@@ -1,186 +1,170 @@
 <x-layout>
-    <!-- Hero Banner -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card bg-dark text-white rounded-3 overflow-hidden">
-                <img src="{{ asset('images/banner.jpg') }}" class="card-img opacity-50" alt="Книжный магазин" style="height: 400px; object-fit: cover;">
-                <div class="card-img-overlay d-flex flex-column justify-content-center">
-                    <div class="container">
-                        <h1 class="card-title display-4 fw-bold">Добро пожаловать в наш магазин</h1>
-                        <p class="card-text fs-5 mb-4">Откройте для себя новые миры с нашей коллекцией книг</p>
-                        <div class="d-flex">
-                            {{-- <a href="{{ route('books.new') }}" class="btn btn-primary btn-lg me-3">Новинки</a> --}}
-                            {{-- <a href="{{ route('books.bestsellers') }}" class="btn btn-outline-light btn-lg">Бестселлеры</a> --}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<main class="container py-3">
+  <!-- Hero Banner -->
+  <div class="row mb-3">
+      <div class="col-12">
+          <div class="card bg-dark text-white rounded-3 overflow-hidden">
+              <img src="{{ asset('images/banner.jpg') }}" class="card-img opacity-50" alt="Книжный магазин" style="object-fit: cover;">
+              <div class="card-img-overlay d-flex flex-column justify-content-center">
+                  <div class="container">
+                      <h1 class="card-title display-4 fw-bold">Добро пожаловать в наш книжный магазин</h1>
+                      <p class="card-text fs-5 mb-4">Откройте для себя новые миры с нашей коллекцией книг</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- Categories -->
+  <div class="row mb-5">
+      <div class="col-12">
+          <h2 class="mb-4">Популярные категории</h2>
+      </div>
+      <div class="col-12">
+          <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+              <div class="col">
+                  <a href="{{ route('catalog.category', 'classics') }}" class="text-decoration-none">
+                      <div class="card h-100 text-center hover-shadow">
+                          <div class="card-body">
+                              <i class="bi bi-book-half fs-1 text-primary mb-3"></i>
+                              <h5 class="card-title">Классика</h5>
+                          </div>
+                      </div>
+                  </a>
+              </div>
+              <div class="col">
+                  <a href="{{ route('catalog.category', 'detective') }}" class="text-decoration-none">
+                      <div class="card h-100 text-center hover-shadow">
+                          <div class="card-body">
+                              <i class="bi bi-search fs-1 text-danger mb-3"></i>
+                              <h5 class="card-title">Детектив</h5>
+                          </div>
+                      </div>
+                  </a>
+              </div>
+              <div class="col">
+                  <a href="{{ route('catalog.category', 'philosophy') }}" class="text-decoration-none">
+                      <div class="card h-100 text-center hover-shadow">
+                          <div class="card-body">
+                              <i class="bi bi-lightbulb fs-1 text-warning mb-3"></i>
+                              <h5 class="card-title">Философия</h5>
+                          </div>
+                      </div>
+                  </a>
+              </div>
+              <div class="col">
+                  <a href="{{ route('catalog.category', 'poetry') }}" class="text-decoration-none">
+                      <div class="card h-100 text-center hover-shadow">
+                          <div class="card-body">
+                              <i class="bi bi-pen fs-1 text-info mb-3"></i>
+                              <h5 class="card-title">Поэзия</h5>
+                          </div>
+                      </div>
+                  </a>
+              </div>
+              <div class="col">
+                  <a href="{{ route('catalog.category', 'fantasy') }}" class="text-decoration-none">
+                      <div class="card h-100 text-center hover-shadow">
+                          <div class="card-body">
+                              <i class="bi bi-stars fs-1 text-purple mb-3"></i>
+                              <h5 class="card-title">Фэнтези</h5>
+                          </div>
+                      </div>
+                  </a>
+              </div>
+              <div class="col">
+                  <a href="{{ route('catalog.index') }}" class="text-decoration-none">
+                      <div class="card h-100 text-center hover-shadow">
+                          <div class="card-body">
+                              <i class="bi bi-grid-3x3-gap fs-1 text-dark mb-3"></i>
+                              <h5 class="card-title">Все категории</h5>
+                          </div>
+                      </div>
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <!-- New Releases -->
+  <div class="row mb-5">
+    <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+        <h2>Новинки</h2>
     </div>
 
-    <!-- Categories -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <h2 class="mb-4">Популярные категории</h2>
-        </div>
-        <div class="col-12">
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
-                <div class="col">
-                    <a href="{{ route('catalog.category', 'fiction') }}" class="text-decoration-none">
-                        <div class="card h-100 text-center hover-shadow">
-                            <div class="card-body">
-                                <i class="bi bi-book fs-1 text-primary mb-3"></i>
-                                <h5 class="card-title">Художественная литература</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col">
-                    <a href="{{ route('catalog.category', 'non-fiction') }}" class="text-decoration-none">
-                        <div class="card h-100 text-center hover-shadow">
-                            <div class="card-body">
-                                <i class="bi bi-journal-text fs-1 text-success mb-3"></i>
-                                <h5 class="card-title">Нон-фикшн</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col">
-                    <a href="{{ route('catalog.category', 'science') }}" class="text-decoration-none">
-                        <div class="card h-100 text-center hover-shadow">
-                            <div class="card-body">
-                                <i class="bi bi-graph-up fs-1 text-info mb-3"></i>
-                                <h5 class="card-title">Наука</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col">
-                    <a href="{{ route('catalog.category', 'children') }}" class="text-decoration-none">
-                        <div class="card h-100 text-center hover-shadow">
-                            <div class="card-body">
-                                <i class="bi bi-emoji-smile fs-1 text-warning mb-3"></i>
-                                <h5 class="card-title">Детские книги</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col">
-                    <a href="{{ route('catalog.category', 'business') }}" class="text-decoration-none">
-                        <div class="card h-100 text-center hover-shadow">
-                            <div class="card-body">
-                                <i class="bi bi-briefcase fs-1 text-danger mb-3"></i>
-                                <h5 class="card-title">Бизнес</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col">
-                    <a href="{{ route('catalog.index') }}" class="text-decoration-none">
-                        <div class="card h-100 text-center hover-shadow">
-                            <div class="card-body">
-                                <i class="bi bi-grid fs-1 text-secondary mb-3"></i>
-                                <h5 class="card-title">Все категории</h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
+    <div class="col-12">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            @php
+              $newBooks = App\Models\Book::select('books.id', 'books.title', 'books.image_path', 'books.author', 'books.price')
+                  ->orderByDesc('created_at')
+                  ->limit(4)
+                  ->get();
+            @endphp
+
+            @foreach($newBooks ?? [] as $book)
+            <div class="col">
+              <a href="{{ route('catalog.book', $book->id ?? 1) }}" class="text-decoration-none text-dark">
+                  <div class="card h-100 book-card">
+                      <div class="position-relative">
+                          <img src="{{ asset($book->image_path) }}" class="card-img-top" alt="{{ $book->title ?? 'Бестселлер' }}" style="height: 300px; object-fit: cover;">
+                          <div class="position-absolute top-0 start-0 m-2">
+                              <span class="badge bg-success">Бестселлер</span>
+                          </div>
+                      </div>
+                      <div class="card-body">
+                          <div class="mb-2">
+                              @for($i = 1; $i <= 5; $i++)
+                                  @if($i <= ($book->reviews->isEmpty() ? 0 : round($book->reviews->avg('rating'), 2)))
+                                      <i class="bi bi-star-fill text-warning"></i>
+                                  @else
+                                      <i class="bi bi-star text-warning"></i>
+                                  @endif
+                              @endfor
+                              <small class="text-muted ms-1">Отзывов: {{ count($book->reviews) ?? 0 }}</small>
+                          </div>
+                          <h5 class="card-title">{{ $book->title ?? 'Название книги' }}</h5>
+                          <p class="card-text text-muted">{{ $book->author ?? 'Автор книги' }}</p>
+                          <div class="d-flex justify-content-between align-items-center">
+                              <span class="fs-5 fw-bold text-primary">{{ number_format($book->price, 2, '.', ' ') }} ₽</span>
+                              <div class="d-flex">
+                                  <a href="{{ route('catalog.book', $book->id ?? 1) }}" class="btn btn-sm btn-outline-secondary">
+                                      <i class="bi bi-eye"></i>
+                                  </a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </a>
             </div>
+            @endforeach
         </div>
     </div>
+  </div>
 
-    <!-- New Releases -->
-    <div class="row mb-5">
-        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
-            <h2>Новинки</h2>
-            {{-- TODO --}}
-            <a href="{{ route('index') }}" class="btn btn-outline-primary">Смотреть все</a>
-            {{-- <a href="{{ route('catalog.new') }}" class="btn btn-outline-primary">Смотреть все</a> --}}
-        </div>
+  <!-- Bestsellers -->
+  <div class="row mb-5">
+      <div class="col-12 d-flex justify-content-between align-items-center mb-4">
+          <h2>Бестселлеры</h2>
+      </div>
 
-        <div class="col-12">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                @foreach($newBooks ?? [] as $book)
-                <div class="col">
+      <div class="col-12">
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+              @php
+                $bestsellerBooks = App\Models\Book::select('books.id', 'books.title', 'books.image_path', 'books.author', 'books.price')
+                    ->join('orders_books', 'books.id', '=', 'orders_books.book_id')
+                    ->selectRaw('SUM(orders_books.quantity) as total_sold')
+                    ->groupBy('books.id', 'books.title')
+                    ->orderByDesc('total_sold')
+                    ->limit(4)
+                    ->get();
+              @endphp
+
+              @foreach($bestsellerBooks ?? [] as $book)
+              <div class="col">
+                <a href="{{ route('catalog.book', $book->id ?? 1) }}" class="text-decoration-none text-dark">
                     <div class="card h-100 book-card">
                         <div class="position-relative">
-                            <img src="{{ $book->image_url ?? '/placeholder.svg?height=300&width=200' }}" class="card-img-top" alt="{{ $book->title ?? 'Новая книга' }}" style="height: 300px; object-fit: cover;">
-                            <div class="position-absolute top-0 start-0 m-2">
-                                <span class="badge bg-danger">Новинка</span>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <h5 class="card-title">{{ $book->title ?? 'Название книги' }}</h5>
-                            <p class="card-text text-muted">{{ $book->author ?? 'Автор книги' }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="fs-5 fw-bold text-primary">{{ isset($book->price) ? number_format($book->price, 2) . ' ₽' : '450.00 ₽' }}</span>
-                                <div class="d-flex">
-                                    <form action="{{ route('cart.add', $book->id ?? 1) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-primary me-2">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                    </form>
-                                    <a href="{{ route('books.show', $book->id ?? 1) }}" class="btn btn-sm btn-outline-secondary">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @endforeach
-
-                <!-- Fallback if no books are provided -->
-                @if(empty($newBooks ?? []))
-                    @for($i = 0; $i < 4; $i++)
-                    <div class="col">
-                        <div class="card h-100 book-card">
-                            <div class="position-relative">
-                                <img src="/placeholder.svg?height=300&width=200" class="card-img-top" alt="Новая книга" style="height: 300px; object-fit: cover;">
-                                <div class="position-absolute top-0 start-0 m-2">
-                                    <span class="badge bg-danger">Новинка</span>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">Название книги {{ $i + 1 }}</h5>
-                                <p class="card-text text-muted">Автор книги</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fs-5 fw-bold text-primary">{{ (450 + $i * 50) . '.00 ₽' }}</span>
-                                    <div class="d-flex">
-                                        <button type="button" class="btn btn-sm btn-primary me-2">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                        <a href="#" class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endfor
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <!-- Bestsellers -->
-    <div class="row mb-5">
-        <div class="col-12 d-flex justify-content-between align-items-center mb-4">
-            <h2>Бестселлеры</h2>
-            {{-- TODO --}}
-            <a href="{{ route('index') }}" class="btn btn-outline-primary">Смотреть все</a>
-            {{-- <a href="{{ route('catalog.bestsellers') }}" class="btn btn-outline-primary">Смотреть все</a> --}}
-        </div>
-
-        <div class="col-12">
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-                @foreach($bestsellerBooks ?? [] as $book)
-                <div class="col">
-                    <div class="card h-100 book-card">
-                        <div class="position-relative">
-                            <img src="{{ $book->image_url ?? '/placeholder.svg?height=300&width=200' }}" class="card-img-top" alt="{{ $book->title ?? 'Бестселлер' }}" style="height: 300px; object-fit: cover;">
+                            <img src="{{ asset($book->image_path) }}" class="card-img-top" alt="{{ $book->title ?? 'Бестселлер' }}" style="height: 300px; object-fit: cover;">
                             <div class="position-absolute top-0 start-0 m-2">
                                 <span class="badge bg-success">Бестселлер</span>
                             </div>
@@ -188,207 +172,190 @@
                         <div class="card-body">
                             <div class="mb-2">
                                 @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= ($book->rating ?? 4))
+                                    @if($i <= ($book->reviews->isEmpty() ? 0 : round($book->reviews->avg('rating'), 2)))
                                         <i class="bi bi-star-fill text-warning"></i>
                                     @else
                                         <i class="bi bi-star text-warning"></i>
                                     @endif
                                 @endfor
-                                <small class="text-muted ms-1">{{ $book->reviews_count ?? rand(10, 100) }} отзывов</small>
+                                <small class="text-muted ms-1">{{ $book->reviews_count ?? 0 }} отзывов</small>
                             </div>
                             <h5 class="card-title">{{ $book->title ?? 'Название книги' }}</h5>
                             <p class="card-text text-muted">{{ $book->author ?? 'Автор книги' }}</p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="fs-5 fw-bold text-primary">{{ isset($book->price) ? number_format($book->price, 2) . ' ₽' : '550.00 ₽' }}</span>
+                                <span class="fs-5 fw-bold text-primary">{{ number_format($book->price, 2, '.', ' ') }} ₽</span>
                                 <div class="d-flex">
-                                    <form action="{{ route('cart.add', $book->id ?? 1) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm btn-primary me-2">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                    </form>
-                                    <a href="{{ route('books.show', $book->id ?? 1) }}" class="btn btn-sm btn-outline-secondary">
+                                    <a href="{{ route('catalog.book', $book->id ?? 1) }}" class="btn btn-sm btn-outline-secondary">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                @endforeach
+                </a>
+              </div>
+              @endforeach
+          </div>
+      </div>
+  </div>
 
-                <!-- Fallback if no books are provided -->
-                @if(empty($bestsellerBooks ?? []))
-                    @for($i = 0; $i < 4; $i++)
-                    <div class="col">
-                        <div class="card h-100 book-card">
-                            <div class="position-relative">
-                                <img src="/placeholder.svg?height=300&width=200" class="card-img-top" alt="Бестселлер" style="height: 300px; object-fit: cover;">
-                                <div class="position-absolute top-0 start-0 m-2">
-                                    <span class="badge bg-success">Бестселлер</span>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        @if($i <= 4)
-                                            <i class="bi bi-star-fill text-warning"></i>
-                                        @else
-                                            <i class="bi bi-star text-warning"></i>
-                                        @endif
-                                    @endfor
-                                    <small class="text-muted ms-1">{{ rand(10, 100) }} отзывов</small>
-                                </div>
-                                <h5 class="card-title">Бестселлер {{ $i + 1 }}</h5>
-                                <p class="card-text text-muted">Известный автор</p>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="fs-5 fw-bold text-primary">{{ (550 + $i * 50) . '.00 ₽' }}</span>
-                                    <div class="d-flex">
-                                        <button type="button" class="btn btn-sm btn-primary me-2">
-                                            <i class="bi bi-cart-plus"></i>
-                                        </button>
-                                        <a href="#" class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    @endfor
-                @endif
-            </div>
-        </div>
-    </div>
+  <!-- Information Blocks -->
+  <div class="row mb-3">
+      <div class="col-12 mb-4">
+          <h2>Наши преимущества</h2>
+      </div>
 
-    <!-- Special Offers -->
-    <div class="row mb-5">
-        <div class="col-12 mb-4">
-            <h2>Специальные предложения</h2>
-        </div>
+      <div class="col-md-3 mb-4">
+          <div class="card h-100 text-center hover-shadow border-0 bg-light">
+              <div class="card-body py-4">
+                  <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-flex mb-3">
+                      <i class="bi bi-truck fs-1 text-primary"></i>
+                  </div>
+                  <h4>Быстрая доставка</h4>
+                  <p class="text-muted">Доставляем заказы по всей России в течение 1-3 дней в крупные города и 3-7 дней в удаленные регионы.</p>
+              </div>
+          </div>
+      </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card bg-primary text-white h-100">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="/placeholder.svg?height=300&width=200" class="img-fluid rounded-start h-100" alt="Специальное предложение" style="object-fit: cover;">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h3 class="card-title">Скидка 20% на все книги по психологии</h3>
-                            <p class="card-text">Только до конца месяца! Используйте промокод PSYCH20 при оформлении заказа.</p>
-                            <a href="{{ route('catalog.category', 'psychology') }}" class="btn btn-light">Перейти к книгам</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <div class="col-md-3 mb-4">
+          <div class="card h-100 text-center hover-shadow border-0 bg-light">
+              <div class="card-body py-4">
+                  <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-flex mb-3">
+                      <i class="bi bi-shield-check fs-1 text-success"></i>
+                  </div>
+                  <h4>Гарантия качества</h4>
+                  <p class="text-muted">Мы тщательно проверяем каждую книгу перед отправкой и гарантируем возврат в случае брака.</p>
+              </div>
+          </div>
+      </div>
 
-        <div class="col-md-6 mb-4">
-            <div class="card bg-success text-white h-100">
-                <div class="row g-0">
-                    <div class="col-md-4">
-                        <img src="/placeholder.svg?height=300&width=200" class="img-fluid rounded-start h-100" alt="Специальное предложение" style="object-fit: cover;">
-                    </div>
-                    <div class="col-md-8">
-                        <div class="card-body">
-                            <h3 class="card-title">Бесплатная доставка</h3>
-                            <p class="card-text">При заказе от 2000 рублей доставка бесплатна по всей России!</p>
-                            <a href="{{ route('index')}}" class="btn btn-light">Подробнее о доставке</a>
-                            {{-- <a href="{{ route('delivery.info') }}" class="btn btn-light">Подробнее о доставке</a> --}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+      <div class="col-md-3 mb-4">
+          <div class="card h-100 text-center hover-shadow border-0 bg-light">
+              <div class="card-body py-4">
+                  <div class="rounded-circle bg-warning bg-opacity-10 p-3 d-inline-flex mb-3">
+                      <i class="bi bi-credit-card fs-1 text-warning"></i>
+                  </div>
+                  <h4>Удобная оплата</h4>
+                  <p class="text-muted">Принимаем все популярные способы оплаты: банковские карты, электронные деньги и наличные при получении.</p>
+              </div>
+          </div>
+      </div>
 
-    <!-- Author Spotlight -->
-    <div class="row mb-5">
-        <div class="col-12 mb-4">
-            <h2>Автор месяца</h2>
-        </div>
+      <div class="col-md-3 mb-4">
+          <div class="card h-100 text-center hover-shadow border-0 bg-light">
+              <div class="card-body py-4">
+                  <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-flex mb-3">
+                      <i class="bi bi-headset fs-1 text-info"></i>
+                  </div>
+                  <h4>Поддержка 24/7</h4>
+                  <p class="text-muted">Наша служба поддержки всегда готова ответить на ваши вопросы и помочь с выбором книг.</p>
+              </div>
+          </div>
+      </div>
+  </div>
 
-        <div class="col-12">
-            <div class="card">
-                <div class="row g-0">
-                    <div class="col-md-3">
-                        <img src="/placeholder.svg?height=400&width=300" class="img-fluid rounded-start" alt="Автор месяца" style="height: 100%; object-fit: cover;">
-                    </div>
-                    <div class="col-md-9">
-                        <div class="card-body">
-                            <h3 class="card-title">Федор Достоевский</h3>
-                            <p class="card-text">Один из самых значительных и известных в мире русских писателей и мыслителей. Его художественное наследие анализируется литературоведами во всем мире, а произведения переведены на более чем 170 языков.</p>
-                            <p class="card-text">Романы «Преступление и наказание», «Идиот», «Бесы», «Братья Карамазовы» включены в список 100 лучших книг всех времен.</p>
+  <!-- Reading Club -->
+  <div class="row mb-3">
+      <div class="col-12">
+          <div class="card bg-primary text-white">
+              <div class="card-body p-4">
+                  <div class="row align-items-center">
+                      <div class="col-lg-6">
+                          <h2 class="mb-3"><i class="bi bi-people-fill me-2"></i>Книжный клуб "Читатель"</h2>
+                          <p class="fs-5 mb-4">Присоединяйтесь к нашему книжному клубу и получите доступ к эксклюзивным мероприятиям, встречам с авторами и специальным предложениям!</p>
+                          <ul class="list-unstyled mb-4">
+                              <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i>Ежемесячные встречи и обсуждения книг</li>
+                              <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i>Скидка 10% на все книги для членов клуба</li>
+                              <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i>Предварительный доступ к новинкам</li>
+                              <li><i class="bi bi-check-circle-fill me-2"></i>Онлайн-дискуссии и рекомендации от экспертов</li>
+                          </ul>
+                      </div>
+                      <div class="col-lg-6 d-none d-lg-block">
+                          <img src="/images/book_club.png" class="img-fluid" alt="Книжный клуб">
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
 
-                            <div class="row row-cols-2 row-cols-md-4 g-3 mt-3">
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <img src="/placeholder.svg?height=200&width=150" class="card-img-top" alt="Книга автора" style="height: 200px; object-fit: cover;">
-                                        <div class="card-body p-2">
-                                            <h6 class="card-title">Преступление и наказание</h6>
-                                            <p class="card-text text-primary fw-bold">350.00 ₽</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <img src="/placeholder.svg?height=200&width=150" class="card-img-top" alt="Книга автора" style="height: 200px; object-fit: cover;">
-                                        <div class="card-body p-2">
-                                            <h6 class="card-title">Идиот</h6>
-                                            <p class="card-text text-primary fw-bold">380.00 ₽</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <img src="/placeholder.svg?height=200&width=150" class="card-img-top" alt="Книга автора" style="height: 200px; object-fit: cover;">
-                                        <div class="card-body p-2">
-                                            <h6 class="card-title">Бесы</h6>
-                                            <p class="card-text text-primary fw-bold">400.00 ₽</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="card h-100">
-                                        <img src="/placeholder.svg?height=200&width=150" class="card-img-top" alt="Книга автора" style="height: 200px; object-fit: cover;">
-                                        <div class="card-body p-2">
-                                            <h6 class="card-title">Братья Карамазовы</h6>
-                                            <p class="card-text text-primary fw-bold">420.00 ₽</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+  <!-- Upcoming Events -->
+  <div class="row mb-3">
+      <div class="col-12 mb-4">
+          <h2>Предстоящие мероприятия</h2>
+      </div>
 
-                            <a href="{{ route('index', 1) }}" class="btn btn-outline-primary mt-4">Все книги автора</a>
-                            {{-- <a href="{{ route('authors.show', 1) }}" class="btn btn-outline-primary mt-4">Все книги автора</a> --}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+      <div class="col-12">
+          <div class="card border-0 shadow-sm">
+              <div class="card-body p-0">
+                  <div class="list-group list-group-flush">
+                      <div class="list-group-item p-4">
+                          <div class="row align-items-center">
+                              <div class="col-md-2 text-center mb-3 mb-md-0">
+                                  <div class="bg-light rounded-3 py-3 px-4">
+                                      <div class="fs-1 fw-bold text-primary">15</div>
+                                      <div class="text-uppercase">Апреля</div>
+                                  </div>
+                              </div>
+                              <div class="col-md-8 mb-3 mb-md-0">
+                                  <h4><i class="bi bi-mic-fill me-2 text-danger"></i>Встреча с автором: Мария Петрова</h4>
+                                  <p class="text-muted mb-0">Презентация новой книги "Путь к себе" и автограф-сессия. Начало в 18:00.</p>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="list-group-item p-4">
+                          <div class="row align-items-center">
+                              <div class="col-md-2 text-center mb-3 mb-md-0">
+                                  <div class="bg-light rounded-3 py-3 px-4">
+                                      <div class="fs-1 fw-bold text-primary">22</div>
+                                      <div class="text-uppercase">Апреля</div>
+                                  </div>
+                              </div>
+                              <div class="col-md-8 mb-3 mb-md-0">
+                                  <h4><i class="bi bi-book-fill me-2 text-success"></i>Книжный клуб: обсуждение классики</h4>
+                                  <p class="text-muted mb-0">Обсуждаем роман "Мастер и Маргарита" М. Булгакова. Начало в 19:00.</p>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="list-group-item p-4">
+                          <div class="row align-items-center">
+                              <div class="col-md-2 text-center mb-3 mb-md-0">
+                                  <div class="bg-light rounded-3 py-3 px-4">
+                                      <div class="fs-1 fw-bold text-primary">29</div>
+                                      <div class="text-uppercase">Апреля</div>
+                                  </div>
+                              </div>
+                              <div class="col-md-8 mb-3 mb-md-0">
+                                  <h4><i class="bi bi-easel-fill me-2 text-warning"></i>Мастер-класс: Как написать свою книгу</h4>
+                                  <p class="text-muted mb-0">Практические советы от профессионального писателя. Начало в 17:00.</p>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</main>
 
-    <!-- Newsletter Subscription -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card bg-light">
-                <div class="card-body text-center py-5">
-                    <h3 class="mb-3">Подпишитесь на нашу рассылку</h3>
-                    <p class="mb-4">Получайте информацию о новинках, скидках и специальных предложениях</p>
-                    <div class="row justify-content-center">
-                        <div class="col-md-6">
-                            <form action="{{ route('index') }}" method="POST" class="d-flex">
-                            {{-- <form action="{{ route('newsletter.subscribe') }}" method="POST" class="d-flex"> --}}
-                                @csrf
-                                <input type="email" class="form-control me-2" placeholder="Ваш email" required>
-                                <button type="submit" class="btn btn-primary">Подписаться</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<style>
+.hover-shadow:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  transform: translateY(-3px);
+  transition: all 0.3s ease;
+}
 
+.book-card {
+  transition: all 0.3s ease;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.text-purple {
+  color: #6f42c1;
+}
+</style>
 </x-layout>
