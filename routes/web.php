@@ -79,7 +79,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/invoice', [CheckoutController::class, 'invoice'])->name('invoice');
 
         Route::get('/{cartId}', [CheckoutController::class, 'show'])->name('show');
-        Route::post('/{cartId}', [CheckoutController::class, 'process'])->name('process');
+        Route::post('/', [CheckoutController::class, 'process'])->name('process');
 
         Route::post('/{cartId}', [CheckoutController::class, 'destroy'])->name('destroy');
 

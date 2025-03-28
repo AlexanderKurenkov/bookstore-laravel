@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\CheckoutService;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\CheckoutProcessRequest;
+use App\Models\Order;
+use App\Services\CheckoutService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class CheckoutController extends Controller
@@ -39,28 +40,21 @@ class CheckoutController extends Controller
     /**
      * Show the invoice page.
      */
-    public function invoice()
+    public function invoice(): View|RedirectResponse
     {
-        // Get the authenticated user
-        $user = Auth::user();
+        // Retrieve order ID from session
+        $orderId = session('order_id');
 
-        // For demo purposes, create a sample order
-        $order = (object)[
-            'order_number' => 'ORD-' . rand(10000, 99999),
-            'created_at' => now()->format('d.m.Y H:i'),
-            'payment_method' => 'Банковская карта',
-            'card_last4' => '1234',
-            'delivery_method' => 'Стандартная доставка',
-            'expected_delivery' => now()->addDays(3)->format('d.m.Y'),
-            'subtotal' => session('cart_total', 1190),
-            'shipping_cost' => session('cart_total', 0) >= 2000 ? 0 : 300,
-            'total' => session('cart_total', 1190) + (session('cart_total', 0) >= 2000 ? 0 : 300),
-            'items' => collect(session('cart', []))->map(function ($item) {
-                return (object)$item;
-            })
-        ];
+        // Prevent direct access
+        if (!$orderId) {
+            return redirect()->route('checkout.index')->withErrors('Access denied.');
+        }
 
-        return view('invoice', compact('user', 'order'));
+        // Retrieve the order and remove it from session (one-time access)
+        $order = Order::find($orderId);
+        session()->forget('order_id');
+
+        return view('invoice', compact('order'));
     }
 
     public function show(): View|RedirectResponse
@@ -75,19 +69,6 @@ class CheckoutController extends Controller
         return view('checkout', $result);
     }
 
-    // public function process(Request $request): View|RedirectResponse
-    // {
-    //     $user = Auth::user();
-    //     $result = $this->checkoutService->processOrder($user, $request);
-
-    //     if (isset($result['redirect'])) {
-    //         return redirect()->route('checkout.show')->with($result['redirect']);
-    //     }
-
-    //     // ? cart view or something different (maybe new view like 'cart.submitted')
-    //     return view('cart', $result);
-    // }
-
     public function process(CheckoutProcessRequest $request): View|RedirectResponse
     {
         $user = Auth::user();
@@ -97,10 +78,14 @@ class CheckoutController extends Controller
 
         // Redirect to checkout page if there's an issue
         if (isset($result['redirect'])) {
-            return redirect()->route('checkout.show')->with($result['redirect']);
+            return redirect()->route('checkout.index')->with($result['redirect']);
         }
 
-        // Redirect to an order confirmation page (or show the cart as before)
-        return view('invoice', $result);
+        // Store the order ID in session
+        session(['order_id' => $result['order']->id]);
+
+
+        // Redirect to invoice route
+        return redirect()->route('checkout.invoice');
     }
 }

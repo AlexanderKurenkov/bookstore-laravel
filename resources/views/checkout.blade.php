@@ -89,9 +89,9 @@
                                         @enderror
                                     </div>
                                     <div class="col-md-4">
-                                        <label for="region" class="form-label">Область/Край</label>
+                                        <label for="region" class="form-label">Область/Край <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control @error('region') is-invalid @enderror"
-                                            id="region" name="region" value="{{ old('region') ?? (Auth::check() && Auth::user()->region ? Auth::user()->region : '') }}">
+                                            id="region" name="region" value="{{ old('region') ?? (Auth::check() && Auth::user()->region ? Auth::user()->region : '') }}" required>
                                         @error('region')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror

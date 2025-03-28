@@ -2,9 +2,11 @@
 
 namespace App\Services;
 
+use App\Models\DeliveryDetail;
 use App\Models\Order;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class CheckoutService
 {
@@ -32,116 +34,45 @@ class CheckoutService
      * @param Request $request The request data
      * @return array
      */
-    // public function processOrder(User $user, Request $request) : array
-    // {
-    //     // Validate the order data
-    //     $validated = $request->validate([
-    //         'first_name' => 'required|string|max:255',
-    //         'last_name' => 'required|string|max:255',
-    //         'email' => 'required|email|max:255',
-    //         'phone' => 'required|string|max:20',
-    //         'address' => 'required|string|max:255',
-    //         'city' => 'required|string|max:255',
-    //         'region' => 'nullable|string|max:255',
-    //         'postal_code' => 'required|string|max:20',
-    //         'delivery_method' => 'required|in:standard,pickup',
-    //         'payment_method' => 'required|in:card,cash',
-    //         'terms' => 'required|accepted',
-    //     ]);
-
-    //     // If payment method is card, validate card details
-    //     if ($request->payment_method === 'card') {
-    //         $request->validate([
-    //             'card_number' => 'required|string|max:19',
-    //             'card_expiry' => 'required|string|max:5',
-    //             'card_cvv' => 'required|string|max:4',
-    //             'card_holder' => 'required|string|max:255',
-    //         ]);
-    //     }
-
-    //     // Create the order
-    //     $order = Order::create([
-    //         'user_id' => $user->id,
-    //         'order_status' => 'confirmed',
-    //         'order_number' => 'ORD-' . rand(10000, 99999),
-    //         'customer_name' => $validated['first_name'] . ' ' . $validated['last_name'],
-    //         'email' => $validated['email'],
-    //         'phone' => $validated['phone'],
-    //         'address' => $validated['address'],
-    //         'city' => $validated['city'],
-    //         'region' => $validated['region'],
-    //         'postal_code' => $validated['postal_code'],
-    //         'delivery_method' => $validated['delivery_method'],
-    //         'payment_method' => $validated['payment_method'],
-    //         'order_total' => $this->calculateTotal($user),
-    //         'shipping_cost' => $validated['delivery_method'] === 'standard' ?
-    //             (session('cart_total', 0) >= 2000 ? 0 : 300) : 0,
-    //     ]);
-
-    //     // Add order items from cart
-    //     $cartItems = session('cart', []);
-    //     foreach ($cartItems as $item) {
-    //         $order->items()->create([
-    //             'book_id' => $item['id'],
-    //             'quantity' => $item['quantity'],
-    //             'price' => $item['price'],
-    //         ]);
-    //     }
-
-    //     // Clear the cart
-    //     session()->forget(['cart', 'cart_total']);
-
-    //     // Optionally send confirmation email
-    //     // Mail::to($user->email)->send(new OrderConfirmationMail($user, $order));
-
-    //     return [
-    //         'order' => $order,
-    //         'estimatedDeliveryDate' => now()->addDays(3)->format('d.m.Y')
-    //     ];
-    // }
-
-    use App\Models\Order;
-    use App\Models\User;
-    use Illuminate\Support\Facades\Session;
-
     public function processOrder(User $user, array $validated): array
     {
-        // Calculate shipping cost
-        $shippingCost = ($validated['delivery_method'] === 'standard' && session('cart_total', 0) < 2000) ? 300 : 0;
+        // Calculate shipping cost based on cart total
+        $cartTotal = session('cart_total', 0);
+        $shippingCost = ($validated['delivery_method'] === 'standard' && $cartTotal < 2000) ? 300 : 0;
 
-        // Create the order
+        // Ensure delivery details exist
+        $deliveryDetail = DeliveryDetail::firstOrCreate(
+            ['user_id' => $user->id], // Find existing record for user
+            [
+                'address_line1' => $validated['address'],
+                'city' => $validated['city'],
+                'state' => $validated['region'],
+                'postal_code' => $validated['postal_code'],
+                'country' => 'Unknown', // Ensure a valid default country
+                'phone' => $validated['phone'],
+                'user_comment' => $validated['user_comment'] ?? null, // Optional
+            ]
+        );
+
+        // Create order (only correct fields)
         $order = Order::create([
             'user_id' => $user->id,
-            'order_status' => 'confirmed',
-            'order_number' => 'ORD-' . rand(10000, 99999),
-            'customer_name' => $validated['first_name'] . ' ' . $validated['last_name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'],
-            'address' => $validated['address'] ?? null,
-            'city' => $validated['city'] ?? null,
-            'region' => $validated['region'] ?? null,
-            'postal_code' => $validated['postal_code'] ?? null,
-            'delivery_method' => $validated['delivery_method'],
-            'payment_method' => $validated['payment_method'],
-            'order_total' => $this->calculateTotal($user),
-            'shipping_cost' => $shippingCost,
+            'delivery_detail_id' => $deliveryDetail->id, // ✅ Cannot be null now
+            'order_status' => 'pending',
+            'order_total' => $cartTotal + $shippingCost,
         ]);
 
-        // Add order items from cart
+        // Add books to order (many-to-many relationship)
         $cartItems = session('cart', []);
         foreach ($cartItems as $item) {
-            $order->items()->create([
-                'book_id' => $item['id'],
+            $order->books()->attach($item['id'], [
                 'quantity' => $item['quantity'],
-                'price' => $item['price'],
+                'price' => $item['price'], // Snapshot price at purchase time
             ]);
         }
 
-        // Clear the cart
+        // Clear cart after order is placed
         Session::forget(['cart', 'cart_total']);
-
-        // Optionally send confirmation email
-        // Mail::to($user->email)->send(new OrderConfirmationMail($user, $order));
 
         return [
             'order' => $order,

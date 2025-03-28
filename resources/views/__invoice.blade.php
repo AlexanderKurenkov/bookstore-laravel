@@ -15,21 +15,12 @@
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
                         <h5 class="mb-0">Информация о заказе</h5>
-                        {{-- TODO --}}
-                        {{-- <div>
-                            <button class="btn btn-sm btn-outline-secondary me-2" onclick="window.print()">
-                                <i class="bi bi-printer me-1"></i>Печать
-                            </button>
-                            <a href="{{ route('orders.download', $order->id) }}" class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-download me-1"></i>Скачать PDF
-                            </a>
-                        </div> --}}
                     </div>
                     <div class="card-body p-4">
                         <div class="row mb-4">
                             <div class="col-md-6 mb-3 mb-md-0">
                                 <h6 class="text-muted mb-2">Номер заказа</h6>
-                                <p class="mb-0 fw-bold">{{ $order->order_number ?? 'ORD-' . rand(10000, 99999) }}</p>
+                                <p class="mb-0 fw-bold">ORD-{{ str_pad($order->id, 6, "0", STR_PAD_LEFT) }}</p>
                             </div>
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Дата заказа</h6>
@@ -68,7 +59,6 @@
 
                         <hr class="my-4">
 
-                        <!-- Replace the entire order items section with dynamic data -->
                         <!-- Order Items -->
                         <h6 class="mb-3">Товары</h6>
                         <div class="table-responsive mb-4">
@@ -91,45 +81,53 @@
                                                              alt="{{ $item->title ?? 'Книга' }}" class="me-3"
                                                              style="width: 45px; height: 60px; object-fit: cover;">
                                                         <div>
-                                                            <h6 class="mb-0">{{ $item->title }}</h6>
-                                                            <small class="text-muted">{{ $item->author }}</small>
+                                                            <h6 class="mb-0">{{ $item->title ?? 'Название книги' }}</h6>
+                                                            <small class="text-muted">{{ $item->author ?? 'Автор книги' }}</small>
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td class="text-center">{{ number_format($item->price, 2) }} ₽</td>
-                                                <td class="text-center">{{ $item->quantity }}</td>
-                                                <td class="text-end">{{ number_format($item->price * $item->quantity, 2) }} ₽</td>
-                                            </tr>
-                                        @endforeach
-                                    @elseif(session()->has('cart') && count(session('cart')) > 0)
-                                        @foreach(session('cart') as $item)
-                                            <tr>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <img src="{{ $item['image'] ?? '/placeholder.svg?height=60&width=45' }}"
-                                                             alt="{{ $item['title'] ?? 'Книга' }}" class="me-3"
-                                                             style="width: 45px; height: 60px; object-fit: cover;">
-                                                        <div>
-                                                            <h6 class="mb-0">{{ $item['title'] }}</h6>
-                                                            <small class="text-muted">{{ $item['author'] ?? 'Автор не указан' }}</small>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="text-center">{{ number_format($item['price'], 2) }} ₽</td>
-                                                <td class="text-center">{{ $item['quantity'] }}</td>
-                                                <td class="text-end">{{ number_format($item['price'] * $item['quantity'], 2) }} ₽</td>
+                                                <td class="text-center">{{ number_format($item->price ?? 450, 2) }} ₽</td>
+                                                <td class="text-center">{{ $item->quantity ?? 1 }}</td>
+                                                <td class="text-end">{{ number_format(($item->price ?? 450) * ($item->quantity ?? 1), 2) }} ₽</td>
                                             </tr>
                                         @endforeach
                                     @else
+                                        <!-- Sample data for preview -->
                                         <tr>
-                                            <td colspan="4" class="text-center py-3">Информация о товарах недоступна</td>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="/placeholder.svg?height=60&width=45" alt="Книга" class="me-3"
+                                                         style="width: 45px; height: 60px; object-fit: cover;">
+                                                    <div>
+                                                        <h6 class="mb-0">Преступление и наказание</h6>
+                                                        <small class="text-muted">Федор Достоевский</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">350.00 ₽</td>
+                                            <td class="text-center">1</td>
+                                            <td class="text-end">350.00 ₽</td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <img src="/placeholder.svg?height=60&width=45" alt="Книга" class="me-3"
+                                                         style="width: 45px; height: 60px; object-fit: cover;">
+                                                    <div>
+                                                        <h6 class="mb-0">Мастер и Маргарита</h6>
+                                                        <small class="text-muted">Михаил Булгаков</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">420.00 ₽</td>
+                                            <td class="text-center">2</td>
+                                            <td class="text-end">840.00 ₽</td>
                                         </tr>
                                     @endif
                                 </tbody>
                             </table>
                         </div>
 
-                        <!-- Replace the order summary section with dynamic data -->
                         <!-- Order Summary -->
                         <div class="row">
                             <div class="col-md-6 mb-4 mb-md-0">
@@ -141,13 +139,12 @@
                                             <div class="col-6 text-end">
                                                 @if(($order->payment_method ?? '') == 'card')
                                                     <i class="bi bi-credit-card text-primary me-1"></i>
-                                                    Банковская карта
-                                                    @if(isset($order->card_last4))
-                                                        <br><small class="text-muted">**** **** **** {{ $order->card_last4 }}</small>
-                                                    @endif
                                                 @else
                                                     <i class="bi bi-cash-stack text-success me-1"></i>
-                                                    Наличными при получении
+                                                @endif
+                                                {{ $order->payment_method ?? 'Банковская карта' }}
+                                                @if(($order->payment_method ?? '') == 'Банковская карта')
+                                                    <br><small class="text-muted">**** **** **** {{ $order->card_last4 ?? '1234' }}</small>
                                                 @endif
                                             </div>
                                         </div>
@@ -157,7 +154,7 @@
                                         </div>
                                         <div class="row">
                                             <div class="col-6 text-muted">Дата оплаты:</div>
-                                            <div class="col-6 text-end">{{ isset($order->paid_at) ? date('d.m.Y', strtotime($order->paid_at)) : now()->format('d.m.Y') }}</div>
+                                            <div class="col-6 text-end">{{ $order->paid_at ?? now()->format('d.m.Y') }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -166,53 +163,27 @@
                                 <div class="card bg-light">
                                     <div class="card-body">
                                         <h6 class="mb-3">Сумма заказа</h6>
-                                        @php
-                                            // Calculate subtotal from items if available, otherwise use order subtotal or cart total
-                                            $subtotal = 0;
-                                            if(isset($order->items) && count($order->items) > 0) {
-                                                foreach($order->items as $item) {
-                                                    $subtotal += $item->price * $item->quantity;
-                                                }
-                                            } elseif(isset($order->subtotal)) {
-                                                $subtotal = $order->subtotal;
-                                            } elseif(session()->has('cart_total')) {
-                                                $subtotal = session('cart_total');
-                                            }
-                                            
-                                            // Get shipping cost
-                                            $shippingCost = $order->shipping_cost ?? 0;
-                                            if($shippingCost === 0 && $subtotal < 2000 && ($order->delivery_method ?? 'standard') === 'standard') {
-                                                $shippingCost = 300;
-                                            }
-                                            
-                                            // Get discount
-                                            $discount = $order->discount ?? 0;
-                                            if($discount === 0 && session()->has('promo_discount')) {
-                                                $discount = $subtotal * (session('promo_discount') / 100);
-                                            }
-                                            
-                                            // Calculate total
-                                            $total = $subtotal - $discount + $shippingCost;
-                                        @endphp
-                                        
                                         <div class="d-flex justify-content-between mb-2">
                                             <span>Товары:</span>
-                                            <span>{{ number_format($subtotal, 2) }} ₽</span>
+                                            <span>{{ number_format($order->subtotal ?? 1190, 2) }} ₽</span>
                                         </div>
                                         <div class="d-flex justify-content-between mb-2">
                                             <span>Доставка:</span>
+                                            @php
+                                                $shippingCost = $order->shipping_cost ?? 0;
+                                            @endphp
                                             <span>{{ $shippingCost > 0 ? number_format($shippingCost, 2) . ' ₽' : 'Бесплатно' }}</span>
                                         </div>
-                                        @if($discount > 0)
+                                        @if(($order->discount ?? 0) > 0)
                                             <div class="d-flex justify-content-between mb-2 text-success">
                                                 <span>Скидка:</span>
-                                                <span>-{{ number_format($discount, 2) }} ₽</span>
+                                                <span>-{{ number_format($order->discount ?? 0, 2) }} ₽</span>
                                             </div>
                                         @endif
                                         <hr>
                                         <div class="d-flex justify-content-between fw-bold">
                                             <span>Итого:</span>
-                                            <span class="fs-5">{{ number_format($total, 2) }} ₽</span>
+                                            <span class="fs-5">{{ number_format($order->total ?? 1190, 2) }} ₽</span>
                                         </div>
                                     </div>
                                 </div>
@@ -342,29 +313,28 @@
       .btn, nav, footer {
           display: none !important;
       }
-      
+
       .card {
           border: none !important;
           box-shadow: none !important;
       }
-      
+
       .container {
           width: 100% !important;
           max-width: 100% !important;
       }
-      
+
       body {
           font-size: 12pt;
       }
-      
+
       h1 {
           font-size: 18pt;
       }
-      
+
       h5, h6 {
           font-size: 14pt;
       }
     }
     </style>
 </x-layout>
-
