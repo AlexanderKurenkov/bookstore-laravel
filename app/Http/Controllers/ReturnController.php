@@ -156,16 +156,6 @@ class ReturnController extends Controller
 
         $order->update(['order_status' => 'returned']);
 
-        // Send email notification
-        try {
-            Mail::to('returns@' . config('app.domain'))
-                ->send(new ReturnRequestSubmitted($return));
-        } catch (\Exception $e) {
-            \Log::error('Failed to send return request email: ' . $e->getMessage());
-            return redirect()->route('returns.confirmation', $return->id)
-                ->with('warning', 'Ваша заявка на возврат отправлена, но не удалось отправить email.');
-        }
-
         // Redirect with success message
         return redirect()->route('returns.confirmation', $return->id)
             ->with('success', 'Ваша заявка на возврат успешно отправлена. Мы свяжемся с вами в ближайшее время.');

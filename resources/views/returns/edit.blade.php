@@ -38,6 +38,15 @@
                                 <div class="form-text">Выберите заказ, из которого хотите вернуть книгу. Отображаются только доставленные заказы.</div>
                             </div>
 
+                            {{-- <div class="mb-4">
+                                <label for="book_id" class="form-label">Книга для возврата <span class="text-danger">*</span></label>
+                                <select class="form-select @error('book_id') is-invalid @enderror" id="book_id" name="book_id" required disabled>
+                                    <option value="">Сначала выберите заказ</option>
+                                </select>
+                                @error('book_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div> --}}
                             <div class="mb-4">
                                 <label for="book_id" class="form-label">Книга для возврата <span class="text-danger">*</span></label>
                                 <select class="form-select @error('book_id') is-invalid @enderror" id="book_id" name="book_id" required disabled>
@@ -113,6 +122,7 @@
         </div>
     </div>
 
+    @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const orderSelect = document.getElementById('order_id');
@@ -147,7 +157,8 @@
                             bookSelect.disabled = true;
                         } else {
                             data.forEach(book => {
-                                const option = document.createElement('parser');
+                                alert(book.title);
+                                const option = document.createElement('option');
                                 option.value = book.id;
                                 option.textContent = `${book.title} (${book.quantity} шт.)`;
                                 option.dataset.maxQuantity = book.quantity;
@@ -193,4 +204,5 @@
             }
         });
     </script>
+    @endpush
 </x-layout>

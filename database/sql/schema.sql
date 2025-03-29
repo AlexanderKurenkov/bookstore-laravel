@@ -53,9 +53,9 @@ CREATE TABLE users (
 DROP TABLE IF EXISTS books;
 CREATE TABLE books (
     id BIGSERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    author VARCHAR(255) NOT NULL,
-    publisher VARCHAR(255) NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    author VARCHAR(100) NOT NULL,
+    publisher VARCHAR(80) NOT NULL,
     image_path VARCHAR(255),
     sample_page_images TEXT[],     			-- массив URL-адресов изображений c примерами страниц
     publication_year SMALLINT NOT NULL,
@@ -155,7 +155,7 @@ CREATE TABLE payments (
 DROP TABLE IF EXISTS card_payments;
 CREATE TABLE card_payments (
     id BIGSERIAL PRIMARY KEY,
-    card_type VARCHAR(50) NOT NULL,
+    card_type VARCHAR(20) NOT NULL,
     card_last_four CHAR(4) NOT NULL,       -- Last four digits of the card number
     card_expiry_month SMALLINT,            -- Expiration month (1-12)
     card_expiry_year SMALLINT,             -- Expiration year (YYYY)
@@ -168,12 +168,12 @@ CREATE TABLE card_payments (
 DROP TABLE IF EXISTS delivery_details;
 CREATE TABLE delivery_details (
     id BIGSERIAL PRIMARY KEY,
-    address_line1 VARCHAR(255) NOT NULL,
-    address_line2 VARCHAR(255),
-    city VARCHAR(100) NOT NULL,
-    state VARCHAR(100) NOT NULL,
+    address_line1 VARCHAR(100) NOT NULL,
+    address_line2 VARCHAR(100),
+    city VARCHAR(20) NOT NULL,
+    state VARCHAR(50) NOT NULL,
     postal_code VARCHAR(20) NOT NULL,
-    country VARCHAR(100) NOT NULL,
+    country VARCHAR(50) NOT NULL,
     phone VARCHAR(20),
     user_comment VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -185,7 +185,7 @@ DROP TABLE IF EXISTS deliveries;
 CREATE TABLE deliveries (
     id BIGSERIAL PRIMARY KEY,
     courier VARCHAR(255),              -- Name of the courier (e.g., UPS, FedEx)
-    tracking_number VARCHAR(255),      -- Tracking number provided by the courier
+    tracking_number VARCHAR(50),      -- Tracking number provided by the courier
     delivery_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- e.g., pending, shipped, in_transit, delivered, returned
     shipped_at TIMESTAMP,              -- When the order was shipped
     expected_delivery TIMESTAMP,       -- Estimated delivery date/time
