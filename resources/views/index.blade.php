@@ -106,9 +106,9 @@
               <a href="{{ route('catalog.book', $book->id ?? 1) }}" class="text-decoration-none text-dark">
                   <div class="card h-100 book-card">
                       <div class="position-relative">
-                          <img src="{{ asset($book->image_path) }}" class="card-img-top" alt="{{ $book->title ?? 'Бестселлер' }}" style="height: 300px; object-fit: cover;">
+                          <img src="{{ asset($book->image_path) }}" class="card-img-top" alt="{{ $book->title ?? 'Новинка' }}" style="height: 420px; object-fit: cover;">
                           <div class="position-absolute top-0 start-0 m-2">
-                              <span class="badge bg-success">Бестселлер</span>
+                              <span class="badge bg-danger">Новинка</span>
                           </div>
                       </div>
                       <div class="card-body">
@@ -164,7 +164,7 @@
                 <a href="{{ route('catalog.book', $book->id ?? 1) }}" class="text-decoration-none text-dark">
                     <div class="card h-100 book-card">
                         <div class="position-relative">
-                            <img src="{{ asset($book->image_path) }}" class="card-img-top" alt="{{ $book->title ?? 'Бестселлер' }}" style="height: 300px; object-fit: cover;">
+                            <img src="{{ asset($book->image_path) }}" class="card-img-top" alt="{{ $book->title ?? 'Бестселлер' }}" style="height: 420px; object-fit: cover;">
                             <div class="position-absolute top-0 start-0 m-2">
                                 <span class="badge bg-success">Бестселлер</span>
                             </div>
