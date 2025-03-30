@@ -32,7 +32,7 @@
 ----------------------------------------------------------
 -- SET client_encoding TO 'UTF8'; -- If the data was inserted when the client encoding was incorrect, the text might have been stored incorrectly.
 
--- Create the users table
+-- Таблица для пользователей.
 DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
@@ -43,13 +43,14 @@ CREATE TABLE users (
     email_verified_at TIMESTAMP,
     phone VARCHAR(20),
     date_of_birth DATE,
-    gender VARCHAR(10) CHECK (gender IN ('male', 'female') OR gender IS NULL);
+    gender VARCHAR(10)
+        CHECK (gender IN ('male', 'female') OR gender IS NULL);
     remember_token VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the book table
+-- Таблица для книг.
 DROP TABLE IF EXISTS books;
 CREATE TABLE books (
     id BIGSERIAL PRIMARY KEY,
@@ -57,34 +58,49 @@ CREATE TABLE books (
     author VARCHAR(100) NOT NULL,
     publisher VARCHAR(80) NOT NULL,
     image_path VARCHAR(255),
-    sample_page_images TEXT[],     			-- массив URL-адресов изображений c примерами страниц
+    -- массив URL-адресов изображений c примерами страниц
+    sample_page_images TEXT[],
     publication_year SMALLINT NOT NULL,
     price DECIMAL(19, 2) NOT NULL,
-    quantity_in_stock SMALLINT,				-- NULL для цифровых и аудиокниг
+    -- NULL для цифровых и аудиокниг
+    quantity_in_stock SMALLINT,
     description TEXT,
-    binding_type VARCHAR(50),       		-- тип переплета: твердый переплет, мягкая обложка (hardcover, paperback); NULL для цифровых и аудиокниг
-    publication_type VARCHAR(50) NOT NULL,	-- тип издания: печатное, цифровое, аудиокнига (physical, ebook, audiobook)
-    isbn VARCHAR(20) NOT NULL,				-- International Standard Book Number
-    edition VARCHAR(50),            		-- издание (например, "2-е издание")
-    circulation INT, 						-- тираж
-    language VARCHAR(50) NOT NULL,			-- язык (например, русский, английский)
-    pages SMALLINT,                 		-- общее число страниц
-    weight DECIMAL(10, 2),					-- вес книги
+    -- тип переплета: твердый переплет, мягкая обложка (hardcover, paperback)
+    -- NULL для цифровых и аудиокниг
+    binding_type VARCHAR(50),
+    -- тип издания: печатное, цифровое, аудиокнига (physical, ebook, audiobook)
+    publication_type VARCHAR(50) NOT NULL,
+    -- ISBN (International Standard Book Number)
+    isbn VARCHAR(20) NOT NULL,
+    -- издание (например, "2-е издание")
+    edition VARCHAR(50),
+    -- тираж
+    circulation INT,
+    -- язык (например, русский, английский)
+    language VARCHAR(50) NOT NULL,
+    -- общее число страниц
+    pages SMALLINT,
+    -- вес книги
+    weight DECIMAL(10, 2),
     size VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create the users_favorite_books table to track favorite books for each user
+-- Промежуточная таблица для реализации
+-- связи M:N между отношениями "users" и "books".
 DROP TABLE IF EXISTS users_favorite_books;
 CREATE TABLE users_favorite_books (
     user_id BIGINT NOT NULL,
     book_id BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (user_id, book_id) -- NOTE: also prevents user from 'liking' the same book multiple times
+    -- ПРИМЕЧАНИЕ: нет необходимости в ограничении уникальности,
+    -- чтобы предотвратить добавление одной и той же книги в избранное несколько раз,
+    -- так как это уже гарантирукет первичный ключ.
+    PRIMARY KEY (user_id, book_id)
 );
 
--- Categories Table
+-- Таблица для категорий книг.
 DROP TABLE IF EXISTS categories;
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
@@ -94,7 +110,9 @@ CREATE TABLE categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
--- modeling a many-to-many relationship between books and categories
+
+-- Промежуточная таблица для реализации
+-- связи M:N между отношениями "books" и "categories".
 DROP TABLE IF EXISTS books_categories;
 CREATE TABLE books_categories (
     book_id BIGINT NOT NULL,
@@ -102,11 +120,17 @@ CREATE TABLE books_categories (
     PRIMARY KEY (book_id, category_id)
 );
 
--- Create the orders table
+-- Таблица для заказов.
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
-    -- оформляется (pending), комплектуется (processing), отправлен (shipped), доставлен (delivered), отменен (cancelled), возвращен (returned)
+    -- Возможные значнеия:
+    --      оформляется (pending),
+    --      комплектуется (processing),
+    --      отправлен (shipped),
+    --      доставлен (delivered),
+    --      отменен (cancelled),
+    --      возвращен (returned).
     order_status VARCHAR(20) DEFAULT 'pending' NOT NULL,
     order_total DECIMAL(19, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -114,57 +138,70 @@ CREATE TABLE orders (
     user_id BIGINT NOT NULL,
     delivery_detail_id BIGINT NOT NULL
 );
--- Create the orders_books table
--- modeling a many-to-many relationship between orders and books
+
+-- Промежуточная таблица для реализации
+-- связи M:N между отношениями "orders" и "books".
 DROP TABLE IF EXISTS orders_books;
 CREATE TABLE orders_books (
     quantity SMALLINT NOT NULL,
-    price DECIMAL(19, 2) NOT NULL, -- price of the book at the time of purchase, which might differ from the current price
+    price DECIMAL(19, 2) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     order_id BIGINT NOT NULL,
     book_id BIGINT NOT NULL,
     PRIMARY KEY (order_id, book_id)
 );
--- Reviews table
+
+-- Таблица для отзывов пользователей.
 DROP TABLE IF EXISTS reviews;
 CREATE TABLE reviews (
     id SERIAL PRIMARY KEY,
-    -- 1 to 5 stars
-    rating SMALLINT CHECK (rating >= 1 AND rating <= 5) NOT NULL,
+    -- от 1 до 5 звезд
+    rating SMALLINT
+        CHECK (rating >= 1 AND rating <= 5) NOT NULL,
     review_comment TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     book_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL
 );
--- Create the payments table
--- Order can have multiple payments (for example, couple of failed payment attempts before successful payment)
+
+-- Таблица для оплаты.
+-- ПРИМЕЧАНИЕ: Заказ может содержать несколько платежей, например,
+-- несколько неудачных попыток оплаты перед успешной оплатой.
 DROP TABLE IF EXISTS payments;
 CREATE TABLE payments (
     id BIGSERIAL PRIMARY KEY,
     amount DECIMAL(19, 2) NOT NULL,
     transaction_id VARCHAR(255) NOT NULL,
-    payment_method VARCHAR(20) DEFAULT 'card' NOT NULL, 	-- card, cash
-    payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL, 	-- success, pending, failed
+    -- card, cash
+    payment_method VARCHAR(20) DEFAULT 'card' NOT NULL,
+    -- success, pending, failed
+    payment_status VARCHAR(20) DEFAULT 'pending' NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     order_id BIGINT NOT NULL
 );
 
+-- Таблица для данных по оплате банковской картой.
 DROP TABLE IF EXISTS card_payments;
 CREATE TABLE card_payments (
     id BIGSERIAL PRIMARY KEY,
     card_type VARCHAR(20) NOT NULL,
-    card_last_four CHAR(4) NOT NULL,       -- Last four digits of the card number
-    card_expiry_month SMALLINT,            -- Expiration month (1-12)
-    card_expiry_year SMALLINT,             -- Expiration year (YYYY)
-    cardholder_name VARCHAR(255),          -- Optional: Name as printed on the card
+    -- Последние четыре цифры номера карты
+    card_last_four CHAR(4) NOT NULL,
+    -- Месяц истечения срока действия (1-12)
+    card_expiry_month SMALLINT,
+    -- Год истечения срока действия (ГГГГ)
+    card_expiry_year SMALLINT,
+    -- Имя, указанное на карте
+    cardholder_name VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     payment_id BIGINT NOT NULL
 );
 
+-- Таблица с дополнительной информацией о доставке.
 DROP TABLE IF EXISTS delivery_details;
 CREATE TABLE delivery_details (
     id BIGSERIAL PRIMARY KEY,
@@ -181,31 +218,41 @@ CREATE TABLE delivery_details (
     user_id BIGINT NOT NULL,
 );
 
+-- Таблица для информации о доставке.
 DROP TABLE IF EXISTS deliveries;
 CREATE TABLE deliveries (
     id BIGSERIAL PRIMARY KEY,
-    courier VARCHAR(255),              -- Name of the courier (e.g., UPS, FedEx)
-    tracking_number VARCHAR(50),      -- Tracking number provided by the courier
-    delivery_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- e.g., pending, shipped, in_transit, delivered, returned
-    shipped_at TIMESTAMP,              -- When the order was shipped
-    expected_delivery TIMESTAMP,       -- Estimated delivery date/time
-    delivered_at TIMESTAMP,            -- Actual delivery date/time
+    -- Название службы доставки.
+    courier VARCHAR(255),
+    -- Номер для отслеживания, предоставленный курьером.
+    tracking_number VARCHAR(50),
+    -- Статус доставки: pending, shipped, in_transit, delivered, returned.
+    delivery_status VARCHAR(20)
+        DEFAULT 'pending' NOT NULL,
+    -- Время отправки товара.
+    shipped_at TIMESTAMP,
+    -- Ожидаемое время доставки.
+    expected_delivery TIMESTAMP,
+    -- Фактическое время доставки.
+    delivered_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     order_id BIGINT NOT NULL,
 );
 
+-- Таблица с информацией об отмене заказа.
 DROP TABLE IF EXISTS order_cancellations;
 CREATE TABLE order_cancellations (
     id BIGSERIAL PRIMARY KEY,
-    order_id BIGINT NOT NULL,
     cancellation_reason TEXT,
     cancelled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     refunded_amount DECIMAL(19, 2),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    order_id BIGINT NOT NULL
 );
 
+-- Таблица с информацией о возврате заказа.
 DROP TABLE IF EXISTS order_returns;
 CREATE TABLE order_returns (
     id BIGSERIAL PRIMARY KEY,
@@ -213,144 +260,151 @@ CREATE TABLE order_returns (
     book_id BIGINT NOT NULL,
     return_quantity SMALLINT NOT NULL,
     return_reason TEXT,
-    return_status VARCHAR(20) DEFAULT 'pending' NOT NULL,  -- pending, approved, rejected
+    -- pending, approved, rejected
+    return_status VARCHAR(20) DEFAULT 'pending' NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ----------------------------------------------------------
--- Foreign Key Constraints
+-- Ограничения внешнего ключа
 ----------------------------------------------------------
 ALTER TABLE reviews
-    ADD CONSTRAINT FK_reviews_books FOREIGN KEY (book_id) REFERENCES books(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
---
+    ADD CONSTRAINT FK_reviews_books
+        FOREIGN KEY (book_id) REFERENCES books(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE reviews
-    ADD CONSTRAINT FK_reviews_users FOREIGN KEY (user_id) REFERENCES users(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
--- prevent users from reviewing the same book multiple times
+    ADD CONSTRAINT FK_reviews_users
+        FOREIGN KEY (user_id) REFERENCES users(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
+-- Ограничение уникальности позволяет избежать случая, когда
+-- пользователь может оставить отзыв для одной и той же книги несколько раз.
 ALTER TABLE reviews
-    ADD CONSTRAINT UNIQUE_user_book_review UNIQUE (user_id, book_id);
---
+    ADD CONSTRAINT UNIQUE_user_book_review
+        UNIQUE (user_id, book_id);
+
 ALTER TABLE orders
-    ADD CONSTRAINT FK_orders_users FOREIGN KEY (user_id) REFERENCES users(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
---
+    ADD CONSTRAINT FK_orders_users
+        FOREIGN KEY (user_id) REFERENCES users(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE orders
-    ADD CONSTRAINT FK_orders_delivery_details FOREIGN KEY (delivery_detail_id) REFERENCES delivery_details(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
---
+    ADD CONSTRAINT FK_orders_delivery_details
+        FOREIGN KEY (delivery_detail_id) REFERENCES delivery_details(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE payments
-    ADD CONSTRAINT FK_payments_orders FOREIGN KEY (order_id) REFERENCES orders(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
---
+    ADD CONSTRAINT FK_payments_orders
+        FOREIGN KEY (order_id) REFERENCES orders(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE card_payments
-    ADD CONSTRAINT FK_card_payments_payments FOREIGN KEY (payment_id) REFERENCES payments(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
---
+    ADD CONSTRAINT FK_card_payments_payments
+        FOREIGN KEY (payment_id) REFERENCES payments(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE books_categories
-    ADD CONSTRAINT FK_books_categories_books FOREIGN KEY (book_id) REFERENCES books(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
---
+    ADD CONSTRAINT FK_books_categories_books
+        FOREIGN KEY (book_id) REFERENCES books(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE books_categories
-    ADD CONSTRAINT FK_books_categories_categories FOREIGN KEY (category_id) REFERENCES categories(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
---
--- Foreign key constraint linking to the users table
+    ADD CONSTRAINT FK_books_categories_categories
+        FOREIGN KEY (category_id) REFERENCES categories(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE users_favorite_books
-    ADD CONSTRAINT FK_users_favorite_books_users FOREIGN KEY (user_id) REFERENCES users(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
--- Foreign key constraint linking to the books table
+    ADD CONSTRAINT FK_users_favorite_books_users
+        FOREIGN KEY (user_id) REFERENCES users(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE users_favorite_books
-    ADD CONSTRAINT FK_users_favorite_books_books FOREIGN KEY (book_id) REFERENCES books(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
+    ADD CONSTRAINT FK_users_favorite_books_books
+        FOREIGN KEY (book_id) REFERENCES books(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
 --
 ALTER TABLE orders_books
-    ADD CONSTRAINT FK_orders_books_books FOREIGN KEY (book_id) REFERENCES books(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
---
+    ADD CONSTRAINT FK_orders_books_books
+        FOREIGN KEY (book_id) REFERENCES books(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+
 ALTER TABLE orders_books
-    ADD CONSTRAINT FK_orders_books_orders FOREIGN KEY (order_id) REFERENCES orders(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
+    ADD CONSTRAINT FK_orders_books_orders
+        FOREIGN KEY (order_id) REFERENCES orders(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
 
 ALTER TABLE delivery_details
-    ADD CONSTRAINT FK_delivery_details_users FOREIGN KEY (user_id) REFERENCES users(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
+    ADD CONSTRAINT FK_delivery_details_users
+        FOREIGN KEY (user_id) REFERENCES users(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
 
 ALTER TABLE order_cancellations
-    ADD CONSTRAINT FK_order_cancellations_orders FOREIGN KEY (order_id) REFERENCES orders(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
+    ADD CONSTRAINT FK_order_cancellations_orders
+        FOREIGN KEY (order_id) REFERENCES orders(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
 
 ALTER TABLE order_returns
-    ADD CONSTRAINT FK_order_returns_orders FOREIGN KEY (order_id) REFERENCES orders(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
+    ADD CONSTRAINT FK_order_returns_orders
+        FOREIGN KEY (order_id) REFERENCES orders(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
 
 ALTER TABLE order_returns
-    ADD CONSTRAINT FK_order_returns_books FOREIGN KEY (book_id) REFERENCES books(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE;
-----------------------------------------------------------
--- Triggers
-----------------------------------------------------------
--- Update the `updated_at` column to the current timestamp
-CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER AS $$ BEGIN --
+    ADD CONSTRAINT FK_order_returns_books
+        FOREIGN KEY (book_id) REFERENCES books(id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE;
+------------------------------------------------------------------------
+-- Триггеры для автоматической установки значения столбца `updated_at`.
+------------------------------------------------------------------------
+-- Обновить столбец `updated_at`, используя текущую временную метку.
+CREATE OR REPLACE FUNCTION set_updated_at() RETURNS TRIGGER AS $$ BEGIN
     NEW.updated_at = CURRENT_TIMESTAMP;
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
--- Add the trigger to the `users` table
 CREATE TRIGGER update_timestamp_in_users BEFORE
     UPDATE ON users FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `books` table
 CREATE TRIGGER update_timestamp_in_books BEFORE
     UPDATE ON books FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `categories` table
 CREATE TRIGGER update_timestamp_in_categories BEFORE
     UPDATE ON categories FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `reviews` table
 CREATE TRIGGER update_timestamp_in_reviews BEFORE
     UPDATE ON reviews FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `orders` table
 CREATE TRIGGER update_timestamp_in_orders BEFORE
     UPDATE ON orders FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `orders_books` table
 CREATE TRIGGER update_timestamp_in_orders_books BEFORE
     UPDATE ON orders_books FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `payments` table
 CREATE TRIGGER update_timestamp_in_payments BEFORE
     UPDATE ON payments FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `card_payments` table
 CREATE TRIGGER update_timestamp_in_card_payments BEFORE
     UPDATE ON card_payments FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `delivery_details` table
 CREATE TRIGGER update_timestamp_in_delivery_details BEFORE
     UPDATE ON delivery_details FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `deliveries` table
 CREATE TRIGGER update_timestamp_in_deliveries BEFORE
     UPDATE ON deliveries FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `order_cancellations` table
 CREATE TRIGGER update_timestamp_in_order_cancellations BEFORE
     UPDATE ON order_cancellations FOR EACH ROW EXECUTE FUNCTION set_updated_at();
--- Add the trigger to the `order_returns` table
 CREATE TRIGGER update_timestamp_in_order_returns BEFORE
     UPDATE ON order_returns FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
 ----------------------------------------------------------
--- Indices on foreign keys
+-- Индексы для внешних ключей
 ----------------------------------------------------------
 -- `reviews`
 CREATE INDEX idx_reviews_book_id ON reviews(book_id);
@@ -386,6 +440,7 @@ CREATE INDEX idx_order_cancellations_order_id ON order_cancellations(order_id);
 CREATE INDEX idx_order_returns_order_id ON order_returns(order_id);
 CREATE INDEX idx_order_returns_book_id ON order_returns(book_id);
 
--- Adding indexes on commonly searched fields can improve performance.
+-- Добавление индексов к часто используемым полям
+-- для повышения производительности.
 CREATE INDEX idx_books_title ON books(title);
 CREATE INDEX idx_books_author ON books(author);

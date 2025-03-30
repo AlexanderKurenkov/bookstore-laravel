@@ -1,20 +1,19 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
     <div class="container">
-        <!-- Logo/Brand (Left) -->
         <a class="navbar-brand d-flex align-items-center" href="{{ route('index') }}">
             <i class="bi bi-book fs-3 text-primary me-2"></i>
             <span class="fw-bold">{{__('Bookstore')}}</span>
         </a>
 
-        <!-- Mobile Toggle Button -->
+        <!-- Кнопка меню (раскладка мобильного устройства) -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
                 aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <!-- Navbar Content -->
+        <!-- Navbar -->
         <div class="collapse navbar-collapse" id="navbarContent">
-            <!-- Search Form (Middle) -->
+            <!-- Форма для поиска -->
             <form action="{{ route('search.results') }}" method="GET" class="w-50 mx-auto">
                 <div class="input-group">
                     <input type="text" class="form-control flex-grow-1" placeholder="Поиск книг..." name="query" required
@@ -41,16 +40,16 @@
                 </div>
             </form>
 
-            <!-- User Actions (Right) -->
+            <!-- Пользовательские действия -->
             <ul class="navbar-nav ms-auto">
-                <!-- Favorites Button -->
+                <!-- Кнопка для избранного -->
                 <li class="nav-item me-2">
                     <a class="nav-link position-relative" href="#" data-bs-toggle="modal" data-bs-target="#favoritesModal">
                         <i class="bi bi-heart fs-5"></i>
                     </a>
                 </li>
 
-                <!-- Cart Dropdown -->
+                <!-- Выпадающее меню для корзины -->
                 <li class="nav-item dropdown me-2">
                     <a class="nav-link position-relative" href="#" id="cartDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <span class="bi bi-cart fs-5"></span>
@@ -103,7 +102,7 @@
                     </div>
                 </li>
 
-                <!-- User Account Dropdown -->
+                <!-- Выпадающее меню для профиля пользователя -->
                 <li class="nav-item dropdown">
                     @auth
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
@@ -138,7 +137,7 @@
     </div>
 </nav>
 
-<!-- Category Submenu (Optional - for desktop only) -->
+<!-- Списко категорий книг -->
 <div class="bg-light py-2 d-none d-lg-block border-bottom">
     <div class="container">
         <div class="row">
@@ -180,7 +179,7 @@
     </div>
 </div>
 
-<!-- Favorites Modal -->
+<!-- Модальное окно для избранного -->
 <div class="modal fade" id="favoritesModal" tabindex="-1" aria-labelledby="favoritesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
@@ -254,7 +253,7 @@
 </div>
 
 
-<!-- Authentication Modal -->
+<!-- Модальное для входи и регистрации -->
 <div class="modal fade" id="authenticationModal" tabindex="-1" aria-labelledby="authenticationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">

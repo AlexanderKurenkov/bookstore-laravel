@@ -51,7 +51,7 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
 });
 
-// Protected routes.
+// Защищенные маршруты.
 Route::middleware(['auth', 'verified'])->group(function () {
     // No need to include {id} in the URL path for the profile routes because
     // profile belongs to the authenticated user.

@@ -6,50 +6,66 @@ use App\Models\Book;
 use App\Models\Category;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
+/**
+ * Сервис для работы с каталогом книг.
+ */
 class CatalogService
 {
-    public function getAllBooks()
+    /**
+     * Получает запрос (Query Builder) для всех книг.
+     *
+     * @return Builder Запрос для получения всех книг
+     */
+    public function getAllBooks(): Builder
     {
         return Book::query();
     }
 
-    public function getBookById($id): Model
+    /**
+     * Получает книгу по её идентификатору.
+     *
+     * @param int $id Идентификатор книги
+     * @return Model Найденная книга
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Если книга не найдена
+     */
+    public function getBookById(int $id): Model
     {
         return Book::findOrFail($id);
     }
 
-    // public function getBooksByCategory(string $url_slug): array
-    // {
-    //     // Retrieve category by slug
-    //     $category = Category::where('url_slug', $url_slug)->firstOrFail();
-
-    //     // Retrieve books associated with this category
-    //     $books = Book::whereHas('categories', function ($query) use ($url_slug) {
-    //         $query->where('url_slug', $url_slug);
-    //     })->paginate(10) ?? collect(); // Ensure it's never null
-
-    //     return [
-    //         'books' => $books,
-    //         'categoryName' => $category->name
-    //     ];
-    // }
+    /**
+     * Получает книги из указанной категории с возможностью сортировки.
+     *
+     * @param string $url_slug URL-идентификатор категории
+     * @param string $sort Метод сортировки (по умолчанию — 'default')
+     * @return array<string, mixed> Массив с книгами и информацией о категории
+     *
+     * Возможные значения $sort:
+     * - 'price_asc'        Сортировка по цене (возрастание)
+     * - 'price_desc'       Сортировка по цене (убывание)
+     * - 'date_added'       Сортировка по дате добавления (новые сверху)
+     * - 'title'            Сортировка по названию (алфавитный порядок)
+     * - 'rating'           Сортировка по среднему рейтингу (сначала лучшие)
+     */
     public function getBooksByCategory(string $url_slug, string $sort = 'default'): array
     {
         if ($url_slug === 'all') {
-            $category = null; // No specific category
-            $booksQuery = Book::query(); // Get all books
+            $category = null; // Нет конкретной категории
+            $booksQuery = Book::query(); // Получаем все книги
         } else {
             $category = Category::where('url_slug', $url_slug)->firstOrFail();
 
-            // Get books only from the specified category
+            // Получаем книги только из указанной категории
             $booksQuery = Book::whereHas('categories', function ($query) use ($url_slug) {
                 $query->where('url_slug', $url_slug);
             });
         }
 
-        // Apply sorting
+        // Применяем сортировку
         switch ($sort) {
             case 'price_asc':
                 $booksQuery->orderBy('price', 'asc');
@@ -71,11 +87,13 @@ class CatalogService
                 break;
         }
 
+        // Пагинация книг (8 книг на страницу)
         $books = $booksQuery->paginate(8)->withQueryString();
 
         return [
             'books' => $books,
-            'categoryName' => $category->name ?? __('All books'), // Default name for 'all'
+            // Название категории (или "Все книги" по умолчанию)
+            'categoryName' => $category->name ?? __('All books'),
             'categorySlug' => $url_slug
         ];
     }

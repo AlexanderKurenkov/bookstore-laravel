@@ -2,11 +2,11 @@
 <html lang="en">
 <x-header />
 
-<body class="d-flex flex-column min-vh-100"> <!-- <body> is a flex container -->
+<body class="d-flex flex-column min-vh-100">
 
     <x-navbar />
 
-    <main class="container flex-grow-1"> <!-- content takes available space -->
+    <main class="container flex-grow-1">
         {{ $slot }}
     </main>
 
