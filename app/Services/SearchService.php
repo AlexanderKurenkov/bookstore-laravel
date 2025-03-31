@@ -10,31 +10,39 @@ use App\Models\Category;
 
 class SearchService
 {
-    public function searchBooks($query, $sort, $categorySlug): mixed
+    /**
+     * Выполняет поиск книг по заданным параметрам.
+     *
+     * @param string|null $query Поисковый запрос
+     * @param string $sort Тип сортировки
+     * @param string|null $categorySlug Слаг категории
+     * @return array Возвращает массив [пагинированный список книг, информация о категории]
+     */
+    public function searchBooks($query, $sort, $categorySlug): array
     {
-        // Start building the query
+        // Начинаем формирование запроса
         $booksQuery = Book::query();
 
         $category = null;
-        // Get category information if specified
+        // Получаем информацию о категории, если она указана
         if ($categorySlug) {
-            $category = Category::where('url_slug', $categorySlug)->first(); // first() returns null when no record is found.
+            $category = Category::where('url_slug', $categorySlug)->first(); // first() вернёт null, если категория не найдена
             if ($category) {
                 $booksQuery->whereHas('categories', fn(Builder $q) => $q->where('categories.id', $category->id));
             }
         }
 
-        // Apply search filter
+        // Применяем фильтр поиска
         if ($query) {
-            $booksQuery->where(function (Builder $q) use ($query) {
-                $q->where('title', 'ILIKE', "%{$query}%")
-                    ->orWhere('author', 'ILIKE', "%{$query}%")
-                    ->orWhere('description', 'ILIKE', "%{$query}%")
-                    ->orWhere('publisher', 'ILIKE', "%{$query}%");
-            });
+$booksQuery->where(function (Builder $q) use ($query) {
+    $q->where('title', 'ILIKE', "%{$query}%")
+        ->orWhere('author', 'ILIKE', "%{$query}%")
+        ->orWhere('description', 'ILIKE', "%{$query}%")
+        ->orWhere('publisher', 'ILIKE', "%{$query}%");
+});
         }
 
-        // Apply sorting
+        // Применяем сортировку
         switch ($sort) {
             case 'price_asc':
                 $booksQuery->orderBy('price', 'asc');
@@ -55,11 +63,9 @@ class SearchService
                     ->orderByRaw('avg_rating DESC, books.created_at DESC');
                 break;
             default:
-                // Default sorting by relevance (for search) or newest
+                // Сортировка по умолчанию: по релевантности (если есть запрос) или по дате добавления
                 if ($query) {
-                    // For search results, we might want to order by relevance
-                    // This is a simple implementation - in a real app, you might use
-                    // more sophisticated relevance scoring
+                    // Простая реализация сортировки по релевантности
                     $booksQuery->orderByRaw(
                         "
                         CASE
@@ -76,7 +82,7 @@ class SearchService
                 }
         }
 
-        // Get paginated results
+        // Получаем пагинированный результат
         return [$booksQuery->paginate(8)->withQueryString(), $category];
     }
 }

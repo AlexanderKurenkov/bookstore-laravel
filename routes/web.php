@@ -70,8 +70,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // });
 
-
-    //TODO make '/checkout' protected
     Route::prefix('checkout')->name('checkout.')->group(function () {
         //TODO
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
@@ -86,7 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Route::patch('/payment', [CheckoutController::class, 'updatePayment'])->name('payment');
     });
 
-    // Web route
+    // Web routes
     Route::prefix('orders/returns')->name('orders.returns.')->group(function () {
         Route::get('/edit/{id}', [OrderController::class, 'edit'])->name('edit');
         Route::post('/', [OrderController::class, 'store'])->name('store');
@@ -98,7 +96,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('api')->group(function () {
         Route::get('/orders/{orderId}/books', [OrderController::class, 'getOrderBooks']);
     });
-
 });
 
 

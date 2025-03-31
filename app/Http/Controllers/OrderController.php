@@ -10,32 +10,40 @@ class OrderController extends Controller
 {
     protected OrderService $orderService;
 
+    // Конструктор класса, принимает сервис заказов
     public function __construct(OrderService $orderService)
     {
         $this->orderService = $orderService;
     }
 
     /**
-     * Display the return form.
+     * Отображает форму возврата заказов.
      */
     public function edit($id)
     {
+        // Получаем список доставленных заказов пользователя
         $deliveredOrders = $this->orderService->getDeliveredOrdersForUser(auth()->id());
 
+        // Возвращаем представление с переданными данными
         return view('returns.edit', compact('deliveredOrders'));
     }
 
+    /**
+     * Обрабатывает запрос на создание возврата.
+     */
     public function store(Request $request)
     {
+        // Валидация входных данных
         $validator = Validator::make($request->all(), [
-            'order_id' => 'required|exists:orders,id',
-            'book_id' => 'required|exists:books,id',
-            'return_quantity' => 'required|integer|min:1',
-            'return_reason_type' => 'required|string',
-            'return_reason' => 'nullable|required_if:return_reason_type,other|string',
-            'agree_terms' => 'required|accepted',
+            'order_id' => 'required|exists:orders,id', // ID заказа должен существовать
+            'book_id' => 'required|exists:books,id', // ID книги должен существовать
+            'return_quantity' => 'required|integer|min:1', // Количество должно быть положительным числом
+            'return_reason_type' => 'required|string', // Тип причины возврата обязателен
+            'return_reason' => 'nullable|required_if:return_reason_type,other|string', // Причина обязательна, если выбран тип "другое"
+            'agree_terms' => 'required|accepted', // Пользователь должен согласиться с условиями
         ]);
 
+        // Если валидация не пройдена, возвращаем пользователя обратно с ошибками
         if ($validator->fails()) {
             return redirect()->back()
                 ->withErrors($validator)
@@ -43,65 +51,77 @@ class OrderController extends Controller
         }
 
         try {
+            // Создаем возврат с использованием сервиса заказов
             $return = $this->orderService->createReturn(auth()->id(), $request->all());
         } catch (\Exception $e) {
+            // В случае ошибки возвращаем пользователя обратно с сообщением об ошибке
             return redirect()->back()
                 ->with('error', $e->getMessage())
                 ->withInput();
         }
 
+        // Перенаправляем на страницу подтверждения возврата с сообщением об успешной отправке
         return redirect()->route('orders.returns.confirmation', $return->id)
             ->with('success', 'Ваша заявка на возврат успешно отправлена. Мы свяжемся с вами в ближайшее время.');
     }
 
     /**
-     * Display return confirmation page.
+     * Отображает страницу подтверждения возврата.
      */
     public function confirmation($id)
     {
+        // Получаем данные возврата для пользователя
         $return = $this->orderService->getReturnForUser($id, auth()->id());
 
+        // Возвращаем представление с переданными данными
         return view('returns.confirmation', compact('return'));
     }
 
-
     /**
-     * Cancel an order.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Отменяет заказ пользователя.
      */
     public function cancel(Request $request)
     {
+        // Валидация входных данных
         $request->validate([
-            'order_id' => 'required|exists:orders,id',
-            'cancellation_reason' => 'required|string|max:1000',
+            'order_id' => 'required|exists:orders,id', // ID заказа должен существовать
+            'cancellation_reason' => 'required|string|max:1000', // Причина отмены обязательна и ограничена 1000 символами
         ]);
 
         try {
+            // Вызываем сервис для отмены заказа
             $this->orderService->cancelOrder(auth()->id(), $request->order_id, $request->cancellation_reason);
 
+            // Если запрос был AJAX, возвращаем JSON-ответ
             if ($request->ajax()) {
                 return response()->json(['success' => true]);
             }
 
+            // Перенаправляем пользователя на страницу заказов с сообщением об успехе
             return redirect()->route('profile.orders')
                 ->with('success', 'Заказ успешно отменен.')
                 ->with('cancellation_success', true);
         } catch (\Exception $e) {
+            // Если запрос AJAX, возвращаем JSON-ответ с ошибкой
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Ошибка при отмене заказа.'], 500);
             }
 
+            // Перенаправляем пользователя обратно с сообщением об ошибке
             return redirect()->back()
                 ->with('error', 'Произошла ошибка при отмене заказа. Пожалуйста, попробуйте еще раз.');
         }
     }
 
+    /**
+     * Возвращает список книг, содержащихся в заказе.
+     */
     public function getOrderBooks($orderId)
     {
+        // Получаем книги, входящие в заказ пользователя
         $books = $this->orderService->getOrderBooks($orderId, auth()->id());
 
+        // Возвращаем данные в формате JSON
         return response()->json($books);
     }
 }

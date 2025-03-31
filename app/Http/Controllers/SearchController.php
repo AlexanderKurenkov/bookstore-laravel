@@ -10,29 +10,44 @@ class SearchController extends Controller
 {
 	protected SearchService $searchService;
 
+	/**
+	 * Конструктор контроллера.
+	 *
+	 * @param SearchService $searchService Сервис поиска книг
+	 */
 	public function __construct(SearchService $searchService)
 	{
 		$this->searchService = $searchService;
 	}
 
-	// Shows advanced search form.
-	public function index(): View
-	{
-		return view('search.index'); // View for the advanced search form
-	}
+	/**
+	 * Отображает форму расширенного поиска.
+	 *
+	 * @return View Представление с формой поиска
+	 */
+	// public function index(): View
+	// {
+	// 	return view('search.index'); // Представление для формы расширенного поиска
+	// }
 
 	/**
-	 * Search books by title or description.
+	 * Выполняет поиск книг по названию или описанию.
+	 *
+	 * @param Request $request Запрос с параметрами поиска
+	 * @return View Представление с результатами поиска
 	 */
 	public function results(Request $request): View
 	{
+		// Поисковый запрос
 		$query = $request->input('query');
+		// Категория (если указана)
 		$categorySlug = $request->input('category');
-        $sort = $request->input('sort', 'default');
+		// Тип сортировки (по умолчанию 'default')
+		$sort = $request->input('sort', 'default');
 
-		// Get the list of books based on the query
+		// Получаем список книг, соответствующих запросу
 		[$books, $category] = $this->searchService->searchBooks($query, $sort, $categorySlug);
 
-        return view('search.results', compact('books', 'category'));
+		return view('search.results', compact('books', 'category'));
 	}
 }
