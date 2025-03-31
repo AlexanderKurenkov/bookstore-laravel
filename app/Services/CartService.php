@@ -1,3 +1,9 @@
+Я планирую получить бакалавр по программной инженерии и занимаюсь написанием отчета по практике "Разработка интернет-магазина по продаже книг".
+Мне нужуно, что бы ты описал, как представленный ниже код реализует функциональность корзины в онлайн магазине.
+ВАЖНО:
+- в ответе не используй списки текста (только непрерывный текст).
+- проиллюстрируй свой ответ фрагментами кода, представленного ниже.
+```
 <?php
 
 namespace App\Services;
@@ -10,36 +16,46 @@ class CartService
 {
 	public function getAllItems(User $user): \Illuminate\Support\Collection | \Illuminate\Database\Eloquent\Collection
 	{
+		// Получаем активный (незавершенный) заказ пользователя
 		$order = $this->getActiveOrder($user);
+
+		// Если заказ найден, возвращаем связанные с ним книги, иначе — пустую коллекцию
 		return $order ? $order->books : collect();
 	}
 
 	public function addCartItem(User $user, int $bookId, int $qty): bool
 	{
+		// Находим книгу по ID или выбрасываем исключение, если она не найдена
 		$book = Book::findOrFail($bookId);
 
+		// Проверяем, есть ли достаточное количество книги на складе
 		if ($qty > $book->in_stock_number) {
-			return false;
+			return false; // Если недостаточно, операция отклоняется
 		}
 
+		// Получаем активный заказ пользователя или создаем новый
 		$order = $this->getOrCreateOrder($user);
 
-		// Check if the book is already in the order
+		// Проверяем, есть ли уже эта книга в заказе
 		$existingItem = $order->books()->where('book_id', $book->id)->first();
 
 		if ($existingItem) {
+			// Если книга уже есть в заказе, увеличиваем ее количество
 			$existingItem->pivot->quantity += $qty;
 			$existingItem->pivot->save();
 		} else {
+			// Если книги нет в заказе, добавляем новую запись в промежуточную таблицу
 			$order->books()->attach($book->id, [
 				'quantity' => $qty,
 				'price' => $book->price,
 			]);
 		}
 
+		// Обновляем общую сумму заказа
 		$this->updateOrderTotal($order);
-		return true;
+		return true; // Операция успешно выполнена
 	}
+
 
 	public function updateCartItem(User $user, int $bookId, int $qty): bool
 	{
@@ -62,38 +78,34 @@ class CartService
 		return true;
 	}
 
-	public function removeCartItem(User $user, int $bookId): bool
-	{
-		$order = $this->getActiveOrder($user);
+public function removeCartItem(User $user, int $bookId): bool
+{
+	// Получаем активный заказ пользователя
+	$order = $this->getActiveOrder($user);
 
-		if (!$order) {
-			return false;
-		}
-
-		$order->books()->detach($bookId);
-		$this->updateOrderTotal($order);
-
-		return true;
-	}
-
-	public function removeAllItems(): bool
-	{
-		// $order = $this->getActiveOrder($user);
-
-		// if (!$order) {
-		// 	return false;
-		// }
-
-		// $order->books()->detach();
-		// $this->updateOrderTotal($order);
-
-		// return true;
-
-		if (session()->forget(['cart', 'cart_total']))
-			return true;
-
+	// Если активного заказа нет, возвращаем false
+	if (!$order) {
 		return false;
 	}
+
+	// Удаляем книгу из заказа
+	$order->books()->detach($bookId);
+
+	// Обновляем общую сумму заказа после удаления товара
+	$this->updateOrderTotal($order);
+
+	return true; // Операция успешно выполнена
+}
+
+public function removeAllItems(): bool
+{
+	// Удаляем данные о корзине из сессии
+	if (session()->forget(['cart', 'cart_total'])) {
+		return true; // Операция успешно выполнена
+	}
+
+	return false; // Ошибка при очистке корзины
+}
 
 	private function updateOrderTotal(Order $order): void
 	{

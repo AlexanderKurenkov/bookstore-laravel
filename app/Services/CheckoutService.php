@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Services;
@@ -28,50 +29,57 @@ class CheckoutService
     }
 
     /**
-     * Process an order.
+     * Обрабатывает создание заказа.
      *
-     * @param User $user The authenticated user
-     * @param Request $request The request data
-     * @return array
+     * Метод получает валидированные данные оформления заказа, рассчитывает стоимость доставки
+     * и сохраняет заказ в базе данных. Также проверяется наличие данных о доставке,
+     * при необходимости создается соответствующая запись. После этого товары из корзины
+     * привязываются к заказу, а корзина очищается.
+     *
+     * В результате метод возвращает созданный заказ и предполагаемую дату доставки.
+     *
+     * @param User $user Аутентифицированный пользователь, оформляющий заказ.
+     * @param array $validated Валидированные данные запроса, содержащие информацию о заказе.
+     * @return array Массив с созданным заказом и предполагаемой датой доставки.
      */
     public function processOrder(User $user, array $validated): array
     {
-        // Calculate shipping cost based on cart total
+        // Рассчитываем стоимость доставки в зависимости от метода доставки
         $cartTotal = session('cart_total', 0);
-        $shippingCost = ($validated['delivery_method'] === 'standard' && $cartTotal < 2000) ? 300 : 0;
+        $shippingCost = ($validated['delivery_method'] === 'standard') ? 300 : 0;
 
-        // Ensure delivery details exist
+        // Проверяем существование данных о доставке и создаем их при необходимости
         $deliveryDetail = DeliveryDetail::firstOrCreate(
-            ['user_id' => $user->id], // Find existing record for user
+            ['user_id' => $user->id], // Поиск существующей записи о доставке для пользователя
             [
                 'address_line1' => $validated['address'],
                 'city' => $validated['city'],
                 'state' => $validated['region'],
                 'postal_code' => $validated['postal_code'],
-                'country' => 'Unknown', // Ensure a valid default country
+                'country' => 'Unknown', // Устанавливаем значение по умолчанию
                 'phone' => $validated['phone'],
-                'user_comment' => $validated['user_comment'] ?? null, // Optional
+                'user_comment' => $validated['user_comment'] ?? null, // Опциональный комментарий пользователя
             ]
         );
 
-        // Create order (only correct fields)
+        // Создаем заказ
         $order = Order::create([
             'user_id' => $user->id,
-            'delivery_detail_id' => $deliveryDetail->id, // ✅ Cannot be null now
+            'delivery_detail_id' => $deliveryDetail->id,
             'order_status' => 'pending',
             'order_total' => $cartTotal + $shippingCost,
         ]);
 
-        // Add books to order (many-to-many relationship)
+        // Добавляем книги в заказ (отношение многие ко многим)
         $cartItems = session('cart', []);
         foreach ($cartItems as $item) {
             $order->books()->attach($item['id'], [
                 'quantity' => $item['quantity'],
-                'price' => $item['price'], // Snapshot price at purchase time
+                'price' => $item['price'], // Фиксируем цену на момент покупки
             ]);
         }
 
-        // Clear cart after order is placed
+        // Очищаем корзину после оформления заказа
         Session::forget(['cart', 'cart_total']);
 
         return [
@@ -79,6 +87,7 @@ class CheckoutService
             'estimatedDeliveryDate' => now()->addDays(3)->format('d.m.Y')
         ];
     }
+
 
     private function calculateTotal(User $user): mixed
     {

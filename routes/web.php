@@ -18,12 +18,11 @@ Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
 Route::get('/privacy', [HomeController::class, 'privacy'])->name('privacy');
 
 Route::prefix('catalog')->name('catalog.')->group(function () {
-    Route::get('/', [CatalogController::class, 'index'])->name('index'); // displays all books
+    Route::get('/', [CatalogController::class, 'index'])->name('index');
     Route::get('/category/{url_slug}', [CatalogController::class, 'showCategory'])->name('category');
     Route::get('/book/{id}', [CatalogController::class, 'showBook'])->name('book');
 });
 
-// TODO make API
 Route::prefix('favorites')->name('favorites.')->group(function () {
     Route::get('/', [CatalogController::class, 'listFavorites'])->name('list');
     Route::post('/toggle', [CatalogController::class, 'toggleFavorites'])->name('toggle');
@@ -51,10 +50,10 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
 });
 
+// No need to include {id} in the URL path for the profile routes because
+// profile belongs to the authenticated user.
 // Защищенные маршруты.
 Route::middleware(['auth', 'verified'])->group(function () {
-    // No need to include {id} in the URL path for the profile routes because
-    // profile belongs to the authenticated user.
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
         Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');

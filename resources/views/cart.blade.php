@@ -114,7 +114,7 @@
                                     <span>Доставка</span>
                                     @php
                                         $cartTotal = session('cart_total') ?? 0;
-                                        $shippingCost = $cartTotal >= 2000 ? 0 : 300;
+                                        $shippingCost = 300;
                                     @endphp
                                     <span>{{ $shippingCost > 0 ? number_format($shippingCost, 2) . ' ₽' : 'Бесплатно' }}</span>
                                 </div>
@@ -124,8 +124,7 @@
                                 <div class="d-flex justify-content-between mb-3 fw-bold">
                                     <span>Итого</span>
                                     @php
-                                        $discount = session('promo_discount') ? (session('cart_total') ?? 0) * (session('promo_discount') / 100) : 0;
-                                        $total = (session('cart_total') ?? 0) - $discount + $shippingCost;
+                                        $total = $cartTotal + $shippingCost;
                                     @endphp
                                     <span class="fs-5">{{ number_format($total, 2) }} ₽</span>
                                 </div>

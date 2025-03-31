@@ -12,31 +12,47 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
+/**
+ * Контроллер для управления профилем пользователя.
+ */
 class ProfileController extends Controller
 {
+    /**
+     * @var ProfileService Сервис для работы с профилем пользователя.
+     */
     protected ProfileService $profileService;
 
+    /**
+     * Создает экземпляр контроллера и инициализирует сервис профиля.
+     *
+     * @param ProfileService $profileService Сервис профиля.
+     */
     public function __construct(ProfileService $profileService)
     {
         $this->profileService = $profileService;
     }
 
-    /**
-     * Display the form to edit user's profile.
-     */
+/**
+ * Отображает страницу редактирования профиля пользователя.
+ *
+ * @param Request $request HTTP-запрос.
+ * @return View Представление профиля пользователя.
+ */
     public function index(Request $request): View
     {
-
-        // TODO put into service
-        // Get all orders for the currently authenticated user
+        // TODO: Переместить логику в сервис
+        // Получаем все заказы аутентифицированного пользователя
         $orders = auth()->user()->orders;
 
-        // Pass orders to the view
+        // Передаем заказы в представление
         return view('profile.index', compact('orders'));
     }
 
     /**
-     * Update the user's profile information.
+     * Обновляет информацию профиля пользователя.
+     *
+     * @param ProfileUpdateRequest $request Запрос с данными для обновления профиля.
+     * @return RedirectResponse Перенаправление обратно с сообщением об успешном обновлении.
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -45,34 +61,35 @@ class ProfileController extends Controller
         return redirect()->to(route('profile.index') . '#edit-profile')->with('status', 'profile-updated');
     }
 
+    /**
+     * Обновляет пароль пользователя.
+     *
+     * @param Request $request HTTP-запрос с текущим и новым паролем.
+     * @return \Illuminate\Http\JsonResponse Ответ в формате JSON.
+     */
     public function updatePassword(Request $request)
     {
-        // Validate the input data
+        // Валидация входных данных
         $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'min:8', 'confirmed'], // Confirmed checks password_confirmation field
+            'password' => ['required', 'min:8', 'confirmed'], // confirmed проверяет поле password_confirmation
         ]);
 
-        // Get the authenticated user
+        // Получаем аутентифицированного пользователя
         $user = Auth::user();
 
-        // Ensure the current password is correct
+        // Проверяем корректность текущего пароля
         if (!Hash::check($request->current_password, $user->password)) {
-            // If the current password is incorrect
-            // return back()->withErrors(['current_password' => 'Текущий пароль неверный.'])->withInput();
             return response()->json([
                 'success' => false,
                 'errors' => ['current_password' => 'Текущий пароль неверный.']
-            ], 422); // 422 Unprocessable Entity is appropriate for validation errors
+            ], 422); // 422 Unprocessable Entity подходит для ошибок валидации
         }
 
-        // Update the password
+        // Обновляем пароль
         $user->update([
-            'password' => bcrypt($request->password), // Encrypt the new password
+            'password' => bcrypt($request->password), // Шифруем новый пароль
         ]);
-
-        // Redirect with a success message
-        // return redirect()->route('profile.index')->with('status', 'password-updated');
 
         return response()->json([
             'success' => true,
@@ -81,13 +98,15 @@ class ProfileController extends Controller
     }
 
     /**
-     * Delete the user's account.
+     * Удаляет аккаунт пользователя.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request HTTP-запрос с подтверждением пароля.
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse Ответ в зависимости от типа запроса.
+     * @throws ValidationException Если пароль введен неверно.
      */
     public function destroy(Request $request)
     {
+        // Валидация входных данных
         $request->validate([
             'password' => 'required',
             'confirm_deletion' => 'required|accepted',
@@ -95,7 +114,7 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        // Verify password
+        // Проверяем пароль пользователя
         if (!Hash::check($request->password, $user->password)) {
             if ($request->ajax()) {
                 return response()->json([
@@ -110,16 +129,13 @@ class ProfileController extends Controller
 
         DB::beginTransaction();
         try {
-            // Delete related data
-            // Note: This assumes you have proper foreign key constraints with cascade delete
-            // or you need to manually delete related records here
-
-            // Delete the user
+            // Удаляем связанные данные (если требуется ручное удаление, иначе каскадное удаление)
+            // Удаляем пользователя
             $user->delete();
 
             DB::commit();
 
-            // Log the user out
+            // Разлогиниваем пользователя
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
