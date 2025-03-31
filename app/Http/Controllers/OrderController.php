@@ -2,13 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\OrderCancellation;
+use App\Services\OrderService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
+    protected OrderService $orderService;
+
+    public function __construct(OrderService $orderService)
+    {
+        $this->orderService = $orderService;
+    }
+
+    /**
+     * Display the return form.
+     */
+    public function edit($id)
+    {
+        $deliveredOrders = $this->orderService->getDeliveredOrdersForUser(auth()->id());
+
+        return view('returns.edit', compact('deliveredOrders'));
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'order_id' => 'required|exists:orders,id',
+            'book_id' => 'required|exists:books,id',
+            'return_quantity' => 'required|integer|min:1',
+            'return_reason_type' => 'required|string',
+            'return_reason' => 'nullable|required_if:return_reason_type,other|string',
+            'agree_terms' => 'required|accepted',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        try {
+            $return = $this->orderService->createReturn(auth()->id(), $request->all());
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', $e->getMessage())
+                ->withInput();
+        }
+
+        return redirect()->route('orders.returns.confirmation', $return->id)
+            ->with('success', 'Ваша заявка на возврат успешно отправлена. Мы свяжемся с вами в ближайшее время.');
+    }
+
+    /**
+     * Display return confirmation page.
+     */
+    public function confirmation($id)
+    {
+        $return = $this->orderService->getReturnForUser($id, auth()->id());
+
+        return view('returns.confirmation', compact('return'));
+    }
+
+
     /**
      * Cancel an order.
      *
@@ -22,31 +78,8 @@ class OrderController extends Controller
             'cancellation_reason' => 'required|string|max:1000',
         ]);
 
-        // Verify the order belongs to the authenticated user
-        $order = Order::where('id', $request->order_id)
-            ->where('user_id', auth()->id())
-            ->whereIn('order_status', ['pending', 'processing', 'shipped'])
-            ->firstOrFail();
-
-        DB::beginTransaction();
         try {
-            // Update order status
-            $order->order_status = 'cancelled';
-            $order->save();
-
-            // Create cancellation record
-            $cancellation = new OrderCancellation();
-            $cancellation->order_id = $order->id;
-            $cancellation->cancellation_reason = $request->cancellation_reason;
-            
-            // If the order was paid, set the refunded amount
-            if ($order->payment_status === 'paid') {
-                $cancellation->refunded_amount = $order->order_total;
-            }
-            
-            $cancellation->save();
-
-            DB::commit();
+            $this->orderService->cancelOrder(auth()->id(), $request->order_id, $request->cancellation_reason);
 
             if ($request->ajax()) {
                 return response()->json(['success' => true]);
@@ -56,8 +89,6 @@ class OrderController extends Controller
                 ->with('success', 'Заказ успешно отменен.')
                 ->with('cancellation_success', true);
         } catch (\Exception $e) {
-            DB::rollBack();
-            
             if ($request->ajax()) {
                 return response()->json(['success' => false, 'message' => 'Ошибка при отмене заказа.'], 500);
             }
@@ -66,5 +97,11 @@ class OrderController extends Controller
                 ->with('error', 'Произошла ошибка при отмене заказа. Пожалуйста, попробуйте еще раз.');
         }
     }
-}
 
+    public function getOrderBooks($orderId)
+    {
+        $books = $this->orderService->getOrderBooks($orderId, auth()->id());
+
+        return response()->json($books);
+    }
+}

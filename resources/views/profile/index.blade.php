@@ -122,7 +122,7 @@
                                                                     Отменить
                                                                 </button>
                                                             @elseif($order->order_status === 'delivered')
-                                                                <a href="{{ route('returns.edit', ['id' => $order->id]) }}" class="btn btn-sm btn-outline-warning ms-1">
+                                                                <a href="{{ route('orders.returns.edit', ['id' => $order->id]) }}" class="btn btn-sm btn-outline-warning ms-1">
                                                                     Возврат
                                                                 </a>
                                                             @endif

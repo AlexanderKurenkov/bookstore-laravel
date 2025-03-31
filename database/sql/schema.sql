@@ -124,7 +124,7 @@ CREATE TABLE books_categories (
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
-    -- Возможные значнеия:
+    -- Возможные значения:
     --      оформляется (pending),
     --      комплектуется (processing),
     --      отправлен (shipped),

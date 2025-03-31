@@ -7,7 +7,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ReturnController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
@@ -86,22 +86,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Route::patch('/payment', [CheckoutController::class, 'updatePayment'])->name('payment');
     });
 
-    Route::prefix('returns')->name('returns.')->group(function () {
-        Route::get('/edit/{id}', [ReturnController::class, 'edit'])->name('edit');
-        Route::post('/', [ReturnController::class, 'store'])->name('store');
-        Route::get('/{id}/confirmation', [ReturnController::class, 'confirmation'])->name('confirmation');
+    // Web route
+    Route::prefix('orders/returns')->name('orders.returns.')->group(function () {
+        Route::get('/edit/{id}', [OrderController::class, 'edit'])->name('edit');
+        Route::post('/', [OrderController::class, 'store'])->name('store');
+        Route::get('/{id}/confirmation', [OrderController::class, 'confirmation'])->name('confirmation');
     });
+    Route::post('/orders/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
+    // API route for getting books from an order
+    Route::prefix('api')->group(function () {
+        Route::get('/orders/{orderId}/books', [OrderController::class, 'getOrderBooks']);
+    });
+
 });
 
 
-// API route for getting books from an order
-Route::middleware(['auth'])->prefix('api')->group(function () {
-    Route::get('/orders/{orderId}/books', [ReturnController::class, 'getOrderBooks']);
-});
 
 // Order cancellation
 Route::middleware(['auth'])->group(function () {
-    Route::post('/orders/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
+
 });
 
 // Route::get('/profile', function () {
