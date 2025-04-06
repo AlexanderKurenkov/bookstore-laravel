@@ -44,7 +44,7 @@ CREATE TABLE users (
     phone VARCHAR(20),
     date_of_birth DATE,
     gender VARCHAR(10)
-        CHECK (gender IN ('male', 'female') OR gender IS NULL);
+        CHECK (gender IN ('male', 'female') OR gender IS NULL),
     remember_token VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -215,7 +215,7 @@ CREATE TABLE delivery_details (
     user_comment VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL
 );
 
 -- Таблица для информации о доставке.
@@ -237,7 +237,7 @@ CREATE TABLE deliveries (
     delivered_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    order_id BIGINT NOT NULL,
+    order_id BIGINT NOT NULL
 );
 
 -- Таблица с информацией об отмене заказа.
