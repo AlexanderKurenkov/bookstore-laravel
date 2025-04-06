@@ -103,7 +103,7 @@ CREATE TABLE users_favorite_books (
 -- Таблица для категорий книг.
 DROP TABLE IF EXISTS categories;
 CREATE TABLE categories (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(20) UNIQUE NOT NULL,
     url_slug VARCHAR(20) UNIQUE NOT NULL,
     description TEXT,
@@ -155,7 +155,7 @@ CREATE TABLE orders_books (
 -- Таблица для отзывов пользователей.
 DROP TABLE IF EXISTS reviews;
 CREATE TABLE reviews (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     -- от 1 до 5 звезд
     rating SMALLINT
         CHECK (rating >= 1 AND rating <= 5) NOT NULL,
