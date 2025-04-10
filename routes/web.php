@@ -7,7 +7,6 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,23 +27,13 @@ Route::prefix('favorites')->name('favorites.')->group(function () {
     Route::post('/toggle', [CatalogController::class, 'toggleFavorites'])->name('toggle');
 });
 
-Route::prefix('reviews')->name('reviews.')->group(function () {
-    Route::get('/{id}', [ReviewController::class, 'index'])->name('index');
-    Route::post('/{id}', [ReviewController::class, 'store'])->name('store');
-    Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
-    Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
-});
-
 Route::prefix('search')->name('search.')->group(function () {
-    // Shows advanced search form.
-    Route::get('/', [SearchController::class, 'index'])->name('index');
-    // GET method for search allows users to bookmark search results.
+    // Метод / GET для поиска позволяет пользователям добавлять в закладки результаты поиска.
     Route::get('/results', [SearchController::class, 'results'])->name('results');
 });
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index');
-    Route::post('/item', [CartController::class, 'storeItem'])->name('item.store');
     Route::patch('/item/{id}', [CartController::class, 'updateItem'])->name('item.update');
     Route::delete('/item', [CartController::class, 'destroyItem'])->name('item.destroy');
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
@@ -63,12 +52,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/update-password', [ProfileController::class, 'updatePassword'])->name('password.update');
     });
 
-    // TODO API?
-    // Route::prefix('addresses')->name('addresses.')->group(function () {
-    //     Route::post('/', [ProfileController::class, 'storeAddress'])->name('store');
-    //     Route::delete('/{id}', [ProfileController::class, 'destroyAddress'])->name('destroy');
 
-    // });
+    Route::prefix('reviews')->name('reviews.')->group(function () {
+        Route::get('/{id}', [ReviewController::class, 'index'])->name('index');
+        Route::post('/{id}', [ReviewController::class, 'store'])->name('store');
+        Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
+    });
 
     Route::prefix('checkout')->name('checkout.')->group(function () {
         //TODO
@@ -79,9 +69,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/', [CheckoutController::class, 'process'])->name('process');
 
         Route::post('/{cartId}', [CheckoutController::class, 'destroy'])->name('destroy');
-
-        // Route::patch('/shipping', [CheckoutController::class, 'updateShipping'])->name('shipping');
-        // Route::patch('/payment', [CheckoutController::class, 'updatePayment'])->name('payment');
     });
 
     // Web routes
@@ -94,27 +81,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // API route for getting books from an order
     Route::prefix('api')->group(function () {
-        Route::get('/orders/{orderId}/books', [OrderController::class, 'getOrderBooks']);
+        Route::get('/orders/{orderId}/books', [OrderController::class, 'getOrderBooks'])
+            ->name('api.orders.books');
     });
 });
 
-
-
-// Order cancellation
-Route::middleware(['auth'])->group(function () {
-
-});
-
-// Route::get('/profile', function () {
-//     return view('profile');
-// })->middleware(['auth', 'verified'])->name('profile');
-
-// Cart API routes for dynamic updates
-Route::prefix('api/cart')->group(function () {
-    Route::get('/', [CartController::class, 'getCart'])->name('cart.api.get');
-    Route::post('/add', [CartController::class, 'addItem'])->name('cart.api.add');
-    Route::post('/remove', [CartController::class, 'removeItem'])->name('cart.api.destroy');
-    Route::post('/update', [CartController::class, 'updateItem'])->name('cart.api.update');
+// API-маршруты для динамического обновления корзины
+Route::prefix('api/cart')->name('api.cart.')->group(function () {
+    Route::get('/', [CartController::class, 'getCart'])->name('get');
+    Route::post('/add', [CartController::class, 'addItem'])->name('add');
+    Route::post('/remove', [CartController::class, 'removeItem'])->name('destroy');
 });
 
 // DEV

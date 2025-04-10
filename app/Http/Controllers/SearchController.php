@@ -21,16 +21,6 @@ class SearchController extends Controller
 	}
 
 	/**
-	 * Отображает форму расширенного поиска.
-	 *
-	 * @return View Представление с формой поиска
-	 */
-	// public function index(): View
-	// {
-	// 	return view('search.index'); // Представление для формы расширенного поиска
-	// }
-
-	/**
 	 * Выполняет поиск книг по названию или описанию.
 	 *
 	 * @param Request $request Запрос с параметрами поиска

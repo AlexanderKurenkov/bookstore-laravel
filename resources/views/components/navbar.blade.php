@@ -420,7 +420,7 @@
 
         // Function to fetch cart data from server
         window.fetchCartData = function() {
-            fetch('{{ route("cart.api.get") }}', {
+            fetch('{{ route("api.cart.get") }}', {
                 method: 'GET',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -516,7 +516,7 @@
 
         // Function to remove item from cart
         window.removeCartItem = function(itemId) {
-            fetch(`{{ route('cart.api.destroy') }}`, {
+            fetch(`{{ route('api.cart.destroy') }}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -554,7 +554,7 @@
 
         // Function to add item to cart
         window.addToCart = function(itemId, quantity = 1) {
-            fetch(`{{ route('cart.api.add') }}`, {
+            fetch(`{{ route('api.cart.add') }}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -591,7 +591,7 @@
 
     // Function to update the favorites modal content
     function updateFavoritesModal() {
-        fetch('/favorites') // Adjust the URL to your actual route
+        fetch("{{ route('favorites.list') }}")
             .then(response => response.json())
             .then(data => {
                 const favoritesModalBody = document.querySelector('#favoritesModal .modal-body');
@@ -657,7 +657,7 @@
                 const id = this.dataset.id;
                 const icon = document.getElementById('favoriteIcon' + id); // Get the corresponding icon
 
-                fetch('/favorites/toggle', {
+                fetch("{{ route('favorites.toggle') }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -13,110 +13,65 @@ use Illuminate\View\View;
 
 class CartController extends Controller
 {
+	/**
+	 * Сервис для работы с корзиной
+	 */
 	protected CartService $cartService;
 
+	/**
+	 * Конструктор контроллера
+	 *
+	 * @param CartService $cartService
+	 */
 	public function __construct(CartService $cartService)
 	{
 		$this->cartService = $cartService;
 	}
 
+	/**
+	 * Отображает страницу корзины
+	 *
+	 * @return View
+	 */
 	public function index(): View
 	{
-		// $user = Auth::user();
-		// $orderItems = $this->cartService->getAllItems();
-		// return view('cart', ['orderItems' => $orderItems]);
-
 		return view('cart');
 	}
 
-	// public function storeItem(Request $request) //: JsonResponse
-	// {
-	// 	// $user = Auth::user();
-	// 	// $bookId = $request->input('bookId');
-	// 	// $quantity = (int) $request->input('quantity');
-
-	// 	// $success = $this->cartService->addCartItem($user, $bookId, $quantity);
-
-	// 	// return redirect()->route('cart.index')
-	// 	// 	->with($success ? 'addBookSuccess' : 'notEnoughStock', true);
-
-	// 	//=====================================
-	// 	// Validate incoming data (optional)
-	// 	$validated = $request->validate([
-	// 		'bookId' => 'required|integer|exists:books,id',
-	// 		'quantity' => 'required|integer|min:1',
-	// 	]);
-
-	// 	// Retrieve item ID and quantity from the request
-	// 	$id = $validated['bookId'];
-	// 	$quantity = $validated['quantity'];
-
-	// 	// Add the item to the cart (stored in the session for simplicity)
-	// 	$cart = session()->get('cart', []);
-
-	// 	if (isset($cart[$id])) {
-	// 		// If the item already exists in the cart, increase its quantity
-	// 		$cart[$id]['quantity'] += $quantity;
-	// 	} else {
-	// 		// Otherwise, add the item to the cart
-	// 		$cart[$id] = [
-	// 			'bookId' => $id,
-	// 			'quantity' => $quantity,
-	// 		];
-	// 	}
-
-	// 	session()->put('cart', $cart);
-
-	// 	// Respond with a success message (optional)
-	// 	return response()->json(['message' => 'Item added to cart successfully']);
-	// }
-
-	// CHECK same method below
-	// public function updateItem(Request $request): RedirectResponse
-	// {
-	// 	$user = Auth::user();
-	// 	$bookId = $request->input('book_id');
-	// 	$quantity = (int) $request->input('quantity');
-
-	// 	$this->cartService->updateCartItem($user, $bookId, $quantity);
-
-	// 	return redirect()->route('cart.index');
-	// }
-
+	/**
+	 * Удаляет товар из корзины и перенаправляет обратно на страницу корзины
+	 *
+	 * @param Request $request
+	 * @return RedirectResponse
+	 */
 	public function destroyItem(Request $request): RedirectResponse
 	{
-		// $user = Auth::user();
-		// $bookId = $request->query('book_id');
-
-		// $this->cartService->removeCartItem($user, $bookId);
-
-		// return redirect()->route('cart.index')->with('removeBookSuccess', true);
-		//
-
 		$this->removeItem($request);
 		return redirect()->route('cart.index')->with('removeBookSuccess', true);
 	}
 
-
-	public function updateItem(Request $request, int $id) : RedirectResponse
+	/**
+	 * Обновляет количество товара в корзине
+	 *
+	 * @param Request $request
+	 * @param int $id ID книги
+	 * @return RedirectResponse|null
+	 */
+	public function updateItem(Request $request, int $id): RedirectResponse
 	{
 		$request->validate([
-			// 'id' => 'required',
 			'quantity' => 'required|integer|min:1'
 		]);
 
 		$bookId = $id;
 		$quantity = $request->quantity;
 
-		// Get current cart
 		$cart = session('cart', []);
 
-		// Update quantity if item exists
 		if (isset($cart[$bookId])) {
 			$cart[$bookId]['quantity'] = $quantity;
 			session(['cart' => $cart]);
 
-			// Calculate cart total
 			$cartTotal = $this->calculateCartTotal($cart);
 			session(['cart_total' => $cartTotal]);
 
@@ -124,6 +79,11 @@ class CartController extends Controller
 		}
 	}
 
+	/**
+	 * Очищает всю корзину
+	 *
+	 * @return RedirectResponse
+	 */
 	public function clear(): RedirectResponse
 	{
 		$this->cartService->removeAllItems();
@@ -131,11 +91,16 @@ class CartController extends Controller
 		return redirect()->route('cart.index');
 	}
 
-	//===============================
+	// ==============================================================
+	// Методы API
+	// ==============================================================
+
 	/**
-	 * Get cart data for API
+	 * Возвращает данные корзины для API
+	 *
+	 * @return JsonResponse
 	 */
-	public function getCart()
+	public function getCart(): JsonResponse
 	{
 		$cart = session('cart', []);
 		$cartTotal = $this->calculateCartTotal($cart);
@@ -149,9 +114,12 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Add item to cart via API
+	 * Добавляет товар в корзину через API
+	 *
+	 * @param Request $request
+	 * @return JsonResponse
 	 */
-	public function addItem(Request $request)
+	public function addItem(Request $request): JsonResponse
 	{
 		$request->validate([
 			'id' => 'required|exists:books,id',
@@ -161,17 +129,12 @@ class CartController extends Controller
 		$bookId = $request->id;
 		$quantity = $request->quantity;
 
-		// Get the book
 		$book = Book::findOrFail($bookId);
-
-		// Get current cart
 		$cart = session('cart', []);
 
-		// Check if book already in cart
 		if (isset($cart[$bookId])) {
 			$cart[$bookId]['quantity'] += $quantity;
 		} else {
-			// Add new item to cart
 			$cart[$bookId] = [
 				'id' => $book->id,
 				'title' => $book->title,
@@ -182,10 +145,8 @@ class CartController extends Controller
 			];
 		}
 
-		// Update session
 		session(['cart' => $cart]);
 
-		// Calculate cart total
 		$cartTotal = $this->calculateCartTotal($cart);
 		session(['cart_total' => $cartTotal]);
 
@@ -198,25 +159,24 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Remove item from cart via API
+	 * Удаляет товар из корзины через API
+	 *
+	 * @param Request $request
+	 * @return JsonResponse
 	 */
-	public function removeItem(Request $request)
+	public function removeItem(Request $request): JsonResponse
 	{
 		$request->validate([
 			'id' => 'required'
 		]);
 
 		$bookId = $request->id;
-
-		// Get current cart
 		$cart = session('cart', []);
 
-		// Remove item if exists
 		if (isset($cart[$bookId])) {
 			unset($cart[$bookId]);
 			session(['cart' => $cart]);
 
-			// Calculate cart total
 			$cartTotal = $this->calculateCartTotal($cart);
 			session(['cart_total' => $cartTotal]);
 
@@ -235,9 +195,12 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Calculate cart total
+	 * Подсчитывает итоговую сумму корзины
+	 *
+	 * @param array $cart
+	 * @return float
 	 */
-	private function calculateCartTotal($cart)
+	private function calculateCartTotal($cart): float
 	{
 		$total = 0;
 
