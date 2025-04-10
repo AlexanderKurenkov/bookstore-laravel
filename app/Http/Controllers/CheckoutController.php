@@ -46,38 +46,31 @@ class CheckoutController extends Controller
         return view('checkout', compact('user', 'cartItems', 'cartTotal'));
     }
 
-
     /**
-     * Show the invoice page.
+     * Отображает страницу счета (инвойса) после оформления заказа.
+     *
+     * Проверяет наличие идентификатора заказа в сессии.
+     * Если идентификатор отсутствует, выполняется редирект с сообщением об ошибке.
+     * После получения заказа идентификатор удаляется из сессии (одноразовый доступ).
+     *
+     * @return View|RedirectResponse Представление страницы счета или редирект при ошибке доступа
      */
     public function invoice(): View|RedirectResponse
     {
-        // Retrieve order ID from session
+        // Получение ID заказа из сессии
         $orderId = session('order_id');
 
-        // Prevent direct access
+        // Предотвращение прямого доступа без ID заказа
         if (!$orderId) {
-            return redirect()->route('checkout.index')->withErrors('Access denied.');
+            return redirect()->route('checkout.index')->withErrors('Доступ запрещён.');
         }
 
-        // Retrieve the order and remove it from session (one-time access)
+        // Получение заказа по ID и удаление ID из сессии (одноразовый доступ)
         $order = Order::find($orderId);
         session()->forget('order_id');
 
+        // Отображение представления счета с переданным заказом
         return view('invoice', compact('order'));
-    }
-
-    public function show(): View|RedirectResponse
-    {
-        // Получаем данные пользователя, если он авторизован
-        $user = Auth::user();
-        $result = $this->checkoutService->prepareCheckoutData($user);
-
-        if (isset($result['redirect'])) {
-            return redirect()->route('cart.index')->with($result['redirect']);
-        }
-
-        return view('checkout', $result);
     }
 
     /**

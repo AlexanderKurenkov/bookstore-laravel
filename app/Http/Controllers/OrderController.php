@@ -8,16 +8,24 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderController extends Controller
 {
+    /** @var OrderService Сервис для работы с заказами. */
     protected OrderService $orderService;
 
-    // Конструктор класса, принимает сервис заказов
+    /**
+     * Конструктор контроллера заказов.
+     *
+     * @param OrderService $orderService Сервис для управления заказами и возвратами.
+     */
     public function __construct(OrderService $orderService)
     {
         $this->orderService = $orderService;
     }
 
     /**
-     * Отображает форму возврата заказов.
+     * Отображает форму возврата для доставленных заказов пользователя.
+     *
+     * @param int $id ID пользователя (необязательно используется в методе)
+     * @return \Illuminate\View\View Представление с формой возврата.
      */
     public function edit($id)
     {
@@ -29,7 +37,10 @@ class OrderController extends Controller
     }
 
     /**
-     * Обрабатывает запрос на создание возврата.
+     * Обрабатывает форму возврата товара и создаёт соответствующую запись.
+     *
+     * @param Request $request HTTP-запрос, содержащий данные формы возврата.
+     * @return \Illuminate\Http\RedirectResponse Редирект на страницу подтверждения или обратно с ошибкой.
      */
     public function store(Request $request)
     {
@@ -67,6 +78,9 @@ class OrderController extends Controller
 
     /**
      * Отображает страницу подтверждения возврата.
+     *
+     * @param int $id ID возврата
+     * @return \Illuminate\View\View Представление с деталями возврата.
      */
     public function confirmation($id)
     {
@@ -78,7 +92,10 @@ class OrderController extends Controller
     }
 
     /**
-     * Отменяет заказ пользователя.
+     * Обрабатывает отмену заказа пользователя.
+     *
+     * @param Request $request HTTP-запрос с ID заказа и причиной отмены.
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse JSON-ответ (для AJAX) или редирект.
      */
     public function cancel(Request $request)
     {
@@ -114,7 +131,10 @@ class OrderController extends Controller
     }
 
     /**
-     * Возвращает список книг, содержащихся в заказе.
+     * Возвращает список книг, входящих в указанный заказ.
+     *
+     * @param int $orderId ID заказа
+     * @return \Illuminate\Http\JsonResponse JSON-ответ со списком книг.
      */
     public function getOrderBooks($orderId)
     {

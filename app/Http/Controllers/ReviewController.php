@@ -8,68 +8,58 @@ use Illuminate\Http\Request;
 use App\Services\ReviewService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
 
 class ReviewController extends Controller
 {
+	/**
+	 * Сервис для работы с отзывами
+	 *
+	 * @var ReviewService
+	 */
 	protected ReviewService $reviewService;
 
+	/**
+	 * Конструктор контроллера
+	 *
+	 * @param ReviewService $reviewService Сервис отзывов
+	 */
 	public function __construct(ReviewService $reviewService)
 	{
 		$this->reviewService = $reviewService;
 	}
 
-	public function show($id) //: View
+	/**
+	 * Сохраняет новый отзыв для книги
+	 *
+	 * @param Request $request HTTP-запрос с данными отзыва
+	 * @param int $id ID книги
+	 * @return RedirectResponse Ответ с перенаправлением назад
+	 */
+	public function store(Request $request, $id): RedirectResponse
 	{
-		// $reviews = $this->reviewService->getAllReviews($id);
-		// return view('reviews.index', compact('reviews'));
-
-		// $reviews = Book::findOrFail($id)->reviews()->paginate(10);
-		// return response()->json($reviews);
-		return $reviews;
-	}
-
-	// public function store(Request $request): RedirectResponse
-	// {
-	// 	$this->reviewService->createReview($request->user(), $request->all());
-	// 	return redirect()->back()->with('success', 'Review added successfully.');
-	// }
-	public function store(Request $request, $id)
-	{
-		// Validate request data
+		// Валидируем входные данные
 		$validated = $request->validate([
-			'rating' => 'required|integer|min:1|max:5',
-			'comment' => 'required|string|max:1000',
+			'rating' => 'required|integer|min:1|max:5', // Оценка от 1 до 5
+			'comment' => 'required|string|max:1000', // Обязательный текст отзыва (до 1000 символов)
 		]);
 
-		// Ensure the book exists
+		// Проверяем, существует ли книга
 		$book = Book::findOrFail($id);
 
-		// Prevent duplicate reviews (one user can only review a book once)
+		// Проверка: пользователь уже оставлял отзыв для этой книги?
 		if (Review::where('user_id', Auth::id())->where('book_id', $book->id)->exists()) {
 			return back()->with('error', 'Вы уже оставили отзыв для этой книги.');
 		}
 
-		// Create a new review
+		// Создаём новый отзыв
 		Review::create([
-			'user_id' => Auth::id(), // Get authenticated user ID
-			'book_id' => $book->id,
-			'rating' => $validated['rating'],
-			'review_comment' => $validated['comment'],
+			'user_id' => Auth::id(), // ID авторизованного пользователя
+			'book_id' => $book->id, // ID книги
+			'rating' => $validated['rating'], // Оценка
+			'review_comment' => $validated['comment'], // Комментарий
 		]);
 
+		// Возвращаем пользователя назад с сообщением об успехе
 		return back()->with('success', 'Ваш отзыв успешно добавлен.');
-	}
-
-	public function update(Request $request, int $id): RedirectResponse
-	{
-		$this->reviewService->updateReview($request->user(), $id, $request->all());
-		return redirect()->back()->with('success', 'Review updated successfully.');
-	}
-
-	public function destroy(Request $request, int $id): RedirectResponse
-	{
-		$this->reviewService->deleteReview($request->user(), $id);
-		return redirect()->back()->with('success', 'Review deleted successfully.');
 	}
 }

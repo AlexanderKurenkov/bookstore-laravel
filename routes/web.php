@@ -39,9 +39,11 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::delete('/', [CartController::class, 'clear'])->name('clear');
 });
 
-// No need to include {id} in the URL path for the profile routes because
-// profile belongs to the authenticated user.
+// ==============================================================
 // Защищенные маршруты.
+// ==============================================================
+// Нет необходимости указывать URL-параметр {id} для маршрутов профиля,
+// так как можно обратиться к авторизованному пользователю, используя фасад Auth или функцию-помощник auth().
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
@@ -54,24 +56,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     Route::prefix('reviews')->name('reviews.')->group(function () {
-        Route::get('/{id}', [ReviewController::class, 'index'])->name('index');
         Route::post('/{id}', [ReviewController::class, 'store'])->name('store');
-        Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
-        Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
+        // TODO
+        // Route::patch('/{id}', [ReviewController::class, 'update'])->name('update');
+        // Route::delete('/{id}', [ReviewController::class, 'destroy'])->name('destroy');
     });
 
     Route::prefix('checkout')->name('checkout.')->group(function () {
-        //TODO
         Route::get('/', [CheckoutController::class, 'index'])->name('index');
         Route::get('/invoice', [CheckoutController::class, 'invoice'])->name('invoice');
-
-        Route::get('/{cartId}', [CheckoutController::class, 'show'])->name('show');
         Route::post('/', [CheckoutController::class, 'process'])->name('process');
-
-        Route::post('/{cartId}', [CheckoutController::class, 'destroy'])->name('destroy');
     });
 
-    // Web routes
     Route::prefix('orders/returns')->name('orders.returns.')->group(function () {
         Route::get('/edit/{id}', [OrderController::class, 'edit'])->name('edit');
         Route::post('/', [OrderController::class, 'store'])->name('store');
@@ -79,21 +75,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::post('/orders/cancel', [OrderController::class, 'cancel'])->name('orders.cancel');
 
-    // API route for getting books from an order
+    // API-маршрут для получения книг из заказа
     Route::prefix('api')->group(function () {
-        Route::get('/orders/{orderId}/books', [OrderController::class, 'getOrderBooks'])
-            ->name('api.orders.books');
+        Route::get('/orders/{orderId}/books', [OrderController::class, 'getOrderBooks']);
     });
 });
 
+// ==============================================================
 // API-маршруты для динамического обновления корзины
+// ==============================================================
 Route::prefix('api/cart')->name('api.cart.')->group(function () {
     Route::get('/', [CartController::class, 'getCart'])->name('get');
     Route::post('/add', [CartController::class, 'addItem'])->name('add');
     Route::post('/remove', [CartController::class, 'removeItem'])->name('destroy');
 });
 
-// DEV
+// ==============================================================
+// Маршруты, доступные на этапе разработки
+// ==============================================================
 if (app()->environment('local')) {
     Route::get('/clear-session', function () {
         session()->flush();

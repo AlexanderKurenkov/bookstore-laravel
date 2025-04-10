@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use App\Services\CatalogService;
+use App\Services\ReviewService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\JsonResponse;
@@ -15,15 +16,19 @@ class CatalogController extends Controller
 {
     /** @var CatalogService Сервис для работы с каталогом книг */
     protected CatalogService $catalogService;
+    /** @var ReviewService Сервис для работы с отзывами */
+    protected ReviewService $reviewService;
 
     /**
      * Конструктор контроллера.
      *
      * @param CatalogService $catalogService Экземпляр сервиса каталога
+     * @param ReviewService $reviewService Экземпляр сервиса для работы с отзывами
      */
-    public function __construct(CatalogService $catalogService)
+    public function __construct(CatalogService $catalogService, ReviewService $reviewService)
     {
         $this->catalogService = $catalogService;
+        $this->reviewService = $reviewService;
     }
 
     /**
@@ -66,12 +71,20 @@ class CatalogController extends Controller
         // Получаем данные о книге по её ID
         $book = $this->catalogService->getBookById($id);
 
-        return view('catalog.book', compact('book'));
+        // Получаем рейтинг книги
+        $bookRating = $this->reviewService->getBookRating($book->id);
+        $ratingValue = $bookRating ? number_format($bookRating, 1) : null;
+
+        // Получаем количество отзывов
+        $reviewCount = $book->reviews->count();
+
+        // Возвращаем представление с книгой, рейтингом и количеством отзывов
+        return view('catalog.book', compact('book', 'ratingValue', 'reviewCount'));
     }
 
     // ==============================================================
-	// API methods
-	// ==============================================================
+    // API methods
+    // ==============================================================
     /**
      * Возвращает список избранных книг пользователя.
      *

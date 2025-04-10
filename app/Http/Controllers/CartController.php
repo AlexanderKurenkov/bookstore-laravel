@@ -7,10 +7,11 @@ use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
+/**
+ * Контроллер для управления корзиной товаров
+ */
 class CartController extends Controller
 {
 	/**
@@ -21,7 +22,7 @@ class CartController extends Controller
 	/**
 	 * Конструктор контроллера
 	 *
-	 * @param CartService $cartService
+	 * @param CartService $cartService Сервис корзины
 	 */
 	public function __construct(CartService $cartService)
 	{
@@ -31,7 +32,7 @@ class CartController extends Controller
 	/**
 	 * Отображает страницу корзины
 	 *
-	 * @return View
+	 * @return View Представление корзины
 	 */
 	public function index(): View
 	{
@@ -39,10 +40,10 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Удаляет товар из корзины и перенаправляет обратно на страницу корзины
+	 * Удаляет товар из корзины и делает редирект на страницу корзины
 	 *
-	 * @param Request $request
-	 * @return RedirectResponse
+	 * @param Request $request HTTP-запрос
+	 * @return RedirectResponse Редирект с флагом успешного удаления
 	 */
 	public function destroyItem(Request $request): RedirectResponse
 	{
@@ -53,9 +54,9 @@ class CartController extends Controller
 	/**
 	 * Обновляет количество товара в корзине
 	 *
-	 * @param Request $request
+	 * @param Request $request HTTP-запрос с новым количеством
 	 * @param int $id ID книги
-	 * @return RedirectResponse|null
+	 * @return RedirectResponse Редирект на страницу корзины
 	 */
 	public function updateItem(Request $request, int $id): RedirectResponse
 	{
@@ -69,9 +70,11 @@ class CartController extends Controller
 		$cart = session('cart', []);
 
 		if (isset($cart[$bookId])) {
+			// Обновляем количество
 			$cart[$bookId]['quantity'] = $quantity;
 			session(['cart' => $cart]);
 
+			// Пересчитываем общую сумму
 			$cartTotal = $this->calculateCartTotal($cart);
 			session(['cart_total' => $cartTotal]);
 
@@ -82,7 +85,7 @@ class CartController extends Controller
 	/**
 	 * Очищает всю корзину
 	 *
-	 * @return RedirectResponse
+	 * @return RedirectResponse Редирект на страницу корзины
 	 */
 	public function clear(): RedirectResponse
 	{
@@ -96,9 +99,9 @@ class CartController extends Controller
 	// ==============================================================
 
 	/**
-	 * Возвращает данные корзины для API
+	 * Возвращает содержимое корзины (API)
 	 *
-	 * @return JsonResponse
+	 * @return JsonResponse JSON-ответ с данными корзины
 	 */
 	public function getCart(): JsonResponse
 	{
@@ -114,10 +117,10 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Добавляет товар в корзину через API
+	 * Добавляет товар в корзину (API)
 	 *
-	 * @param Request $request
-	 * @return JsonResponse
+	 * @param Request $request HTTP-запрос с ID книги и количеством
+	 * @return JsonResponse JSON-ответ с обновлённой корзиной
 	 */
 	public function addItem(Request $request): JsonResponse
 	{
@@ -132,9 +135,11 @@ class CartController extends Controller
 		$book = Book::findOrFail($bookId);
 		$cart = session('cart', []);
 
+		// Если книга уже есть в корзине — увеличиваем количество
 		if (isset($cart[$bookId])) {
 			$cart[$bookId]['quantity'] += $quantity;
 		} else {
+			// Иначе — добавляем новую запись
 			$cart[$bookId] = [
 				'id' => $book->id,
 				'title' => $book->title,
@@ -147,6 +152,7 @@ class CartController extends Controller
 
 		session(['cart' => $cart]);
 
+		// Обновляем сумму
 		$cartTotal = $this->calculateCartTotal($cart);
 		session(['cart_total' => $cartTotal]);
 
@@ -159,10 +165,10 @@ class CartController extends Controller
 	}
 
 	/**
-	 * Удаляет товар из корзины через API
+	 * Удаляет товар из корзины (API)
 	 *
-	 * @param Request $request
-	 * @return JsonResponse
+	 * @param Request $request HTTP-запрос с ID книги
+	 * @return JsonResponse JSON-ответ об успешности операции
 	 */
 	public function removeItem(Request $request): JsonResponse
 	{
@@ -188,17 +194,18 @@ class CartController extends Controller
 			]);
 		}
 
+		// Если товар не найден
 		return response()->json([
 			'success' => false,
-			'message' => 'Item not found in cart'
+			'message' => 'Товар не найден в корзине'
 		], 404);
 	}
 
 	/**
-	 * Подсчитывает итоговую сумму корзины
+	 * Подсчитывает общую стоимость корзины
 	 *
-	 * @param array $cart
-	 * @return float
+	 * @param array $cart Массив товаров в корзине
+	 * @return float Общая сумма
 	 */
 	private function calculateCartTotal($cart): float
 	{
