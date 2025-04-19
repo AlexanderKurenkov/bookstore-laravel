@@ -195,7 +195,7 @@ CREATE TABLE card_payments (
     -- Год истечения срока действия (ГГГГ)
     card_expiry_year SMALLINT,
     -- Имя, указанное на карте
-    cardholder_name VARCHAR(255),
+    cardholder_name VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     payment_id BIGINT NOT NULL
@@ -223,7 +223,7 @@ DROP TABLE IF EXISTS deliveries;
 CREATE TABLE deliveries (
     id BIGSERIAL PRIMARY KEY,
     -- Название службы доставки.
-    courier VARCHAR(255),
+    courier VARCHAR(100),
     -- Номер для отслеживания, предоставленный курьером.
     tracking_number VARCHAR(50),
     -- Статус доставки: pending, shipped, in_transit, delivered, returned.

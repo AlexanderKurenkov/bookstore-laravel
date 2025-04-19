@@ -34,12 +34,12 @@ class SearchService
 
         // Применяем фильтр поиска
         if ($query) {
-$booksQuery->where(function (Builder $q) use ($query) {
-    $q->where('title', 'ILIKE', "%{$query}%")
-        ->orWhere('author', 'ILIKE', "%{$query}%")
-        ->orWhere('description', 'ILIKE', "%{$query}%")
-        ->orWhere('publisher', 'ILIKE', "%{$query}%");
-});
+            $booksQuery->where(function (Builder $q) use ($query) {
+                $q->where('title', 'ILIKE', "%{$query}%")
+                    ->orWhere('author', 'ILIKE', "%{$query}%")
+                    ->orWhere('description', 'ILIKE', "%{$query}%")
+                    ->orWhere('publisher', 'ILIKE', "%{$query}%");
+            });
         }
 
         // Применяем сортировку
