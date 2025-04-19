@@ -7,41 +7,50 @@ use App\Models\Review;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class ReviewService
 {
-    public function getAllReviews(int $id): Collection
+    /**
+     * Создаёт новый отзыв к книге от текущего авторизованного пользователя.
+     *
+     * @param array $validated Валидированные данные отзыва (оценка и комментарий)
+     * @param int $bookId ID книги, для которой создаётся отзыв
+     *
+     * @throws \Illuminate\Validation\ValidationException Если отзыв от этого пользователя для данной книги уже существует
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Если книга с указанным ID не найдена
+     *
+     * @return void
+     */
+    public function createReview(array $validated, int $bookId): void
     {
-        // return Review::latest()->get()->paginate(10); // latest() is a shortcut for orderBy('created_at', 'desc')
-        return Book::findOrFail($id)->reviews()->paginate(10);
-    }
+        // Проверка существования книги
+        $book = Book::findOrFail($bookId);
 
-    public function createReview(User $user, array $data) : Model
-    {
-        return $user->reviews()->create([
-            'book_id' => $data['book_id'],
-            'rating' => $data['rating'],
-            'comment' => $data['comment'],
+        // Проверка: пользователь уже оставлял отзыв
+        if (Review::where('user_id', Auth::id())->where('book_id', $book->id)->exists()) {
+            throw ValidationException::withMessages([
+                'duplicate' => 'Вы уже оставили отзыв для этой книги.',
+            ]);
+        }
+
+        // Создание отзыва
+        Review::create([
+            'user_id' => Auth::id(),
+            'book_id' => $book->id,
+            'rating' => $validated['rating'],
+            'review_comment' => $validated['comment'],
         ]);
     }
 
-    public function updateReview(User $user, int $id, array $data): bool
-    {
-        $review = $user->reviews()->findOrFail($id);
-
-        return $review->update([
-            'rating' => $data['rating'],
-            'comment' => $data['comment'],
-        ]);
-    }
-
-    public function deleteReview(User $user, int $id): bool
-    {
-        $review = $user->reviews()->findOrFail($id);
-        // Using type casting because Model::delete() returns bool|null.
-        return (bool)$review->delete();
-    }
-
+    /**
+     * Возвращает среднюю оценку книги по её отзывам.
+     *
+     * @param int $bookId ID книги, для которой необходимо вычислить среднюю оценку
+     *
+     * @return float|null Средняя оценка (округлённая до двух знаков после запятой) или null, если отзывов нет либо книга не найдена
+     */
     public function getBookRating(int $bookId): ?float
     {
         $book = Book::with('reviews')->find($bookId);
