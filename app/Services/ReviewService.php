@@ -4,9 +4,6 @@ namespace App\Services;
 
 use App\Models\Book;
 use App\Models\Review;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 

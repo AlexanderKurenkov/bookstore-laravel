@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Services;
@@ -11,23 +10,6 @@ use Illuminate\Support\Facades\Session;
 
 class CheckoutService
 {
-    public function prepareCheckoutData(User $user): array
-    {
-        $cartItems = $user->orders()->where('order_status', 'pending')->first()?->books() ?? collect();
-
-        if ($cartItems->isEmpty()) {
-            return ['redirect' => ['emptyCart' => true]];
-        }
-
-        foreach ($cartItems as $cartItem) {
-            if ($cartItem->pivot->quantity > $cartItem->quantity_in_stock) {
-                return ['redirect' => ['notEnoughStock' => true]];
-            }
-        }
-
-        return compact('cartItems', 'user');
-    }
-
     /**
      * Обрабатывает создание заказа.
      *
@@ -86,12 +68,5 @@ class CheckoutService
             'order' => $order,
             'estimatedDeliveryDate' => now()->addDays(3)->format('d.m.Y')
         ];
-    }
-
-
-    private function calculateTotal(User $user): mixed
-    {
-        $order = $user->orders()->where('order_status', 'pending')->first();
-        return $order?->books()->sum(fn($book) => $book->pivot->quantity * $book->pivot->price) ?? 0;
     }
 }

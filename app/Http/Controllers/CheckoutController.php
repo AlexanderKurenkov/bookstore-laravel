@@ -83,9 +83,9 @@ class CheckoutController extends Controller
      * после чего выполняется редирект на страницу счета (invoice).
      *
      * @param CheckoutProcessRequest $request Входящий HTTP-запрос с валидированными данными оформления заказа.
-     * @return View|RedirectResponse Представление страницы счета или редирект обратно на страницу оформления.
+     * @return RedirectResponse Редирект обратно на страницу оформления в случае неудачи или на страницу счета при успешном оформлении.
      */
-    public function process(CheckoutProcessRequest $request): View|RedirectResponse
+    public function process(CheckoutProcessRequest $request): RedirectResponse
     {
         // Получаем данные пользователя, если он авторизован
         $user = Auth::user();
