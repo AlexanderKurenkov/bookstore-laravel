@@ -32,12 +32,12 @@ class ProfileController extends Controller
         $this->profileService = $profileService;
     }
 
-/**
- * Отображает страницу редактирования профиля пользователя.
- *
- * @param Request $request HTTP-запрос.
- * @return View Представление профиля пользователя.
- */
+    /**
+     * Отображает страницу редактирования профиля пользователя.
+     *
+     * @param Request $request HTTP-запрос.
+     * @return View Представление профиля пользователя.
+     */
     public function index(Request $request): View
     {
         // TODO: Переместить логику в сервис
@@ -106,7 +106,6 @@ class ProfileController extends Controller
      */
     public function destroy(Request $request)
     {
-        // Валидация входных данных
         $request->validate([
             'password' => 'required',
             'confirm_deletion' => 'required|accepted',
@@ -114,7 +113,6 @@ class ProfileController extends Controller
 
         $user = Auth::user();
 
-        // Проверяем пароль пользователя
         if (!Hash::check($request->password, $user->password)) {
             if ($request->ajax()) {
                 return response()->json([
@@ -127,28 +125,16 @@ class ProfileController extends Controller
             ]);
         }
 
-        DB::beginTransaction();
-        try {
-            // Удаляем связанные данные (если требуется ручное удаление, иначе каскадное удаление)
-            // Удаляем пользователя
-            $user->delete();
+        $success = $this->profileService->deleteProfile($user, $request);
 
-            DB::commit();
-
-            // Разлогиниваем пользователя
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
+        if ($success) {
             if ($request->ajax()) {
                 return response()->json(['success' => true]);
             }
 
             return redirect()->route('index')
                 ->with('success', 'Ваш аккаунт был успешно удален.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-
+        } else {
             if ($request->ajax()) {
                 return response()->json([
                     'message' => 'Произошла ошибка при удалении аккаунта. Пожалуйста, попробуйте еще раз.'
