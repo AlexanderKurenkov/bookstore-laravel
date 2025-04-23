@@ -25,5 +25,8 @@
     "To the main page": "На главную",
     "All books": "Все книги",
     "Add to cart": "В корзину",
-    "Checkout": "Оформить"
+    "Checkout": "Оформить",
+    "Wrong credentials": "Указанны неверные учетные данные.",
+    "Email reset link": "Ссылка для сброса пароля была отправлена на почту.",
+    "Password reset": "Пароль был успешно изменен"
 }

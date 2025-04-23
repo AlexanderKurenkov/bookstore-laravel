@@ -2,7 +2,7 @@
     <div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+                <div class="card-header">{{ __('Reset password') }}</div>
 
                 <div class="card-body">
                     <form method="POST" action="{{ route('password.store') }}">
@@ -58,4 +58,4 @@
             </div>
         </div>
     </div>
-<x-layout>
+</x-layout>
