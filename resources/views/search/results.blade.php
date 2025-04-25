@@ -2,12 +2,35 @@
     <div class="container my-4">
         <!-- Search Results Header -->
         <div class="mb-4">
-            <h1 class="mb-2">Результаты поиска по запросу: <span class="text-primary">{{ request('query') }}</span></h1>
-            {{-- <p class="text-muted">
-                Найдено книг: {{ $books->total() }}
-            </p> --}}
+            <!-- <h1 class="mb-2">Результаты поиска по запросу: <span class="text-primary">{{ request('query') }}</span></h1> -->
+            <h1 class="mb-2">
+                Результаты поиска по запросу:
+                <span class="text-primary">{{ \Illuminate\Support\Str::limit(request('query'), 30, '...') }}</span>
+            </h1>
+
+
+            @if($errors->any())
+                <div class="text-center py-5">
+                    <i class="bi bi-search fs-1 text-muted"></i>
+                    <h3 class="mt-3">Ошибка</h3>
+                    <p class="text-muted mb-4">
+                        @foreach($errors->all() as $error)
+                            {{ $error }}
+                        @endforeach
+                    </p>
+                    <a href="{{ route('catalog.index') }}" class="btn btn-primary">Перейти в каталог</a>
+                </div>
+                <!-- <div class="alert alert-danger mb-4">
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div> -->
+            @endif
         </div>
 
+    @if(!$errors->any())
         <!-- Sorting Controls -->
         <div class="card mb-4">
             <div class="card-body">
@@ -69,6 +92,7 @@
                 {{ $books->appends(request()->except('page'))->links('pagination::bootstrap-5') }}
             </div>
         @endif
+    @endif
     </div>
 
     @push('head')

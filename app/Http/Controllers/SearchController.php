@@ -4,6 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Services\SearchService;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class SearchController extends Controller
@@ -26,10 +30,17 @@ class SearchController extends Controller
 	 * @param Request $request Запрос с параметрами поиска
 	 * @return View Представление с результатами поиска
 	 */
-	public function results(Request $request): View
+	public function results(Request $request): View|RedirectResponse
 	{
+		// Валидация поискового запроса
+		$validator = Validator::make($request->all(), [
+			'query' => 'nullable|string|max:50',
+		], [
+			'query.max' => 'Поисковый запрос не должен превышать 50 символов.',
+		]);
+
 		// Поисковый запрос
-		$query = $request->input('query');
+		$query = $validator->fails() ? "" : $request->input('query');
 		// Категория (если указана)
 		$categorySlug = $request->input('category');
 		// Тип сортировки (по умолчанию 'default')
@@ -38,6 +49,6 @@ class SearchController extends Controller
 		// Получаем список книг, соответствующих запросу
 		[$books, $category] = $this->searchService->searchBooks($query, $sort, $categorySlug);
 
-		return view('search.results', compact('books', 'category'));
+		return view('search.results', compact('books', 'category'))->withErrors($validator);;
 	}
 }
