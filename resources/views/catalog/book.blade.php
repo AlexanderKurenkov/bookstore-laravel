@@ -510,8 +510,8 @@
 
             if (writeReviewBtn) {
                 writeReviewBtn.addEventListener('click', function() {
-                    @if(auth() - > check())
-                    @if(!$book - > reviews - > contains('user_id', auth() - > id()))
+                    @if(auth()->check())
+                    @if(!$book-> reviews->contains('user_id', auth()->id()))
                     reviewFormContainer.style.display = 'block';
                     writeReviewBtn.style.display = 'none';
 
@@ -607,7 +607,7 @@
                     // Check if user is authenticated
                     const isAuthenticated = {
                         {
-                            auth() - > check() ? 'true' : 'false'
+                            auth()->check() ? 'true' : 'false'
                         }
                     };
 

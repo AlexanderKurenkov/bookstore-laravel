@@ -9,17 +9,17 @@ class DeliveryDetail extends Model
 {
 	protected $table = 'delivery_details';
 
-	// protected $fillable = [
-	// 	'user_id',
-	// 	'address_line1',
-	// 	'address_line2',
-	// 	'city',
-	// 	'state',
-	// 	'postal_code',
-	// 	'country',
-	// 	'phone',
-	// 	'user_comment'
-	// ];
+	protected $fillable = [
+		'user_id',
+		'address_line1',
+		'address_line2',
+		'city',
+		'state',
+		'postal_code',
+		'country',
+		'phone',
+		'user_comment'
+	];
 
 	// Relationship: DeliveryDetail belongs to a User
 	public function user(): BelongsTo

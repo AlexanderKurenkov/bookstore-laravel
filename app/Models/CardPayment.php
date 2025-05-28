@@ -9,14 +9,14 @@ class CardPayment extends Model
 {
     protected $table = 'card_payments';
 
-    // protected $fillable = [
-    //     'payment_id',
-    //     'card_type',
-    //     'card_last_four',
-    //     'card_expiry_month',
-    //     'card_expiry_year',
-    //     'cardholder_name'
-    // ];
+    protected $fillable = [
+        'payment_id',
+        'card_type',
+        'card_last_four',
+        'card_expiry_month',
+        'card_expiry_year',
+        'cardholder_name'
+    ];
 
     // Relationship: CardPayment belongs to a Payment
     public function payment(): BelongsTo

@@ -31,12 +31,12 @@ class Payment extends Model
 		'payment_method' => 'string'
 	];
 
-	// protected $fillable = [
-	// 	'amount',
-	// 	'transaction_id',
-	// 	'payment_status',
-	// 	'order_id'
-	// ];
+	protected $fillable = [
+		'amount',
+		'transaction_id',
+		'payment_status',
+		'order_id'
+	];
 
 	public function order(): BelongsTo
 	{

@@ -9,15 +9,15 @@ class Delivery extends Model
 {
     protected $table = 'deliveries';
 
-    // protected $fillable = [
-    //     'order_id',
-    //     'courier',
-    //     'tracking_number',
-    //     'delivery_status',
-    //     'shipped_at',
-    //     'expected_delivery',
-    //     'delivered_at'
-    // ];
+    protected $fillable = [
+        'order_id',
+        'courier',
+        'tracking_number',
+        'delivery_status',
+        'shipped_at',
+        'expected_delivery',
+        'delivered_at'
+    ];
 
     // Relationship: Delivery belongs to an Order
     public function order(): BelongsTo
