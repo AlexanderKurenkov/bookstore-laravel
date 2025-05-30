@@ -6,6 +6,12 @@ use App\Models\Book;
 use App\Models\Order;
 use App\Models\User;
 
+/**
+ * Сервис для управления корзиной пользователя.
+ *
+ * Предоставляет методы для удаления отдельных товаров из корзины,
+ * полной очистки корзины, а также обновления общей суммы заказа.
+ */
 class CartService
 {
 	public function removeCartItem(User $user, int $bookId): bool
