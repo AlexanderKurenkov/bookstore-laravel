@@ -29,8 +29,8 @@
 ### Отмена заказа и возврат товара
 
 <p align="center">
-<img src="images/order_cancellation.jpg" alt="Отмена заказа" width="300" style="vertical-align: top; margin-right: 10px;">
-<img src="images/order_cancellation_confirmation.jpg" alt="Отмена заказа" width="300" style="vertical-align: top; margin-right: 10px;">
+<img src="images/order_cancellation.jpg" alt="Отмена заказа" width="250" style="vertical-align: top; margin-right: 10px;">
+<img src="images/order_cancellation_confirmation.jpg" alt="Отмена заказа" width="1500" style="vertical-align: top; margin-right: 10px;">
 </p>
 <p align="center">
 <img src="images/return.jpg" alt="Возврат товара" width="400" style="vertical-align: top; margin-right: 10px;">
