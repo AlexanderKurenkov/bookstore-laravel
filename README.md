@@ -39,12 +39,14 @@
 
 ### Личный кабинет пользователя
 
-<p align="center">
-<img src="images/profile_data.jpg" alt="Данные пользователя" width="300" style="vertical-align: top; margin-right: 10px;">
-<img src="images/profile_orders.jpg" alt="Список заказов" width="300" style="vertical-align: top; margin-right: 10px;">
-<img src="images/profile_security.jpg" alt="Редактирование профиля" width="300" style="vertical-align: top; margin-right: 10px;">
-<img src="images/profile_wishlist.jpg" alt="Список избранного" width="300" style="vertical-align: top; margin-right: 10px;">
-</p>
+<table align="center">
+  <tr>
+    <td><img src="images/profile_data.jpg" alt="Данные пользователя" width="250"></td>
+    <td><img src="images/profile_orders.jpg" alt="Список заказов" width="250"></td>
+    <td><img src="images/profile_security.jpg" alt="Редактирование профиля" width="250"></td>
+    <td><img src="images/profile_wishlist.jpg" alt="Список избранного" width="250"></td>
+  </tr>
+</table>
 
 ## Требования
 
