@@ -4,15 +4,17 @@
 
 ### Каталог книг
 <p align="center">
-<img src="images/main_page.png" alt="Главная страница" height="600" style="vertical-align: top; margin-right: 10px;">
-<img src="images/book.png" alt="Пример страницы" height="600" style="vertical-align: top; margin-right: 10px;">
+<img src="images/main_page.png" alt="Главная страница" height="600">
+<img src="images/book.png" alt="Пример страницы" height="600">
 </p>
 
 ### Поиск и фильтры в каталоге
-<p align="center">
-<img src="images/search_results.jpg" alt="Результаты поиска" width="400" style="vertical-align: top; margin-right: 10px;">
-<img src="images/search_empty.jpg" alt="Отсутствие результатов поиска" width="400" style="vertical-align: top; margin-right: 10px;">
-</p>
+<table align="center">
+<tr>
+<td><img src="images/search_results.jpg" alt="Результаты поиска" width="400"></td>
+<td><img src="images/search_empty.jpg" alt="Отсутствие результатов поиска" width="400"></td>
+</tr>
+</table>
 
 ### Функционал корзины
 
@@ -21,21 +23,23 @@
 </p>
 
 ### Оформление заказа
-<p align="center">
-<img src="images/checkout.png" alt="Оформление заказа" width="300" style="vertical-align: top; margin-right: 10px;">
-<img src="images/checkout_invoice.png" alt="Подтверждение оформления заказа" width="300" style="vertical-align: top; margin-right: 10px;">
-</p>
+<table align="center">
+<tr>
+<td><img src="images/checkout.png" alt="Оформление заказа" width="300"></td>
+<td><img src="images/checkout_invoice.png" alt="Подтверждение оформления заказа" width="300"></td>
+</tr>
+</table>
 
 ### Отмена заказа и возврат товара
 
-<p align="center">
-<img src="images/order_cancellation.jpg" alt="Отмена заказа" width="300" style="vertical-align: top; margin-right: 10px;">
-<img src="images/order_cancellation_confirmation.jpg" alt="Отмена заказа" width="300" style="vertical-align: top; margin-right: 10px;">
-</p>
-<p align="center">
-<img src="images/return.jpg" alt="Возврат товара" width="400" style="vertical-align: top; margin-right: 10px;">
-<img src="images/return_confirmed.jpg" alt="Подтверждение возврата" width="400" style="vertical-align: top; margin-right: 10px;">
-</p>
+<table align="center">
+<tr>
+<td><img src="images/order_cancellation.jpg" alt="Отмена заказа" width="300"></td>
+<td><img src="images/order_cancellation_confirmation.jpg" alt="Отмена заказа" width="300"></td>
+<td><img src="images/return.jpg" alt="Возврат товара" width="400"></td>
+<td><img src="images/return_confirmed.jpg" alt="Подтверждение возврата" width="400"></td>
+</tr>
+</table>
 
 ### Личный кабинет пользователя
 
