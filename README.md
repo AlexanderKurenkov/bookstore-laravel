@@ -1,5 +1,11 @@
 # Книжный магазин на Laravel
 
+## ER-диаграмма (PostgreSQL)
+<p align="center">
+<img src="images/er-diagram-physical.png" alt="ER-диаграмма (PostgreSQL)" width="1200">
+</p>
+
+
 ## Функционал
 
 ### Каталог книг
