@@ -5,6 +5,11 @@
 <img src="images/er-diagram-physical.png" alt="ER-диаграмма (PostgreSQL)" width="1200">
 </p>
 
+## UML-диаграмма классов (этап проектирования)
+<p align="center">
+<img src="images/uml-class-diagram.png" alt="UML-диаграмма классов" width="800">
+</p>
+
 
 ## Функционал
 
